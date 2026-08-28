@@ -6,7 +6,7 @@ Display name: **PM3-Strategy Engine** (never shortened to “PM3”)
 
 ## 1. Git commit hash
 
-`1ff43a40cc4f91ff0e9dfd9b124b3e9d0306dd10` (short `1ff43a4`).
+`86197302f7e6a4c4c83772a58fbe3a10529c7c48` (short `8619730`). Sequence 04 kernel commit on `main`.
 
 ## 2. Created / updated files
 
