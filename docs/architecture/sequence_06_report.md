@@ -6,10 +6,9 @@ Display name: **PM4 Risk Gate** (Adaptive Risk Allocation / Kill-Switch)
 
 ## 1. Git commit hash
 
-This App Builder workspace has no `.git` directory. Sequence 05 landed on
-`scfrlight/GrokBuildapprepoFX` as `8cfdc3d3006305b2cf7e4a7bd4b7aa2944e45bdf`.
-Sequence 06 is complete in the workspace and is the next commit to push to that
-repo. Short placeholder until push: **uncommitted Sequence 06 kernel**.
+This App Builder workspace has no `.git` directory. Sequence 06 landed on
+`scfrlight/GrokBuildapprepoFX` as `aa8f79eb4f47321fb24edf9a59618c2edd54f2eb`.
+Docs follow-up records that hash.
 
 ## 2. Created / updated files
 
