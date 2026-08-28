@@ -37,7 +37,7 @@ def _env_key(field: str) -> str:
 # Alias env keys used in the Sequence 02 spec (enable_* names).
 _ALIAS_ENV = {
     "market_data": "BOTMODULEPROJECT1_FEATURE__ENABLE_PM2_MARKET_DATA",
-    "strategy_engine": "BOTMODULEPROJECT1_FEATURE__ENABLE_STRATEGY_ENGINE",
+    "strategy_engine": "BOTMODULEPROJECT1_FEATURE__ENABLE_PM3_STRATEGY_ENGINE",
     "forecasting": "BOTMODULEPROJECT1_FEATURE__ENABLE_FORECASTING",
     "risk_engine": "BOTMODULEPROJECT1_FEATURE__ENABLE_PM4_RISK_GATE",
     "execution": "BOTMODULEPROJECT1_FEATURE__ENABLE_PM5_EXECUTION",
@@ -64,10 +64,10 @@ FEATURE_FLAG_CATALOG: tuple[FeatureFlagSpec, ...] = (
         env_key=_ALIAS_ENV["market_data"],
     ),
     FeatureFlagSpec(
-        name="enable_strategy_engine",
+        name="enable_pm3_strategy_engine",
         field="strategy_engine",
-        description="PM3-Strategy Engine. Not implemented.",
-        allowed_profiles=_NON_LIVE,
+        description="PM3-Strategy Engine. Env opt-in; test and research only. TradeIntent only, never orders.",
+        allowed_profiles=(ProfileName.TEST, ProfileName.RESEARCH),
         safety=SafetyClassification.REQUIRES_REVIEW,
         env_key=_ALIAS_ENV["strategy_engine"],
     ),
@@ -187,6 +187,8 @@ def env_opt_in_fields(environ: Mapping[str, str]) -> dict[str, bool]:
     found: dict[str, bool] = {}
     for spec in FEATURE_FLAG_CATALOG:
         keys = (_env_key(spec.field), spec.env_key)
+        if spec.field == "strategy_engine":
+            keys = keys + ("BOTMODULEPROJECT1_FEATURE__ENABLE_STRATEGY_ENGINE",)
         for key in keys:
             if key in environ and str(environ[key]).strip() != "":
                 found[spec.field] = _parse_bool(str(environ[key]))

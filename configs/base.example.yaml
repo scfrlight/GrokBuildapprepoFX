@@ -97,3 +97,23 @@ pm2:
   one_per_cluster: true
   ghost_tracking: true
   telemetry: true
+
+# PM3-Strategy Engine knobs. Flag stays false. Observe-only. Not orders.
+pm3_strategy_engine:
+  operating_mode: shadow
+  max_active_branches: 3
+  require_handoff_eligibility: true
+  universe:
+    - EURUSD
+    - GBPUSD
+    - USDJPY
+    - AUDUSD
+  enabled_templates:
+    - trend_pullback
+    - orb_session_breakout
+    - mean_reversion
+  go_threshold: 0.55
+  edge_margin: 0.10
+  min_selected_votes: 1
+  conflict_no_trade: 0.35
+  stale_ttl_hours: 4

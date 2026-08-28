@@ -1,11 +1,11 @@
 # Architecture Baseline — BotModuleProject1
 
-Status: Accepted for Sequence 00; PM1 kernel Sequence 01; config governance Sequence 02; PM2 market context Sequence 03  
+Status: Accepted for Sequence 00; PM1 kernel Sequence 01; config governance Sequence 02; PM2 market context Sequence 03; PM3-Strategy Engine Sequence 04  
 Date (UTC): 2026-08-28  
 Scope: EURUSD on MT5 Demo, expandable to additional FX symbols  
-Trading readiness: **not ready**. No strategy, risk, execution, or live path is implemented.
+Trading readiness: **not ready**. PM3-Strategy Engine emits analytical TradeIntent only. No risk ALLOW, execution, or live path is implemented.
 
-This document is the Sequence 00 source of truth for structure, bounded contexts, and safety invariants. Sequence 01 implemented the composition root and v1 contracts against this baseline. Sequence 02 added profiles, pydantic-settings, feature flags, and preflight. Sequence 03 implemented PM2 as a ranking/context layer behind `enable_pm2_market_data` (test/research env opt-in). The module map is unchanged.
+This document is the Sequence 00 source of truth for structure, bounded contexts, and safety invariants. Sequence 01 implemented the composition root and v1 contracts against this baseline. Sequence 02 added profiles, pydantic-settings, feature flags, and preflight. Sequence 03 implemented PM2 as a ranking/context layer behind `enable_pm2_market_data` (test/research env opt-in). Sequence 04 implemented the **PM3-Strategy Engine** behind `enable_pm3_strategy_engine` (test/research env opt-in; TradeIntent is not an order). The module map is unchanged.
 
 
 ## 1. Target monorepo structure
@@ -30,7 +30,7 @@ GrokBuildapprepoFX / workspace
 │   │   └── filesystem/
 │   ├── modules/                # Bounded-context packages
 │   │   ├── pm2_market_context/
-│   │   ├── pm3_strategy_engine/
+│   │   ├── pm3_strategy_engine/  # Sequence 04 kernel (flag off)
 │   │   ├── pm3_forecasting/
 │   │   ├── pm4_risk/
 │   │   ├── pm5_execution/
@@ -74,7 +74,7 @@ Python composition root lives at `botmoduleproject1/app`, not workspace-root `ap
 |---|---|---|
 | Platform / bootstrap | `app` + `runtime` (PM1) | Composition root, DI, lifecycle, registry, health, config contracts |
 | Market context | `modules/pm2_market_context` (PM2) | Universe scan, regime, confluence, ranking, suppression, publication. No orders. |
-| PM3-Strategy Engine | `modules/pm3_strategy_engine` | Templates, profiles, registry, symbol pipes, consensus, TradeIntent |
+| PM3-Strategy Engine | `modules/pm3_strategy_engine` | Templates, profiles, registry, symbol pipes, consensus, TradeIntent (Sequence 04 kernel, flag off) |
 | Forecasting | `modules/pm3_forecasting` (PM3 ML) | QRF / uncertainty / conformal calibration — not the Strategy Engine |
 | Risk | `modules/pm4_risk` (PM4) | Allocation, sizing, heat, drawdown governor, kill-switch. **Sole final gate** |
 | Execution | `modules/pm5_execution` (PM5) | OMS/EMS, broker reconciliation, routing, exit lifecycle |
@@ -128,7 +128,7 @@ Rules:
 |---|---|---|
 | 01 / PM1 | Contract-first domain foundation, composition root | `contracts`, `app`, `runtime` |
 | PM2 | Market data + session + regime | `MarketSnapshot`, `SessionContext`, `RegimeState` |
-| PM3-Strategy Engine | TradeIntent production | `TradeIntent` contract only |
+| PM3-Strategy Engine | TradeIntent production (Sequence 04 kernel; not an order) | `TradeIntent` / `NoTradeDecision` |
 | PM3 forecasting | Enrichment of intents | `ForecastEnvelope` attached to intent, never an order |
 | PM4 | RiskVerdict | Exclusive permission object consumed by PM5 |
 | PM5 | Execution | Accepts only `(TradeIntent, RiskVerdict=ALLOW)` |

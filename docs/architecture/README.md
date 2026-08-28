@@ -9,3 +9,6 @@
 - [Sequence 01 report](./sequence_01_report.md)
 - [Sequence 02 report](./sequence_02_report.md)
 - [Sequence 03 report](./sequence_03_report.md)
+- [Sequence 04 report](./sequence_04_report.md)
+- [PM3-Strategy Engine integration plan](./pm3_strategy_engine_integration_plan.md)
+- [PM3-Strategy Engine test traceability](./pm3_strategy_engine_test_traceability.md)

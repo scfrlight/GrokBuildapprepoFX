@@ -36,6 +36,16 @@ def _market_data_module(settings: Settings, overrides: dict[str, Any], clock: Cl
     return NullMarketData()
 
 
+def _strategy_engine_module(settings: Settings, overrides: dict[str, Any], clock: ClockPort):
+    if "signals" in overrides:
+        return overrides["signals"]
+    if settings.feature_flags.strategy_engine:
+        from botmoduleproject1.modules.pm3_strategy_engine.module import PM3StrategyEngineModule
+
+        return PM3StrategyEngineModule.from_settings(settings, clock)
+    return NullSignals()
+
+
 @dataclass
 class Container:
     settings: Settings
@@ -71,7 +81,7 @@ def build_container(
     builtins = [
         overrides.get("platform") or PlatformHealth(),
         _market_data_module(settings, overrides, clock),
-        overrides.get("signals") or NullSignals(),
+        _strategy_engine_module(settings, overrides, clock),
         overrides.get("forecasting") or NullModel(),
         overrides.get("risk") or NullRiskGate(),
         overrides.get("execution") or DisabledExecution(),

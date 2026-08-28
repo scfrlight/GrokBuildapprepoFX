@@ -11,6 +11,7 @@ from botmoduleproject1.contracts.v1 import (
     ExposureSnapshot,
     ForecastOutput,
     JournalEntry,
+    NoTradeDecision,
     OhlcvBar,
     OrderRequest,
     PublicationBundle,
@@ -215,6 +216,19 @@ class NullSignals:
 
     def latest_signal(self, symbol: str) -> SignalEvent | None:
         return None
+
+    def evaluate_publication(self, bundle: PublicationBundle):
+        return ()
+
+    def evaluate_candidate(self, candidate) -> NoTradeDecision:
+        as_of = getattr(candidate, "as_of", utc_now())
+        symbol = getattr(candidate, "symbol", "UNKNOWN")
+        return NoTradeDecision(
+            symbol=symbol,
+            reason="pm3_strategy_engine_placeholder",
+            as_of=as_of,
+            diagnostics={"enabled": False},
+        )
 
 
 class NullMonitoring:

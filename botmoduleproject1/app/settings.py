@@ -200,6 +200,25 @@ class Pm2Section(BaseModel):
 
 
 
+class Pm3StrategySection(BaseModel):
+    """Public PM3-Strategy Engine knobs. Enabling is a feature flag, not this block."""
+
+    operating_mode: str = "shadow"
+    max_active_branches: int = Field(default=3, ge=1, le=3)
+    require_handoff_eligibility: bool = True
+    universe: tuple[str, ...] = ("EURUSD", "GBPUSD", "USDJPY", "AUDUSD")
+    enabled_templates: tuple[str, ...] = (
+        "trend_pullback",
+        "orb_session_breakout",
+        "mean_reversion",
+    )
+    go_threshold: float = Field(default=0.55, ge=0.0, le=1.0)
+    edge_margin: float = Field(default=0.10, ge=0.0, le=1.0)
+    min_selected_votes: int = Field(default=1, ge=1, le=3)
+    conflict_no_trade: float = Field(default=0.35, ge=0.0, le=1.0)
+    stale_ttl_hours: int = Field(default=4, ge=1, le=48)
+
+
 class MappingSource(PydanticBaseSettingsSource):
     """Inject a precomputed nested mapping as a settings source."""
 
@@ -346,6 +365,7 @@ class Settings(BaseSettings):
     diagnostics: DiagnosticsSection = Field(default_factory=DiagnosticsSection)
     paths: PathsSection = Field(default_factory=PathsSection)
     pm2: Pm2Section = Field(default_factory=Pm2Section)
+    pm3_strategy_engine: Pm3StrategySection = Field(default_factory=Pm3StrategySection)
     profile: ProfileName = ProfileName.DEMO
     cli_mode: str = "doctor"
     config_path: str | None = None

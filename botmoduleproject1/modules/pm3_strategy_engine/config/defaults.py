@@ -1,0 +1,3 @@
+from botmoduleproject1.modules.pm3_strategy_engine.config.schema import Pm3StrategyEngineConfig
+
+DEFAULT_PM3_STRATEGY_ENGINE_CONFIG = Pm3StrategyEngineConfig()

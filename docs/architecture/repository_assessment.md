@@ -69,6 +69,22 @@ Traceability:
 
 Original filename `PM2_Master_Prompt.md` was not found on Drive/GitHub. Sequence 03 treats the embedded spec as source of truth for this stage.
 
+## 3d. Sequence 04 inputs
+
+PM3-Strategy Engine was **not** recovered from an external `PM3_Strategy_Engine_Master_Prompt.md`.
+It was supplied in full inside the Sequence 04 user prompt on 2026-08-28.
+
+Traceability:
+
+| Input | Source | Persisted as |
+|---|---|---|
+| PM3-Strategy Engine spec | Sequence 04 prompt (complete) | `docs/prompts/PM3_Strategy_Engine_Sequence04_Prompt.md` |
+| Integration plan (pre-implementation) | Sequence 04 section 3 | `docs/architecture/pm3_strategy_engine_integration_plan.md` |
+| Feature flag `enable_pm3_strategy_engine` | Sequence 02 catalog, renamed/narrowed | test + research env opt-in only |
+| TradeIntent / consensus contracts | Sequence 04 sections 11–13 | `contracts/v1/strategy.py` + `strategy_engine.py` |
+
+Original `PM3_Strategy_Engine_Master_Prompt.md` was not found on Drive/GitHub. Sequence 04 treats the embedded spec as source of truth. Forecasting/QRF remains a different module.
+
 ## 3. Sequence 01 inputs
 
 PM1 specification and Contract-First Domain Foundation were **not** recovered from an external master-prompt file. They were supplied in full inside the Sequence 01 user prompt on 2026-08-28.

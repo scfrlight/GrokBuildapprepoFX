@@ -1,0 +1,34 @@
+# PM3-Strategy Engine public knobs. Feature flag stays false.
+# Does not enable orders, risk bypass, or live trading.
+
+operating_mode: shadow
+max_active_branches: 3
+require_handoff_eligibility: true
+universe:
+  - EURUSD
+  - GBPUSD
+  - USDJPY
+  - AUDUSD
+enabled_templates:
+  - trend_pullback
+  - orb_session_breakout
+  - mean_reversion
+disabled_templates:
+  - liquidity_sweep_reversal
+  - volatility_squeeze_breakout
+weights:
+  historical_reliability: 0.35
+  regime_fit: 0.25
+  setup_quality: 0.20
+  friction_fit: 0.10
+  recent_live_health: 0.10
+thresholds:
+  go_threshold: 0.55
+  edge_margin: 0.10
+  min_selected_votes: 1
+  conflict_no_trade: 0.35
+calibration_policy: reliability_table
+stale_ttl_hours: 4
+signal_expiry_hours: 4
+observe_only: true
+audit_events: true
