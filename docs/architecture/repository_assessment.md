@@ -1,4 +1,4 @@
-# Repository Assessment — Sequence 00
+# Repository Assessment — Sequence 00 + Sequence 01
 
 Date (UTC): 2026-08-28  
 Assessor: BotModuleProject1 architecture baseline
@@ -7,12 +7,12 @@ Assessor: BotModuleProject1 architecture baseline
 
 | Location | State | Role |
 |---|---|---|
-| Grok App Builder `/workspace` | TanStack Start scaffold; no Python trading code | Preview host + this baseline |
-| [scfrlight/GrokBuildapprepoFX](https://github.com/scfrlight/GrokBuildapprepoFX) | Empty private repo created 2026-08-28, description `Fxtrade` | Designated git home |
+| Grok App Builder `/workspace` | TanStack Start scaffold + Sequence 01 kernel | Preview host + this baseline |
+| [scfrlight/GrokBuildapprepoFX](https://github.com/scfrlight/GrokBuildapprepoFX) | Sequence 00 committed (`002fdee`); Sequence 01 overlay | Designated git home |
 | [scfrlight/FXTGBOT](https://github.com/scfrlight/FXTGBOT) | Legacy V6/V7 scanner monolith | Reference only — do not copy structure |
 | [scfrlight/V8-bot-Jules-1](https://github.com/scfrlight/V8-bot-Jules-1) | Audit notes + config fragment | Reference only |
 | [scfrlight/ForexTG](https://github.com/scfrlight/ForexTG), [Forex-TG](https://github.com/scfrlight/Forex-TG) | Empty | Unused |
-| Google Drive | No PM master prompts found | Gap |
+| Google Drive | No PM master prompts found | Gap (partially closed in Sequence 01) |
 
 ## 2. Mandatory source files (Sequence 00)
 
@@ -21,7 +21,7 @@ Searched in `/workspace`, GitHub (user `scfrlight`), and Google Drive.
 | Required file | Found |
 |---|---|
 | `Grok_Build_Master_Orchestration_Prompt.md` | No |
-| `PM1_Master_Prompt.md` | No |
+| `PM1_Master_Prompt.md` | **Yes — Sequence 01** (`docs/prompts/PM1_Master_Prompt.md`) |
 | `PM2_Master_Prompt.md` | No |
 | `PM3_Master_Prompt.md` | No |
 | `PM3_Strategy_Engine_Master_Prompt.md` | No |
@@ -33,12 +33,27 @@ Searched in `/workspace`, GitHub (user `scfrlight`), and Google Drive.
 | `PM8a_Build_Spec.md` | No |
 | `PM9_Operator_UX_Telegram_Control_Engine_Master_Prompt.md` | No |
 | `PM9a_Strategy_Fine_Tune_Studio_Master_Prompt.md` | No |
-| `requirements.txt` | Not in this repo (legacy FXTGBOT has one) |
+| `requirements.txt` | Yes (this repo; bootstrap set) |
 | `# PM1–PM9a Modular Forex Trading Bot — Installation & Setup Guide.md` | No |
 
-**Impact:** Sequence 00 proceeds from the normalized module map embedded in the Sequence 00 prompt itself. Sequence 01 must reconcile if the original PM prompts are later added under `docs/prompts/`.
+**Impact:** Sequence 00 proceeded from the normalized module map embedded in the Sequence 00 prompt. Sequence 01 received the PM1 spec and Contract-First Domain Foundation **inline in the Sequence 01 prompt**, not as a pre-existing Drive/GitHub file. That inline spec is now persisted at `docs/prompts/PM1_Master_Prompt.md`.
 
-## 3. Current workspace (before Sequence 00 writes)
+## 3. Sequence 01 inputs
+
+PM1 specification and Contract-First Domain Foundation were **not** recovered from an external master-prompt file. They were supplied in full inside the Sequence 01 user prompt on 2026-08-28.
+
+Traceability:
+
+| Input | Source | Persisted as |
+|---|---|---|
+| PM1 Platform Bootstrap spec | Sequence 01 prompt, section 3 | `docs/prompts/PM1_Master_Prompt.md` |
+| Contract-First Domain Foundation | Sequence 01 prompt, section 4 | same file, plus `botmoduleproject1/contracts/v1/` |
+| Safety rules | Sequence 01 prompt, section 1 (same as Seq 00) | ADRs 001–007 (unchanged) |
+| PM2–PM9a master prompts | still missing | `docs/prompts/README.md` |
+
+No original `PM1_Master_Prompt.md` from Drive/GitHub was available to reconcile against. Sequence 01 therefore treats the embedded spec as the source of truth for this stage. Later sequences must reconcile if the original PM files appear.
+
+## 4. Current workspace (before Sequence 00 writes)
 
 Present (App Builder template, left intact):
 
@@ -55,7 +70,7 @@ Absent before Sequence 00:
 
 No `.env` with secrets was present. No local databases or MT5 terminal files were present.
 
-## 4. Legacy FXTGBOT (do not import as the architecture)
+## 5. Legacy FXTGBOT (do not import as the architecture)
 
 Observed traits that Sequence 00 explicitly rejects as the target shape:
 
@@ -74,7 +89,7 @@ Useful lessons retained as *principles*, not code:
 - Health endpoint and doctor-style checks
 - V8 audit: fail closed on costs, avoid M5 as a decision TF, purged CV for ML, correlation-aware heat
 
-## 5. Files that must never enter git
+## 6. Files that must never enter git
 
 - `.env`, `.env.local`, any file matching `*.pem`, `*.key`
 - `.venv/`, `__pycache__/`, caches, coverage
@@ -84,7 +99,7 @@ Useful lessons retained as *principles*, not code:
 - Generated scans, ledgers, model binaries unless explicitly versioned in a registry path
 - `node_modules/`
 
-## 6. Requirements assessment (legacy vs target)
+## 7. Requirements assessment (legacy vs target)
 
 Legacy FXTGBOT `requirements.txt`:
 
@@ -98,16 +113,18 @@ fake-useragent, textblob, pytz, flask, yfinance, pytest>=8.0
 |---|---|
 | Duplicates | None obvious; overlapping HTTP stack (`requests` vs future `httpx`) |
 | Windows / MT5 | `MetaTrader5` **does not install on Linux**. Must be an extra, never a hard dependency in this sandbox |
-| Python version | Legacy README says 3.10+; target is **3.11+** for `tomllib`, `utc`, typing |
+| Python version | Legacy README says 3.10+; target is **3.11+** for `tomllib`, `utc`, typing. Sandbox pytest currently runs on 3.10.21 with a 3.11 interpreter present but without pip |
 | Missing for target architecture | pydantic-settings, PyYAML, structlog, sqlalchemy/asyncpg (later), alembic (later), tenacity, orjson, pytest-asyncio, ruff, mypy |
 | Do not carry forward by default | flask dashboard, yfinance, fake-useragent, textblob, vader, feedparser, pandas_ta (revisit in PM2/PM3) |
 
-New `requirements.txt` in this repo is a **bootstrap set only** (config, typing, tests, logging). No MT5, no Telegram bot SDK, no ML stack until the owning sequence.
+`requirements.txt` remains a **bootstrap set** (config, typing, tests, logging). No MT5, no Telegram bot SDK, no ML stack until the owning sequence.
 
-## 7. Conflicts to watch
+## 8. Conflicts to watch
 
-1. **PM3 naming:** `PM3_Master_Prompt.md` is forecasting; “PM3-Strategy Engine” is a different module. Packages are `pm3_forecasting` vs `pm3_strategy_engine`.
+1. **PM3 naming:** `PM3_Master_Prompt.md` is forecasting; “PM3-Strategy Engine” is a different module. Packages are `pm3_forecasting` vs `pm3_strategy_engine`. Sequence 01 keeps separate contract namespaces (`contracts.v1.strategy` vs `contracts.v1.forecasting`) and separate stub modules.
 2. **PM8 vs PM8a:** spec vs runtime. Only `pm8_persistence` is a package.
 3. **`app/` path:** nested under `botmoduleproject1/app` to avoid web-bundler `app/` convention.
 4. **Auth/DB in App Builder:** remain OFF. Do not reuse `src/lib/db.ts` for the trading ledger.
 5. **Legacy user id in FXTGBOT `.env.example`:** treat as a hygiene defect; placeholders only here.
+6. **Settings vs pydantic-settings:** Sequence 01 uses Pydantic `BaseModel` with explicit YAML + env overlay rather than `BaseSettings` auto-env, to avoid ambient env pollution. `pydantic-settings` remains a declared dependency for Sequence 02 governance.
+7. **Readiness vs doctor boot:** `NullRiskGate` fails critical READINESS (fail-closed). Diagnostic boot uses `fail_on_critical=False` on readiness so `doctor` can still produce a DEGRADED snapshot. Orders remain impossible.

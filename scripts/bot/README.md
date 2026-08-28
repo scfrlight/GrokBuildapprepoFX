@@ -1,8 +1,14 @@
 # Operator scripts
 
-Sequence 00: no scripts. Future entries (PM1+):
+## Windows
 
-- `doctor.py` — non-trading diagnostics
-- `print-config.py` — redacted config snapshot
+`start.bat` activates `.venv` if present and runs `python -m botmoduleproject1`.
 
-Never put tokens in argv or logs. Never send orders from this folder.
+```text
+scripts\bot\start.bat doctor --config configs\test.example.yaml
+scripts\bot\start.bat live
+```
+
+`live` is recognized and refused. Logs append to `logs\platform.*.log`.
+
+Never put tokens on the command line. Never send orders from this folder.

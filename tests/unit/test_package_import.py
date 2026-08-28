@@ -1,4 +1,4 @@
-"""Sequence 00: package imports and safety defaults."""
+"""Sequence 00/01: package imports and safety defaults."""
 
 from botmoduleproject1 import (
     DEFAULT_TRADING_MODE,
@@ -7,8 +7,8 @@ from botmoduleproject1 import (
 )
 
 
-def test_version_is_sequence_zero() -> None:
-    assert __version__ == "0.0.0"
+def test_version_is_sequence_one() -> None:
+    assert __version__ == "0.1.0"
 
 
 def test_live_trading_disabled_by_default() -> None:

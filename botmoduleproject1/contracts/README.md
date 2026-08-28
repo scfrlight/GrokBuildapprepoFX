@@ -1,5 +1,13 @@
-# `contracts` — versioned integration language (placeholder)
+# `contracts` — versioned integration language
 
-Sequence 01 will add v1 schemas: EventEnvelope, TradeIntent, RiskVerdict, RuntimeMode, etc.
+Current schema: **v1** (`botmoduleproject1.contracts.v1`).
 
-Other packages depend on this package; this package must not depend on adapters or modules.
+Namespaces:
+
+- `strategy` — **PM3-Strategy Engine** (`TradeIntent`, …)
+- `forecasting` — PM3 QRF / uncertainty (`ForecastOutput`, …)
+
+These are different modules. Do not merge them.
+
+UTC-first. Naive datetime is rejected. Commands carry `idempotency_key`.
+`OrderRequest.risk_verdict_id` is required (ADR-007).

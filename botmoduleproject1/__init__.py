@@ -1,8 +1,20 @@
-"""BotModuleProject1 package.
+"""BotModuleProject1 platform kernel.
 
-Sequence 00 skeleton. No trading logic. Live trading disabled.
+Sequence 01: contracts + PM1 composition root.
+Not trade-ready. Live trading is disabled.
 """
 
-__version__ = "0.0.0"
+from botmoduleproject1.app.exceptions import LiveTradingDisabledError
+from botmoduleproject1.app.settings import load_settings
+
+__version__ = "0.1.0"
 LIVE_TRADING_ENABLED_DEFAULT = False
 DEFAULT_TRADING_MODE = "demo"
+
+__all__ = [
+    "DEFAULT_TRADING_MODE",
+    "LIVE_TRADING_ENABLED_DEFAULT",
+    "LiveTradingDisabledError",
+    "__version__",
+    "load_settings",
+]

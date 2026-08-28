@@ -1,20 +1,20 @@
-# Master prompts (source-of-truth, not found at Sequence 00)
+# Master prompts (source-of-truth)
 
-Place the following files here when available. Sequence 01 should reconcile contracts against them.
+| File | Status |
+|---|---|
+| `PM1_Master_Prompt.md` | Present — Sequence 01 (prompt persisted in full) |
+| `Grok_Build_Master_Orchestration_Prompt.md` | Missing |
+| `PM2_Master_Prompt.md` | Missing |
+| `PM3_Master_Prompt.md` | Missing (forecasting) |
+| `PM3_Strategy_Engine_Master_Prompt.md` | Missing (not forecasting) |
+| `PM4_Master_Prompt.md` | Missing |
+| `PM5_Master_Prompt.md` | Missing |
+| `PM6_Master_Prompt.md` | Missing |
+| `PM7_Master_Prompt.md` | Missing |
+| `PM8_Master_Prompt.md` | Missing |
+| `PM8a_Build_Spec.md` | Missing |
+| `PM9_Operator_UX_Telegram_Control_Engine_Master_Prompt.md` | Missing |
+| `PM9a_Strategy_Fine_Tune_Studio_Master_Prompt.md` | Missing |
+| `# PM1–PM9a Modular Forex Trading Bot — Installation & Setup Guide.md` | Missing |
 
-- Grok_Build_Master_Orchestration_Prompt.md
-- PM1_Master_Prompt.md
-- PM2_Master_Prompt.md
-- PM3_Master_Prompt.md
-- PM3_Strategy_Engine_Master_Prompt.md
-- PM4_Master_Prompt.md
-- PM5_Master_Prompt.md
-- PM6_Master_Prompt.md
-- PM7_Master_Prompt.md
-- PM8_Master_Prompt.md
-- PM8a_Build_Spec.md
-- PM9_Operator_UX_Telegram_Control_Engine_Master_Prompt.md
-- PM9a_Strategy_Fine_Tune_Studio_Master_Prompt.md
-- `# PM1–PM9a Modular Forex Trading Bot — Installation & Setup Guide.md`
-
-Until they arrive, the normalized map in `docs/architecture/architecture_baseline.md` is authoritative.
+Until the remaining files arrive, the normalized map in `docs/architecture/architecture_baseline.md` plus `PM1_Master_Prompt.md` is authoritative for Sequence 01.

@@ -1,11 +1,12 @@
 # Architecture Baseline — BotModuleProject1
 
-Status: Accepted for Sequence 00  
+Status: Accepted for Sequence 00; **PM1 kernel implemented in Sequence 01**  
 Date (UTC): 2026-08-28  
 Scope: EURUSD on MT5 Demo, expandable to additional FX symbols  
 Trading readiness: **not ready**. No strategy, risk, execution, or live path is implemented.
 
-This document is the Sequence 00 source of truth for structure, bounded contexts, and safety invariants. Implementation of PM1 begins only after this baseline is accepted.
+This document is the Sequence 00 source of truth for structure, bounded contexts, and safety invariants. Sequence 01 implemented the composition root and v1 contracts against this baseline. It did not change the module map or ADRs.
+
 
 ## 1. Target monorepo structure
 
