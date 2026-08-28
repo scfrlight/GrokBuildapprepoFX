@@ -13,6 +13,7 @@ from botmoduleproject1.contracts.v1 import (
     JournalEntry,
     OhlcvBar,
     OrderRequest,
+    PublicationBundle,
     RiskRejectionReason,
     RiskVerdict,
     RiskVerdictStatus,
@@ -58,6 +59,16 @@ class NullMarketData:
 
     def latest_bar(self, symbol: str, timeframe: Timeframe) -> OhlcvBar | None:
         return None
+
+    def scan(self, as_of=None) -> PublicationBundle:
+        from botmoduleproject1.contracts.v1.time import utc_now as _now
+
+        when = as_of or _now()
+        return PublicationBundle(
+            as_of=when,
+            diagnostics_summary={"enabled": False, "reason": "placeholder"},
+            health_summary={"pm2": "disabled"},
+        )
 
     def health_checks(self, kind: CheckKind) -> list[CheckResult]:
         return [

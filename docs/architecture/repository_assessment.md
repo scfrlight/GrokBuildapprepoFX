@@ -53,6 +53,22 @@ Traceability:
 
 No original PM2–PM9a files were present. Sequence 02 does not implement those modules.
 
+## 3c. Sequence 03 inputs
+
+PM2 Market Context Engine was **not** recovered from an external `PM2_Master_Prompt.md`.
+It was supplied in full inside the Sequence 03 user prompt on 2026-08-28.
+
+Traceability:
+
+| Input | Source | Persisted as |
+|---|---|---|
+| PM2 Market Context Engine spec | Sequence 03 prompt (complete) | `docs/prompts/PM1_Sequence03_PM2_MarketContext_Prompt.md` |
+| Feature flag `enable_pm2_market_data` | Sequence 02 catalog, narrowed in Sequence 03 | test + research env opt-in only |
+| Output contracts | Sequence 03 section 10 | `botmoduleproject1/contracts/v1/pm2.py` |
+| Folder structure | Sequence 03 section 15 | `botmoduleproject1/modules/pm2_market_context/` |
+
+Original filename `PM2_Master_Prompt.md` was not found on Drive/GitHub. Sequence 03 treats the embedded spec as source of truth for this stage.
+
 ## 3. Sequence 01 inputs
 
 PM1 specification and Contract-First Domain Foundation were **not** recovered from an external master-prompt file. They were supplied in full inside the Sequence 01 user prompt on 2026-08-28.

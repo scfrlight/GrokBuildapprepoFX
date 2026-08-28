@@ -58,8 +58,8 @@ FEATURE_FLAG_CATALOG: tuple[FeatureFlagSpec, ...] = (
     FeatureFlagSpec(
         name="enable_pm2_market_data",
         field="market_data",
-        description="PM2 market data / session / regime (not implemented).",
-        allowed_profiles=_NON_LIVE,
+        description="PM2 market context / regime / ranking. Env opt-in; test and research only.",
+        allowed_profiles=(ProfileName.TEST, ProfileName.RESEARCH),
         safety=SafetyClassification.REQUIRES_REVIEW,
         env_key=_ALIAS_ENV["market_data"],
     ),

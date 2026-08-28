@@ -26,6 +26,16 @@ from botmoduleproject1.app.stubs import (
 )
 
 
+def _market_data_module(settings: Settings, overrides: dict[str, Any], clock: ClockPort):
+    if "market_data" in overrides:
+        return overrides["market_data"]
+    if settings.feature_flags.market_data:
+        from botmoduleproject1.modules.pm2_market_context.module import PM2Module
+
+        return PM2Module.from_settings(settings, clock)
+    return NullMarketData()
+
+
 @dataclass
 class Container:
     settings: Settings
@@ -60,7 +70,7 @@ def build_container(
 
     builtins = [
         overrides.get("platform") or PlatformHealth(),
-        overrides.get("market_data") or NullMarketData(),
+        _market_data_module(settings, overrides, clock),
         overrides.get("signals") or NullSignals(),
         overrides.get("forecasting") or NullModel(),
         overrides.get("risk") or NullRiskGate(),

@@ -8,6 +8,7 @@ Date (UTC): 2026-08-28
 ```text
 Market Data
   → Session / Regime
+  → PM2 Confluence / Rank (PublicationBundle)
   → Signal
   → PM3-Strategy Engine TradeIntent
   → Forecast / QRF Enrichment
@@ -22,6 +23,7 @@ Market Data
 Hard cuts in this flow:
 
 - A `Signal` is not an order.
+- A `RankedCandidate` is not an order.
 - A `TradeIntent` is not an order.
 - A forecast does not create or mutate an intent's side; it only enriches uncertainty fields.
 - PM5 is unreachable without `RiskVerdict.status == ALLOW`.
@@ -33,7 +35,7 @@ Hard cuts in this flow:
 | Module | Inputs | Outputs | Depends on | Criticality | Failure types |
 |---|---|---|---|---|---|
 | PM1 platform | Config, clock, env | Process, registry, health | contracts, runtime | Startup-critical | Config error → halt |
-| PM2 market context | Broker ticks/bars, calendar | MarketSnapshot, SessionContext, RegimeState | contracts, MT5 adapter (future) | Ready-critical | Stale data → observe-only |
+| PM2 market context | Synthetic/broker bars, calendar | PublicationBundle (shortlist/watchlist/suppressed), RankedCandidate, regime | contracts, synthetic feed (MT5 adapter later) | Ready-critical (non-fatal if flag off) | Stale data → no shortlist; observe-only |
 | PM3-Strategy Engine | Snapshot, regime, profiles | TradeIntent | contracts, PM2 | Decision-critical | Invalid profile → skip symbol, no orders |
 | PM3 forecasting | Intent, features | ForecastEnvelope | contracts, model registry | Degraded-ok | Model missing → intent unmarked, risk must fail closed |
 | PM4 risk | Intent, portfolio, ledger | RiskVerdict | contracts, PM7/PM8 reads | Execution-critical | Any doubt → DENY + halt/observe-only |

@@ -1,0 +1,23 @@
+# PM2 public knobs. Does NOT enable the engine.
+# YAML default for enable_pm2_market_data stays false (see base.example.yaml).
+# Activate only in test/research via:
+#   BOTMODULEPROJECT1_FEATURE__ENABLE_PM2_MARKET_DATA=true
+# Live trading remains disabled. PM2 never sends orders.
+
+pm2:
+  universe:
+    - EURUSD
+    - GBPUSD
+    - USDJPY
+    - AUDUSD
+  timeframes:
+    - M15
+    - H1
+    - H4
+  decision_timeframe: H1
+  lookback_bars: 64
+  operating_mode: shadow
+  ranking_mode: deterministic
+  one_per_cluster: true
+  ghost_tracking: true
+  telemetry: true

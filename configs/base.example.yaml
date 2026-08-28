@@ -78,3 +78,22 @@ notifications:
 paths:
   log_dir: logs
   data_dir: data/local
+
+# PM2 knobs. The engine stays off until env opt-in in test/research.
+pm2:
+  universe:
+    - EURUSD
+    - GBPUSD
+    - USDJPY
+    - AUDUSD
+  timeframes:
+    - M15
+    - H1
+    - H4
+  decision_timeframe: H1
+  lookback_bars: 64
+  operating_mode: shadow
+  ranking_mode: deterministic
+  one_per_cluster: true
+  ghost_tracking: true
+  telemetry: true

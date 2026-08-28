@@ -15,6 +15,7 @@ from botmoduleproject1.contracts.v1 import (
     JournalEntry,
     OhlcvBar,
     OrderRequest,
+    PublicationBundle,
     RiskVerdict,
     SignalEvent,
     Timeframe,
@@ -43,6 +44,9 @@ class HealthCheckProvider(Protocol):
 @runtime_checkable
 class MarketDataProvider(Protocol):
     def latest_bar(self, symbol: str, timeframe: Timeframe) -> OhlcvBar | None:
+        ...
+
+    def scan(self, as_of: datetime | None = None) -> PublicationBundle:
         ...
 
 

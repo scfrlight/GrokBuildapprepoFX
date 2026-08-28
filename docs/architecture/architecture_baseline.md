@@ -1,11 +1,11 @@
 # Architecture Baseline — BotModuleProject1
 
-Status: Accepted for Sequence 00; PM1 kernel Sequence 01; config governance Sequence 02  
+Status: Accepted for Sequence 00; PM1 kernel Sequence 01; config governance Sequence 02; PM2 market context Sequence 03  
 Date (UTC): 2026-08-28  
 Scope: EURUSD on MT5 Demo, expandable to additional FX symbols  
 Trading readiness: **not ready**. No strategy, risk, execution, or live path is implemented.
 
-This document is the Sequence 00 source of truth for structure, bounded contexts, and safety invariants. Sequence 01 implemented the composition root and v1 contracts against this baseline. Sequence 02 added profiles, pydantic-settings, feature flags, and preflight. It did not change the module map.
+This document is the Sequence 00 source of truth for structure, bounded contexts, and safety invariants. Sequence 01 implemented the composition root and v1 contracts against this baseline. Sequence 02 added profiles, pydantic-settings, feature flags, and preflight. Sequence 03 implemented PM2 as a ranking/context layer behind `enable_pm2_market_data` (test/research env opt-in). The module map is unchanged.
 
 
 ## 1. Target monorepo structure
@@ -22,6 +22,7 @@ GrokBuildapprepoFX / workspace
 │   ├── infrastructure/         # Cross-cutting infra helpers
 │   ├── adapters/               # Outbound I/O only
 │   │   ├── mt5/
+│   │   ├── market/             # synthetic confirmed-bar feed (Sequence 03)
 │   │   ├── persistence/
 │   │   ├── telegram/
 │   │   ├── notifications/
@@ -72,7 +73,7 @@ Python composition root lives at `botmoduleproject1/app`, not workspace-root `ap
 | Context | Package | Responsibility |
 |---|---|---|
 | Platform / bootstrap | `app` + `runtime` (PM1) | Composition root, DI, lifecycle, registry, health, config contracts |
-| Market context | `modules/pm2_market_context` (PM2) | Market data, session, regime, market snapshot |
+| Market context | `modules/pm2_market_context` (PM2) | Universe scan, regime, confluence, ranking, suppression, publication. No orders. |
 | PM3-Strategy Engine | `modules/pm3_strategy_engine` | Templates, profiles, registry, symbol pipes, consensus, TradeIntent |
 | Forecasting | `modules/pm3_forecasting` (PM3 ML) | QRF / uncertainty / conformal calibration — not the Strategy Engine |
 | Risk | `modules/pm4_risk` (PM4) | Allocation, sizing, heat, drawdown governor, kill-switch. **Sole final gate** |

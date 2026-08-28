@@ -9,6 +9,7 @@ from pydantic import BaseModel, ConfigDict, Field
 
 class Capability(str, Enum):
     MARKET_DATA = "market_data"
+    REGIME_DETECTION = "regime_detection"
     SIGNALS = "signals"
     FORECASTING = "forecasting"
     RISK_GATING = "risk_gating"

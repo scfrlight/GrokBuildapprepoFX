@@ -185,6 +185,21 @@ class PathsSection(BaseModel):
     data_dir: str = "data/local"
 
 
+class Pm2Section(BaseModel):
+    """Public PM2 knobs. Enabling the engine is a feature flag, not this block."""
+
+    universe: tuple[str, ...] = ("EURUSD", "GBPUSD", "USDJPY", "AUDUSD")
+    timeframes: tuple[str, ...] = ("M15", "H1", "H4")
+    decision_timeframe: str = "H1"
+    lookback_bars: int = 64
+    operating_mode: str = "shadow"
+    ranking_mode: str = "deterministic"
+    one_per_cluster: bool = True
+    ghost_tracking: bool = True
+    telemetry: bool = True
+
+
+
 class MappingSource(PydanticBaseSettingsSource):
     """Inject a precomputed nested mapping as a settings source."""
 
@@ -330,6 +345,7 @@ class Settings(BaseSettings):
     health: HealthSection = Field(default_factory=HealthSection)
     diagnostics: DiagnosticsSection = Field(default_factory=DiagnosticsSection)
     paths: PathsSection = Field(default_factory=PathsSection)
+    pm2: Pm2Section = Field(default_factory=Pm2Section)
     profile: ProfileName = ProfileName.DEMO
     cli_mode: str = "doctor"
     config_path: str | None = None

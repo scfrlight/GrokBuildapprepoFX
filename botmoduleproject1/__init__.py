@@ -1,6 +1,6 @@
 """BotModuleProject1 platform kernel.
 
-Sequence 02: configuration, secrets, bootstrap governance.
+Sequence 03: PM2 market context (flag default-off).
 Not trade-ready. Live trading is disabled. Python 3.11+ required.
 """
 

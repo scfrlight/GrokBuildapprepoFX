@@ -18,6 +18,7 @@ class SessionName(str, Enum):
     NEW_YORK = "new_york"
     OVERLAP_LONDON_NY = "overlap_london_ny"
     OFF_SESSION = "off_session"
+    ROLLOVER = "rollover"
 
 
 class SessionContext(ContractModel):
@@ -25,6 +26,7 @@ class SessionContext(ContractModel):
     sessions: tuple[SessionName, ...] = ()
     is_weekend: bool = False
     is_holiday: bool = False
+    quality: float = Field(default=0.5, ge=0.0, le=1.0)
 
     @field_validator("as_of")
     @classmethod
@@ -35,6 +37,10 @@ class SessionContext(ContractModel):
 class RegimeType(str, Enum):
     TRENDING = "trending"
     RANGING = "ranging"
+    VOLATILE = "volatile"
+    COMPRESSION = "compression"
+    TRANSITIONAL = "transitional"
+    UNTRADEABLE = "untradeable"
     NEUTRAL = "neutral"
     UNKNOWN = "unknown"
 
@@ -45,6 +51,7 @@ class RegimeState(ContractModel):
     confidence: float = Field(ge=0.0, le=1.0)
     as_of: datetime
     method: str = "unspecified"
+    persistence_bars: int = 0
 
     @field_validator("as_of")
     @classmethod
