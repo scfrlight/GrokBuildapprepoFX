@@ -2,7 +2,7 @@
 
 Date (UTC): 2026-08-28  
 Project: BotModuleProject1  
-Git: `scfrlight/GrokBuildapprepoFX`  
+Git: `scfrlight/GrokBuildapprepoFX` (`b160932` on `main`)  
 Package version: `0.1.0`
 
 **The system is not ready for trading, demo trading, paper trading, or production. Live trading is disabled.**
@@ -153,7 +153,7 @@ Interpreter note: `requires-python = ">=3.11"`. Sandbox pytest ran on CPython 3.
 | Settings vs `BaseSettings` | Explicit YAML+env overlay on `BaseModel` to avoid ambient env binding. Sequence 02 may tighten governance. |
 | Diagnostic boot is DEGRADED | `NullRiskGate.is_ready() is False`; readiness is fail-closed. Doctor still starts so operators can inspect. No orders. |
 | App Builder `src/lib/db` | Unused. Auth/DB remain OFF. Console is observe-only. |
-| Sandbox `.git` missing after revive | Git home is GitHub; Sequence 01 is pushed as an overlay on `002fdee`. |
+| Sandbox `.git` missing after revive | Git home is GitHub; Sequence 01 committed as `b160932` on `main`. |
 | `pydantic-settings` declared but Settings is `BaseModel` | Intentional. Dependency kept for Sequence 02. |
 
 ## 6. Build gate result

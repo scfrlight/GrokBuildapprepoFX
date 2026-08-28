@@ -8,7 +8,7 @@ Assessor: BotModuleProject1 architecture baseline
 | Location | State | Role |
 |---|---|---|
 | Grok App Builder `/workspace` | TanStack Start scaffold + Sequence 01 kernel | Preview host + this baseline |
-| [scfrlight/GrokBuildapprepoFX](https://github.com/scfrlight/GrokBuildapprepoFX) | Sequence 00 committed (`002fdee`); Sequence 01 overlay | Designated git home |
+| [scfrlight/GrokBuildapprepoFX](https://github.com/scfrlight/GrokBuildapprepoFX) | Sequence 00 `002fdee`; Sequence 01 `b160932` | Designated git home |
 | [scfrlight/FXTGBOT](https://github.com/scfrlight/FXTGBOT) | Legacy V6/V7 scanner monolith | Reference only — do not copy structure |
 | [scfrlight/V8-bot-Jules-1](https://github.com/scfrlight/V8-bot-Jules-1) | Audit notes + config fragment | Reference only |
 | [scfrlight/ForexTG](https://github.com/scfrlight/ForexTG), [Forex-TG](https://github.com/scfrlight/Forex-TG) | Empty | Unused |
