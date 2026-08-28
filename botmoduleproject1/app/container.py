@@ -76,6 +76,16 @@ def _execution_module(settings: Settings, overrides: dict[str, Any], clock: Cloc
     return DisabledExecution()
 
 
+def _monitoring_module(settings: Settings, overrides: dict[str, Any], clock: ClockPort):
+    if "monitoring" in overrides:
+        return overrides["monitoring"]
+    if getattr(settings.feature_flags, "pm6_post_trade", False):
+        from botmoduleproject1.modules.pm6_post_trade.module import PM6PostTradeModule
+
+        return PM6PostTradeModule.from_settings(settings, clock)
+    return NullMonitoring()
+
+
 @dataclass
 class Container:
     settings: Settings
@@ -117,7 +127,7 @@ def build_container(
         _execution_module(settings, overrides, clock),
         overrides.get("storage") or NullStorage(),
         overrides.get("notifications") or NullNotifications(),
-        overrides.get("monitoring") or NullMonitoring(),
+        _monitoring_module(settings, overrides, clock),
     ]
 
     # Always ensure platform metadata is known even if caller replaced instance.

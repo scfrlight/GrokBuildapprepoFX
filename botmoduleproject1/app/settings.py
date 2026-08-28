@@ -345,6 +345,43 @@ class Pm5ExecutionSection(BaseModel):
         return value
 
 
+class Pm6PostTradeSection(BaseModel):
+    """Public PM6 knobs. Enabling is a feature flag, not this block."""
+
+    operating_mode: str = "shadow"
+    observe_only: bool = True
+    freshness_ttl_seconds: int = Field(default=300, ge=1)
+    stale_ttl_seconds: int = Field(default=14400, ge=60)
+    alert_dedup_seconds: int = Field(default=60, ge=1)
+    incident_correlation_seconds: int = Field(default=300, ge=1)
+    submit_burst: int = Field(default=8, ge=1)
+    reject_burst: int = Field(default=6, ge=1)
+    burst_window_seconds: int = Field(default=60, ge=1)
+    silence_seconds: int = Field(default=600, ge=1)
+    require_withdrawal_approval: bool = True
+    require_withdrawal_confirmation: bool = True
+    auto_rearm: bool = False
+    auto_complete_withdrawal: bool = False
+    mt5_enabled: bool = False
+    broker_commands: bool = False
+    durable: bool = False
+    telemetry_verbose: bool = True
+
+    @field_validator("auto_rearm")
+    @classmethod
+    def _no_auto_rearm(cls, value: bool) -> bool:
+        if value:
+            raise ValueError("pm6_post_trade.auto_rearm must stay false")
+        return value
+
+    @field_validator("mt5_enabled", "broker_commands", "durable", "auto_complete_withdrawal")
+    @classmethod
+    def _no_unsafe(cls, value: bool) -> bool:
+        if value:
+            raise ValueError("PM6 cannot enable MT5, broker commands, durable store, or auto-complete withdrawal")
+        return value
+
+
 class MappingSource(PydanticBaseSettingsSource):
     """Inject a precomputed nested mapping as a settings source."""
 
@@ -495,6 +532,7 @@ class Settings(BaseSettings):
     pm3_forecasting: Pm3ForecastingSection = Field(default_factory=Pm3ForecastingSection)
     pm4_risk_gate: Pm4RiskGateSection = Field(default_factory=Pm4RiskGateSection)
     pm5_execution: Pm5ExecutionSection = Field(default_factory=Pm5ExecutionSection)
+    pm6_post_trade: Pm6PostTradeSection = Field(default_factory=Pm6PostTradeSection)
     profile: ProfileName = ProfileName.DEMO
     cli_mode: str = "doctor"
     config_path: str | None = None

@@ -24,6 +24,8 @@ def test_catalog_has_required_stubs() -> None:
     assert "enable_pm5_simulation" in names
     assert "enable_pm5_broker_adapter" in names
     assert "enable_live_execution" in names
+    assert "enable_pm6_post_trade" in names
+    assert "enable_pm6_surveillance" in names
     assert "enable_telegram_control" in names
     dangerous = [s for s in FEATURE_FLAG_CATALOG if s.safety is SafetyClassification.DANGEROUS]
     assert dangerous

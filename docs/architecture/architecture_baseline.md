@@ -1,11 +1,11 @@
 # Architecture Baseline — BotModuleProject1
 
-Status: Accepted for Sequence 00; PM1 kernel Sequence 01; config governance Sequence 02; PM2 market context Sequence 03; PM3-Strategy Engine Sequence 04; PM3 forecasting / QRF Sequence 05; PM4 Risk Gate Sequence 06; PM5 Execution Sequence 07  
+Status: Accepted for Sequence 00; PM1 kernel Sequence 01; config governance Sequence 02; PM2 market context Sequence 03; PM3-Strategy Engine Sequence 04; PM3 forecasting / QRF Sequence 05; PM4 Risk Gate Sequence 06; PM5 Execution Sequence 07; PM6 Post-Trade Sequence 08  
 Date (UTC): 2026-08-28  
 Scope: EURUSD on MT5 Demo, expandable to additional FX symbols  
-Trading readiness: **not ready**. PM3-Strategy Engine emits analytical TradeIntent only. PM3 forecasting / QRF may attach a ForecastOutput envelope. PM4 may ALLOW a risk-governed handoff. That ALLOW is not an order. PM5 may shadow-record an OMS lifecycle in simulation. It does not send to MT5. No live path is implemented.
+Trading readiness: **not ready**. PM3-Strategy Engine emits analytical TradeIntent only. PM3 forecasting / QRF may attach a ForecastOutput envelope. PM4 may ALLOW a risk-governed handoff. That ALLOW is not an order. PM5 may shadow-record an OMS lifecycle in simulation. It does not send to MT5. PM6 may observe PM4/PM5, raise incidents, and plan orderly withdrawal. It does not send orders, size risk, or invent broker truth. No live path is implemented.
 
-This document is the Sequence 00 source of truth for structure, bounded contexts, and safety invariants. Sequence 01 implemented the composition root and v1 contracts against this baseline. Sequence 02 added profiles, pydantic-settings, feature flags, and preflight. Sequence 03 implemented PM2 as a ranking/context layer behind `enable_pm2_market_data` (test/research env opt-in). Sequence 04 implemented the **PM3-Strategy Engine** behind `enable_pm3_strategy_engine` (test/research env opt-in; TradeIntent is not an order). Sequence 05 implemented **PM3 forecasting / QRF** behind `enable_forecasting` (demo/test/research env opt-in; ForecastOutput is not an order; residual quantile envelope, not a fitted QRF). Sequence 06 implemented the **PM4 Risk Gate** behind `enable_pm4_risk_gate` (test/research env opt-in; ALLOW is not an order). Sequence 07 implemented **PM5 Execution** behind `enable_pm5_simulation` (test/research env opt-in; simulation only; `DisabledExecution` default). The module map is unchanged.
+This document is the Sequence 00 source of truth for structure, bounded contexts, and safety invariants. Sequence 01 implemented the composition root and v1 contracts against this baseline. Sequence 02 added profiles, pydantic-settings, feature flags, and preflight. Sequence 03 implemented PM2 as a ranking/context layer behind `enable_pm2_market_data` (test/research env opt-in). Sequence 04 implemented the **PM3-Strategy Engine** behind `enable_pm3_strategy_engine` (test/research env opt-in; TradeIntent is not an order). Sequence 05 implemented **PM3 forecasting / QRF** behind `enable_forecasting` (demo/test/research env opt-in; ForecastOutput is not an order; residual quantile envelope, not a fitted QRF). Sequence 06 implemented the **PM4 Risk Gate** behind `enable_pm4_risk_gate` (test/research env opt-in; ALLOW is not an order). Sequence 07 implemented **PM5 Execution** behind `enable_pm5_simulation` (test/research env opt-in; simulation only; `DisabledExecution` default). Sequence 08 implemented **PM6 Post-Trade** behind `enable_pm6_post_trade` (test/research env opt-in; observe-only; `NullMonitoring` default). The module map is unchanged.
 
 
 ## 1. Target monorepo structure
@@ -35,7 +35,8 @@ GrokBuildapprepoFX / workspace
 │   │   ├── pm4_risk_gate/        # Sequence 06 kernel (flag off; ALLOW ≠ order)
 │   │   ├── pm4_risk/             # compatibility re-export of pm4_risk_gate
 │   │   ├── pm5_execution/
-│   │   ├── pm6_monitoring/
+│   │   ├── pm6_post_trade/       # Sequence 08 kernel (flag off; NullMonitoring default)
+│   │   ├── pm6_monitoring/       # compatibility re-export of pm6_post_trade
 │   │   ├── pm7_ledger/
 │   │   ├── pm8_persistence/
 │   │   └── pm9_operator_ux/
@@ -79,7 +80,7 @@ Python composition root lives at `botmoduleproject1/app`, not workspace-root `ap
 | Forecasting | `modules/pm3_forecasting` (PM3 forecasting / QRF) | Residual quantile envelope, ForecastOutput, conformal coverage (Sequence 05 kernel, flag off). Not the Strategy Engine. Not a fitted QRF. |
 | Risk | `modules/pm4_risk` (PM4) | Allocation, sizing, heat, drawdown governor, kill-switch. **Sole final gate** |
 | Execution | `modules/pm5_execution` (PM5) | OMS/EMS simulation, independent control, recon (degraded without venue). No MT5 send. |
-| Surveillance | `modules/pm6_monitoring` (PM6) | Post-trade controls, incidents, governance |
+| Surveillance | `modules/pm6_post_trade` (PM6; registry `pm6_monitoring`) | Post-trade controls, two defence lanes, incidents, governance. Observe-only. |
 | Ledger / evidence | `modules/pm7_ledger` (PM7) | Trade ledger, evidence, replay, reporting |
 | Persistence / recovery | `modules/pm8_persistence` (PM8 + PM8a spec) | CQRS, outbox/inbox, idempotency, snapshots, reconciliation |
 | Operator UX | `modules/pm9_operator_ux` (PM9 + PM9a) | Telegram control plane and fine-tune studio |
@@ -133,7 +134,7 @@ Rules:
 | PM3 forecasting / QRF | Enrichment of intents (Sequence 05 kernel; not an order) | `ForecastOutput` linked by `intent_id`; never mutates side |
 | PM4 | RiskVerdict | Exclusive permission object consumed by PM5 |
 | PM5 | Execution | Accepts only `(TradeIntent, RiskVerdict=ALLOW)` |
-| PM6 | Monitoring | Subscribes to events from PM5/PM7/PM8 |
+| PM6 | Monitoring | Observes PM4/PM5 publications; never orders; never invents broker truth |
 | PM7 | Ledger/evidence | Append-only via PM8 persistence API |
 | PM8 / PM8a | Persistence + recovery | Repositories, outbox, snapshots |
 | PM9 / PM9a | Operator UX | Commands → application ports; never adapters |

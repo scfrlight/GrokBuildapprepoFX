@@ -1,0 +1,18 @@
+DETECTORS = (
+    "quantity_drift",
+    "execution_after_kill",
+    "execution_after_freeze",
+    "recon_mismatch",
+    "recon_critical",
+    "sim_as_broker",
+    "submit_burst",
+    "reject_burst",
+    "fill_burst",
+    "cancel_storm",
+    "stale_event",
+    "monitoring_silence",
+    "missing_lifecycle",
+    "unexpected_continuation",
+    "unexpected_position",
+    "activity_during_withdrawal",
+)

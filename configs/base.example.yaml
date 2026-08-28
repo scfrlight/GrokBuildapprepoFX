@@ -36,6 +36,11 @@ feature_flags:
   fine_tune_studio: false
   market_data: false
   live_trading: false
+  pm6_post_trade: false
+  pm6_surveillance: false
+  pm6_incident_response: false
+  pm6_governance: false
+  pm6_withdrawal: false
 
 logging:
   level: INFO
@@ -166,3 +171,17 @@ pm5_execution:
   simulation_auto_fill: true
   recovery_cooldown_seconds: 300
   require_manual_recovery: true
+
+# PM6 post-trade knobs. Flags stay false. Observe-only. Not orders.
+pm6_post_trade:
+  operating_mode: shadow
+  observe_only: true
+  freshness_ttl_seconds: 300
+  stale_ttl_seconds: 14400
+  alert_dedup_seconds: 60
+  auto_rearm: false
+  auto_complete_withdrawal: false
+  mt5_enabled: false
+  broker_commands: false
+  durable: false
+

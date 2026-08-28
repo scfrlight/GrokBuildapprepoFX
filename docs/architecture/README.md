@@ -13,6 +13,7 @@
 - [Sequence 05 report](./sequence_05_report.md)
 - [Sequence 06 report](./sequence_06_report.md)
 - [Sequence 07 report](./sequence_07_report.md)
+- [Sequence 08 report](./sequence_08_report.md)
 - [PM3-Strategy Engine integration plan](./pm3_strategy_engine_integration_plan.md)
 - [PM3-Strategy Engine test traceability](./pm3_strategy_engine_test_traceability.md)
 - [PM3 forecasting / QRF integration plan](./pm3_forecasting_integration_plan.md)
@@ -20,3 +21,5 @@
 - [PM4 Risk Gate test traceability](./pm4_risk_gate_test_traceability.md)
 - [PM5 Execution integration plan](./pm5_execution_integration_plan.md)
 - [PM5 Execution test traceability](./pm5_execution_test_traceability.md)
+- [PM6 Post-Trade integration plan](./pm6_post_trade_integration_plan.md)
+- [PM6 Post-Trade test traceability](./pm6_post_trade_test_traceability.md)

@@ -1,6 +1,6 @@
 # Dependency Graph — BotModuleProject1
 
-Status: Accepted for Sequence 00; PM5 Execution producer live in Sequence 07 (flag off, simulation only, DisabledExecution default)  
+Status: Accepted for Sequence 00; PM6 Post-Trade producer live in Sequence 08 (flag off, observe-only, NullMonitoring default)  
 Date (UTC): 2026-08-28
 
 ## 1. Canonical data flow
@@ -14,9 +14,8 @@ Market Data
   → Forecast / QRF Enrichment
   → PM4 Risk Verdict
   → PM5 Execution
-  → Position / Exit Management
+  → PM6 Post-Trade / Surveillance / Incidents
   → PM7 / PM8 Persistence
-  → PM6 Monitoring
   → PM9 Operator UX
 ```
 
@@ -28,6 +27,8 @@ Hard cuts in this flow:
 - A forecast does not create or mutate an intent's side; it only enriches uncertainty fields.
 - PM5 is unreachable without `RiskVerdict.status == ALLOW`.
 - A PM5 simulation fill is not broker truth.
+- PM6 observes; it does not authorize, size, or submit.
+- Reconciliation without a venue stays degraded — never a silent pass.
 - Persistence is append/reconcile, not a second decision maker.
 - Operator UX observes and issues *commands to application ports*, never raw broker calls.
 
@@ -41,8 +42,8 @@ Hard cuts in this flow:
 | PM3 forecasting / QRF | Intent, confirmed synthetic bars | ForecastOutput (quantiles, model version; not an order) | contracts, synthetic feed, in-memory registry | Degraded-ok (non-critical) | Insufficient history / lookahead → None; risk must still fail closed |
 | PM4 risk gate | Intent, forecast, ranked candidate, book placeholders | RiskVerdict + RiskPublicationBundle (not an order) | contracts, in-memory control state | Execution-critical | Any doubt → DENY / HALT; ALLOW still pending PM5 |
 | PM5 execution | RiskPublicationBundle | ExecutionPublicationBundle (simulation; not a broker order) | contracts, PM4, in-memory OMS | Execution-critical (non-fatal if flag off) | No venue → recon degraded; submit() raises |
-| PM6 monitoring | Events from PM5/PM7/PM8 | Incidents, alerts | contracts | Ops-critical | Alert failure → log locally, do not hide halt |
-| PM7 ledger | Execution/risk events | Evidence, reports | PM8 persistence API | Recovery-critical | Inconsistency → halt |
+| PM6 post-trade | ExecutionPublicationBundle, RiskPublicationBundle | OperationalTruthBundle (observe-only; not an order) | contracts, PM4, PM5, in-memory evidence | Ops-critical (non-fatal if flag off) | No venue → monitoring ≥ degraded; never fabricate broker truth |
+| PM7 ledger | Execution/risk/monitoring events | Evidence, reports | PM8 persistence API | Recovery-critical | Inconsistency → halt |
 | PM8 persistence | All durable writes | Repositories, snapshots, outbox | DB adapter | Recovery-critical | Incomplete recovery → halt |
 | PM9 operator UX | Commands, queries | Operator views, command receipts | application ports | Ops-non-fatal | Transport down → local observe-only |
 | PM9a studio | Research artifacts | Parameter proposals | PM9, contracts | Research-only | Never auto-promotes to live |

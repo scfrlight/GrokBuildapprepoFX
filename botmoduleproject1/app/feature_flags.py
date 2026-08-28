@@ -48,6 +48,11 @@ _ALIAS_ENV = {
     "telegram": "BOTMODULEPROJECT1_FEATURE__ENABLE_TELEGRAM_CONTROL",
     "fine_tune_studio": "BOTMODULEPROJECT1_FEATURE__ENABLE_FINE_TUNE_STUDIO",
     "live_trading": "BOTMODULEPROJECT1_FEATURE__ENABLE_LIVE_TRADING",
+    "pm6_post_trade": "BOTMODULEPROJECT1_FEATURE__ENABLE_PM6_POST_TRADE",
+    "pm6_surveillance": "BOTMODULEPROJECT1_FEATURE__ENABLE_PM6_SURVEILLANCE",
+    "pm6_incident_response": "BOTMODULEPROJECT1_FEATURE__ENABLE_PM6_INCIDENT_RESPONSE",
+    "pm6_governance": "BOTMODULEPROJECT1_FEATURE__ENABLE_PM6_GOVERNANCE_INTELLIGENCE",
+    "pm6_withdrawal": "BOTMODULEPROJECT1_FEATURE__ENABLE_PM6_WITHDRAWAL_PLANNER",
 }
 
 _ALL_PROFILES = tuple(ProfileName)
@@ -158,6 +163,46 @@ FEATURE_FLAG_CATALOG: tuple[FeatureFlagSpec, ...] = (
         safety=SafetyClassification.DANGEROUS,
         env_key=_ALIAS_ENV["live_trading"],
     ),
+    FeatureFlagSpec(
+        name="enable_pm6_post_trade",
+        field="pm6_post_trade",
+        description="PM6 post-trade controls. Env opt-in; test and research only. Observes PM4/PM5. Never orders.",
+        allowed_profiles=(ProfileName.TEST, ProfileName.RESEARCH),
+        safety=SafetyClassification.REQUIRES_REVIEW,
+        env_key=_ALIAS_ENV["pm6_post_trade"],
+    ),
+    FeatureFlagSpec(
+        name="enable_pm6_surveillance",
+        field="pm6_surveillance",
+        description="PM6 automated surveillance detectors. Test/research. Does not send orders.",
+        allowed_profiles=(ProfileName.TEST, ProfileName.RESEARCH),
+        safety=SafetyClassification.REQUIRES_REVIEW,
+        env_key=_ALIAS_ENV["pm6_surveillance"],
+    ),
+    FeatureFlagSpec(
+        name="enable_pm6_incident_response",
+        field="pm6_incident_response",
+        description="PM6 incident orchestration. Test/research. No auto-rearm, no broker commands.",
+        allowed_profiles=(ProfileName.TEST, ProfileName.RESEARCH),
+        safety=SafetyClassification.REQUIRES_REVIEW,
+        env_key=_ALIAS_ENV["pm6_incident_response"],
+    ),
+    FeatureFlagSpec(
+        name="enable_pm6_governance_intelligence",
+        field="pm6_governance",
+        description="PM6 governance/validation packets. Test/research. Headless DTOs only.",
+        allowed_profiles=(ProfileName.TEST, ProfileName.RESEARCH),
+        safety=SafetyClassification.REQUIRES_REVIEW,
+        env_key=_ALIAS_ENV["pm6_governance"],
+    ),
+    FeatureFlagSpec(
+        name="enable_pm6_withdrawal_planner",
+        field="pm6_withdrawal",
+        description="PM6 orderly withdrawal planner. Test/research. Requests PM5 control; never a venue send.",
+        allowed_profiles=(ProfileName.TEST, ProfileName.RESEARCH),
+        safety=SafetyClassification.REQUIRES_REVIEW,
+        env_key=_ALIAS_ENV["pm6_withdrawal"],
+    ),
 )
 
 CATALOG_BY_FIELD = {spec.field: spec for spec in FEATURE_FLAG_CATALOG}
@@ -190,6 +235,11 @@ class FeatureFlags(BaseModel):
     fine_tune_studio: bool = False
     market_data: bool = False
     live_trading: bool = False
+    pm6_post_trade: bool = False
+    pm6_surveillance: bool = False
+    pm6_incident_response: bool = False
+    pm6_governance: bool = False
+    pm6_withdrawal: bool = False
     env_opt_in: tuple[str, ...] = Field(default=())
 
     def enabled_map(self) -> dict[str, bool]:

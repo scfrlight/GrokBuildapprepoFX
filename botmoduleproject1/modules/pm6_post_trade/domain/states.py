@@ -1,0 +1,68 @@
+from botmoduleproject1.contracts.v1.post_trade import (
+    GovernanceReviewState as G,
+    IncidentState as I,
+    MonitoringState as M,
+    WithdrawalState as W,
+)
+
+INCIDENT_TRANSITIONS: dict[I, frozenset[I]] = {
+    I.DETECTED: frozenset({I.TRIAGED, I.TRANSFERRED_TO_PERSISTENCE}),
+    I.TRIAGED: frozenset({I.CLASSIFIED, I.TRANSFERRED_TO_PERSISTENCE}),
+    I.CLASSIFIED: frozenset({I.ESCALATED, I.REMEDIATION_IN_PROGRESS, I.CONTAINMENT_IN_PROGRESS, I.TRANSFERRED_TO_PERSISTENCE}),
+    I.ESCALATED: frozenset({I.CONTAINMENT_IN_PROGRESS, I.REMEDIATION_IN_PROGRESS, I.TRANSFERRED_TO_PERSISTENCE}),
+    I.CONTAINMENT_IN_PROGRESS: frozenset({I.CONTAINED, I.REMEDIATION_IN_PROGRESS, I.TRANSFERRED_TO_PERSISTENCE}),
+    I.REMEDIATION_IN_PROGRESS: frozenset({I.CONTAINED, I.RESOLVED, I.TRANSFERRED_TO_PERSISTENCE}),
+    I.CONTAINED: frozenset({I.REMEDIATION_IN_PROGRESS, I.RESOLVED, I.TRANSFERRED_TO_PERSISTENCE}),
+    I.RESOLVED: frozenset({I.REVIEW_PENDING, I.CLOSED, I.TRANSFERRED_TO_PERSISTENCE}),
+    I.REVIEW_PENDING: frozenset({I.CLOSED, I.REMEDIATION_IN_PROGRESS, I.TRANSFERRED_TO_PERSISTENCE}),
+    I.CLOSED: frozenset(),
+    I.TRANSFERRED_TO_PERSISTENCE: frozenset({I.CLOSED}),
+}
+
+INCIDENT_TERMINAL = frozenset({I.CLOSED})
+
+WITHDRAWAL_TRANSITIONS: dict[W, frozenset[W]] = {
+    W.NOT_REQUIRED: frozenset({W.RECOMMENDED}),
+    W.RECOMMENDED: frozenset({W.APPROVAL_PENDING, W.MANUAL_REVIEW}),
+    W.APPROVAL_PENDING: frozenset({W.INITIATED, W.MANUAL_REVIEW, W.FAILED}),
+    W.INITIATED: frozenset({W.IN_PROGRESS, W.FAILED, W.MANUAL_REVIEW}),
+    W.IN_PROGRESS: frozenset({W.CONFIRMED, W.FAILED, W.MANUAL_REVIEW}),
+    W.CONFIRMED: frozenset({W.COMPLETED, W.FAILED}),
+    W.COMPLETED: frozenset(),
+    W.FAILED: frozenset({W.MANUAL_REVIEW, W.RECOMMENDED}),
+    W.MANUAL_REVIEW: frozenset({W.RECOMMENDED, W.APPROVAL_PENDING}),
+}
+
+GOVERNANCE_TRANSITIONS: dict[G, frozenset[G]] = {
+    G.SCHEDULED: frozenset({G.IN_REVIEW, G.EVIDENCE_COMPILED}),
+    G.IN_REVIEW: frozenset({G.EVIDENCE_COMPILED, G.DECISION_PENDING}),
+    G.EVIDENCE_COMPILED: frozenset({G.DECISION_PENDING}),
+    G.DECISION_PENDING: frozenset({G.APPROVED, G.REMEDIATION_REQUIRED}),
+    G.APPROVED: frozenset({G.CLOSED}),
+    G.REMEDIATION_REQUIRED: frozenset({G.IN_REVIEW, G.CLOSED}),
+    G.CLOSED: frozenset(),
+}
+
+MONITORING_RANK = {
+    M.HEALTHY: 0,
+    M.STABILIZED: 1,
+    M.WATCH: 2,
+    M.WARNING: 3,
+    M.DEGRADED: 4,
+    M.REVIEW_PENDING: 5,
+    M.INCIDENT_ACTIVE: 6,
+    M.WITHDRAWAL_IN_PROGRESS: 7,
+    M.CRITICAL: 8,
+}
+
+
+def can_incident(current: I, target: I) -> bool:
+    return target in INCIDENT_TRANSITIONS.get(current, frozenset())
+
+
+def can_withdrawal(current: W, target: W) -> bool:
+    return target in WITHDRAWAL_TRANSITIONS.get(current, frozenset())
+
+
+def worse(a: M, b: M) -> M:
+    return a if MONITORING_RANK[a] >= MONITORING_RANK[b] else b

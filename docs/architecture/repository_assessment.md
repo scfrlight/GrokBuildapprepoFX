@@ -227,5 +227,40 @@ Hard constraints carried in:
 - No MetaTrader5 on Linux tests.
 - No Telegram, no paper loop, no database migrations.
 
-Outputs: OMS/EMS simulation fabric, independent control plane, recon default `degraded`, architecture desk Sequence 07 panel. Next: Sequence 08 PM6.
+Outputs: OMS/EMS simulation fabric, independent control plane, recon default `degraded`, architecture desk Sequence 07 panel.
+
+## Sequence 08 inputs
+
+Sequence 08 consumes:
+
+- Canonical `ExecutionPublicationBundle` from PM5 (simulation/shadow truth only).
+- Canonical `RiskPublicationBundle` from PM4 (kill/freeze/admission; not mutated).
+- `NullMonitoring` as the fail-closed default bind (must not be deleted).
+- Feature-flag catalog and profile policy from Sequence 02.
+- In-memory repository pattern from PM4/PM5 (no durable ledger until PM7).
+
+Hard constraints carried in:
+
+- `execution_permitted` frozen false.
+- Live profile hard-blocked.
+- No MetaTrader5 on Linux tests.
+- No Telegram, no paper loop, no database migrations.
+- `SIM-*` never labelled broker truth.
+- Reconciliation without a venue stays `degraded`.
+- PM6 never submits, never sizes, never ALLOWs.
+
+Traceability:
+
+| Input | Source | Persisted as |
+|---|---|---|
+| Sequence 08 specification | Sequence 08 prompt (complete) | `docs/prompts/PM6_Post_Trade_Sequence08_Prompt.md` |
+| Feature flags `enable_pm6_*` | Sequence 08 section 28 | `feature_flags.py` — test + research env opt-in |
+| Output contracts | Sequence 08 section 9 | `botmoduleproject1/contracts/v1/post_trade.py` |
+| Folder structure | Sequence 08 section 30 | `botmoduleproject1/modules/pm6_post_trade/` |
+| Integration plan | Sequence 08 section 4 | `docs/architecture/pm6_post_trade_integration_plan.md` |
+| ADR | Sequence 08 section 32 | `docs/adr/ADR-013-pm6-post-trade-governance.md` |
+
+Original filename `PM6_Master_Prompt.md` was not found on Drive/GitHub. Sequence 08 treats the embedded spec as source of truth for this stage.
+
+Outputs: post-trade controls, two defence lanes, surveillance, incidents, withdrawal planner, non-durable evidence, architecture desk Sequence 08 board. Next: Sequence 09 PM7.
 
