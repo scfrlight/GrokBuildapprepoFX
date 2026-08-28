@@ -1,7 +1,7 @@
 [project]
 name = "botmoduleproject1"
 version = "0.1.0"
-description = "Institutional modular Forex system for MT5 Demo (EURUSD first). Sequence 01 kernel — not trade-ready."
+description = "Institutional modular Forex system for MT5 Demo (EURUSD first). Sequence 02 kernel — not trade-ready."
 readme = "README.md"
 requires-python = ">=3.11"
 license = { text = "Proprietary" }
@@ -44,6 +44,9 @@ include = ["botmoduleproject1*"]
 testpaths = ["tests"]
 asyncio_mode = "auto"
 addopts = "-q"
+markers = [
+  "real_interpreter: run against the actual sys.version_info (ADR-008)",
+]
 
 [tool.ruff]
 line-length = 100

@@ -1,4 +1,4 @@
-"""Settings validation, fingerprint, fail-fast live disable."""
+"""Settings validation, fingerprint, fail-fast live disable, prefix isolation."""
 
 from __future__ import annotations
 
@@ -7,11 +7,16 @@ from pathlib import Path
 import pytest
 
 from botmoduleproject1.app.exceptions import LiveTradingDisabledError, SettingsError
+from botmoduleproject1.app.profiles import ProfileName
 from botmoduleproject1.app.settings import load_settings
 
 ROOT = Path(__file__).resolve().parents[2]
 BASE = ROOT / "configs" / "base.example.yaml"
 TEST = ROOT / "configs" / "test.example.yaml"
+DEMO = ROOT / "configs" / "demo.example.yaml"
+BACKTEST = ROOT / "configs" / "backtest.example.yaml"
+RESEARCH = ROOT / "configs" / "research.example.yaml"
+LIVE = ROOT / "configs" / "live.example.yaml"
 
 
 def test_loads_example_yaml() -> None:
@@ -20,6 +25,7 @@ def test_loads_example_yaml() -> None:
     assert settings.safety.live_trading_enabled is False
     assert settings.app.timezone == "UTC"
     assert settings.mt5.enabled is False
+    assert settings.profile is ProfileName.DEMO
 
 
 def test_fingerprint_is_stable_and_hex() -> None:
@@ -28,6 +34,16 @@ def test_fingerprint_is_stable_and_hex() -> None:
     assert a.fingerprint() == b.fingerprint()
     assert len(a.fingerprint()) == 64
     int(a.fingerprint(), 16)
+
+
+def test_fingerprint_changes_when_input_changes() -> None:
+    a = load_settings(config_path=TEST, environ={}, cli_mode="test")
+    b = load_settings(
+        config_path=TEST,
+        environ={"BOTMODULEPROJECT1_APP__DEFAULT_SYMBOL": "GBPUSD"},
+        cli_mode="test",
+    )
+    assert a.fingerprint() != b.fingerprint()
 
 
 def test_fingerprint_redacts_secrets() -> None:
@@ -46,7 +62,7 @@ def test_live_flag_fail_fast() -> None:
     with pytest.raises(LiveTradingDisabledError, match="LIVE TRADING IS DISABLED"):
         load_settings(
             config_path=BASE,
-            environ={"LIVE_TRADING_ENABLED": "true"},
+            environ={"BOTMODULEPROJECT1_SAFETY__LIVE_TRADING_ENABLED": "true"},
             cli_mode="doctor",
         )
 
@@ -60,9 +76,38 @@ def test_live_trading_mode_fail_fast() -> None:
     with pytest.raises(LiveTradingDisabledError):
         load_settings(
             config_path=BASE,
-            environ={"TRADING_MODE": "live"},
+            environ={"BOTMODULEPROJECT1_SAFETY__TRADING_MODE": "live"},
             cli_mode="doctor",
         )
+
+
+def test_unprefixed_env_is_ignored() -> None:
+    settings = load_settings(
+        config_path=TEST,
+        environ={
+            "DEFAULT_SYMBOL": "GBPUSD",
+            "TRADING_MODE": "live",
+            "LIVE_TRADING_ENABLED": "true",
+            "DATABASE_URL": "postgresql://ambient-secret:pw@db/app",
+        },
+        cli_mode="test",
+    )
+    assert settings.app.default_symbol == "EURUSD"
+    assert settings.safety.trading_mode == "test"
+    assert settings.safety.live_trading_enabled is False
+    assert settings.persistence.dsn is None
+    blob = str(settings.public_dict())
+    assert "ambient-secret" not in blob
+    assert "postgresql://" not in blob
+
+
+def test_prefixed_env_overrides_symbol() -> None:
+    settings = load_settings(
+        config_path=BASE,
+        environ={"BOTMODULEPROJECT1_APP__DEFAULT_SYMBOL": "GBPUSD"},
+        cli_mode="test",
+    )
+    assert settings.app.default_symbol == "GBPUSD"
 
 
 def test_enabled_adapter_requires_secret() -> None:
@@ -75,10 +120,11 @@ def test_enabled_adapter_requires_secret() -> None:
         )
 
 
-def test_env_overrides_symbol() -> None:
+def test_database_url_unprefixed_never_binds() -> None:
     settings = load_settings(
         config_path=BASE,
-        environ={"DEFAULT_SYMBOL": "GBPUSD"},
-        cli_mode="test",
+        environ={"DATABASE_URL": "postgresql://should-not-bind"},
+        cli_mode="doctor",
+        extra={"persistence": {"enabled": False}},
     )
-    assert settings.app.default_symbol == "GBPUSD"
+    assert settings.persistence.dsn is None

@@ -2,11 +2,10 @@
 
 Import root for the trading system.
 
-Sequence 01 implements:
+Sequence 01: versioned contracts + PM1 composition root.
+Sequence 02: profiles, pydantic-settings, feature flags, preflight.
 
-- versioned contracts in `contracts/v1/`
-- PM1 composition root in `app/`
-- CLI: `python -m botmoduleproject1`
+CLI: `python -m botmoduleproject1 --profile test doctor`
 
 Forbidden still: strategies, MT5 calls, Telegram, risk math, order send.
-Not trade-ready. Live trading is disabled.
+Not trade-ready. Live trading is disabled. Python 3.11+ required.

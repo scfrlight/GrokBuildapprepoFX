@@ -14,6 +14,7 @@ def test_happy_path_to_running() -> None:
     for state in (
         LifecycleState.CONFIG_LOADED,
         LifecycleState.VALIDATED,
+        LifecycleState.PREFLIGHT_CHECKED,
         LifecycleState.REGISTRY_READY,
         LifecycleState.WIRED,
         LifecycleState.STARTUP_CHECKED,
@@ -23,13 +24,16 @@ def test_happy_path_to_running() -> None:
     ):
         life.transition(state)
     assert life.state is LifecycleState.RUNNING
-    assert len(life.history) == 8
+    assert len(life.history) == 9
 
 
 def test_illegal_transition() -> None:
     life = LifecycleManager()
     with pytest.raises(LifecycleError, match="illegal transition"):
         life.transition(LifecycleState.RUNNING)
+    with pytest.raises(LifecycleError, match="illegal transition"):
+        life.transition(LifecycleState.VALIDATED)
+        life.transition(LifecycleState.REGISTRY_READY)
 
 
 def test_degraded_and_stop() -> None:
@@ -37,6 +41,7 @@ def test_degraded_and_stop() -> None:
     for state in (
         LifecycleState.CONFIG_LOADED,
         LifecycleState.VALIDATED,
+        LifecycleState.PREFLIGHT_CHECKED,
         LifecycleState.REGISTRY_READY,
         LifecycleState.WIRED,
         LifecycleState.STARTUP_CHECKED,

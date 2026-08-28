@@ -1,0 +1,20 @@
+# Recognized live overlay. Loading this file MUST fail closed.
+# There is no override in this build that can make live runnable.
+
+extends: base.example.yaml
+
+profile: live
+
+app:
+  environment: live
+
+safety:
+  trading_mode: live
+  live_trading_enabled: false
+
+mt5:
+  enabled: false
+
+feature_flags:
+  live_trading: false
+  execution: false

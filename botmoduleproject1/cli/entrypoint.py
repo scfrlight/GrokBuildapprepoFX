@@ -7,7 +7,14 @@ import json
 import sys
 from typing import Sequence
 
-from botmoduleproject1.app.exceptions import LiveTradingDisabledError, PlatformError, SettingsError
+from botmoduleproject1.app.exceptions import (
+    LiveTradingDisabledError,
+    PlatformError,
+    PreflightError,
+    PythonVersionError,
+    SettingsError,
+)
+from botmoduleproject1.app.python_version import assert_python_version
 from botmoduleproject1.app.settings import CliMode
 
 
@@ -23,6 +30,18 @@ def build_parser() -> argparse.ArgumentParser:
         help="test | doctor | paper | live | backfill | demo | observe-only",
     )
     parser.add_argument("--config", dest="config", default=None, help="YAML config path")
+    parser.add_argument(
+        "--profile",
+        dest="profile",
+        default=None,
+        help="demo | test | backtest | research | live (live is recognized and refused)",
+    )
+    parser.add_argument(
+        "--env-file",
+        dest="env_file",
+        default=None,
+        help="optional .env path; only prefixed and allowlisted keys are read",
+    )
     parser.add_argument("--json", action="store_true", help="print diagnostics as JSON")
     parser.add_argument(
         "--heartbeat",
@@ -65,12 +84,15 @@ def main(argv: Sequence[str] | None = None) -> int:
     args = parser.parse_args(list(argv) if argv is not None else None)
     mode = _normalize_mode(str(args.mode))
     try:
+        assert_python_version()
         from botmoduleproject1.app.bootstrap import bootstrap
 
         settings, _container, runtime = bootstrap(
             config_path=args.config,
             cli_mode=mode,
             heartbeat_ticks=int(args.heartbeat),
+            profile=args.profile,
+            env_file=args.env_file,
         )
         snapshot = runtime.last_snapshot
         assert snapshot is not None
@@ -79,12 +101,18 @@ def main(argv: Sequence[str] | None = None) -> int:
         else:
             print("\n".join(snapshot.banner_lines()))
             print(f"fingerprint={settings.fingerprint()}")
+            print(f"profile={settings.profile.value}")
+            caps = ", ".join(c.value for c in settings.profile_policy.allowed_capabilities)
+            print(f"allowed_capabilities={caps}")
         runtime.stop()
         return 0
     except LiveTradingDisabledError as exc:
         print(str(exc), file=sys.stderr)
         return 2
-    except (SettingsError, PlatformError) as exc:
+    except PythonVersionError as exc:
+        print(f"STARTUP FAILED: {exc}", file=sys.stderr)
+        return 1
+    except (SettingsError, PreflightError, PlatformError) as exc:
         print(f"STARTUP FAILED: {exc}", file=sys.stderr)
         return 1
 

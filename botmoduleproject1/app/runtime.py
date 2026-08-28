@@ -7,10 +7,12 @@ from typing import Any
 
 from botmoduleproject1.app.container import Container
 from botmoduleproject1.app.diagnostics import DiagnosticsSnapshot, build_snapshot
-from botmoduleproject1.app.exceptions import HealthError, PlatformError
+from botmoduleproject1.app.exceptions import HealthError, LiveTradingDisabledError, PlatformError
 from botmoduleproject1.app.health import CheckKind
 from botmoduleproject1.app.lifecycle import LifecycleState
 from botmoduleproject1.app.logging_config import get_logger
+from botmoduleproject1.app.preflight import PreflightService, report_payload, run_preflight
+from botmoduleproject1.app.profiles import ProfileName
 
 
 class Runtime:
@@ -19,14 +21,20 @@ class Runtime:
         self._stop = False
         self.last_snapshot: DiagnosticsSnapshot | None = None
         self._log = get_logger("botmoduleproject1.runtime")
+        self.last_preflight: dict[str, Any] | None = None
 
     def start(self, *, heartbeat_ticks: int = 0) -> DiagnosticsSnapshot:
         """Run the boot sequence. heartbeat_ticks=0 means no loop (self-test)."""
         life = self.container.lifecycle
         settings = self.container.settings
         try:
+            self._assert_not_live()
             life.transition(LifecycleState.CONFIG_LOADED)
             life.transition(LifecycleState.VALIDATED)
+            preflight = run_preflight(settings, fail_fast=True)
+            self.last_preflight = report_payload(preflight)
+            self.container.health.add(PreflightService(preflight))
+            life.transition(LifecycleState.PREFLIGHT_CHECKED)
             life.transition(LifecycleState.REGISTRY_READY)
             life.transition(LifecycleState.WIRED)
             startup = self.container.health.run(
@@ -35,6 +43,11 @@ class Runtime:
             life.transition(LifecycleState.STARTUP_CHECKED)
             life.transition(LifecycleState.WARMED)
             life.transition(LifecycleState.READY)
+            self._assert_not_live()
+            if not settings.profile_policy.may_enter_running:
+                raise LiveTradingDisabledError(
+                    f"profile={settings.profile.value} cannot enter running"
+                )
             ready = self.container.health.run(
                 CheckKind.READINESS, fail_on_critical=False
             )
@@ -66,6 +79,23 @@ class Runtime:
             life.fail(str(exc))
             raise
 
+    def _assert_not_live(self) -> None:
+        settings = self.container.settings
+        if (
+            settings.profile is ProfileName.LIVE
+            or settings.safety.trading_mode == "live"
+            or settings.safety.live_trading_enabled
+            or settings.cli_mode == "live"
+            or settings.feature_flags.live_trading
+        ):
+            raise LiveTradingDisabledError(
+                f"profile={settings.profile.value} cli_mode={settings.cli_mode}"
+            )
+        if not settings.profile_policy.may_enter_running:
+            raise LiveTradingDisabledError(
+                f"profile={settings.profile.value} may_enter_running=false"
+            )
+
     def stop(self) -> None:
         self._stop = True
         life = self.container.lifecycle
@@ -88,6 +118,7 @@ class Runtime:
             state=self.container.lifecycle.state,
             modules=self.container.registry.snapshot(),
             health=health,
+            preflight=self.last_preflight,
         )
         return self.last_snapshot
 

@@ -139,6 +139,9 @@ class DisabledExecution:
 
 
 class NullStorage:
+    def __init__(self) -> None:
+        self.entries: list[JournalEntry] = []
+
     def metadata(self) -> ModuleMetadata:
         return ModuleMetadata(
             name="pm8_persistence",
@@ -148,7 +151,7 @@ class NullStorage:
         )
 
     def append(self, entry: JournalEntry) -> None:
-        return None
+        self.entries.append(entry)
 
     def health_checks(self, kind: CheckKind) -> list[CheckResult]:
         return [

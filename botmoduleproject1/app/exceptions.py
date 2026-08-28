@@ -20,8 +20,20 @@ class LiveTradingDisabledError(PlatformError):
         self.reason = reason
 
 
+class PythonVersionError(PlatformError):
+    """Interpreter is below the supported floor (Python 3.11+)."""
+
+
 class SettingsError(PlatformError):
     """Invalid or incomplete configuration."""
+
+
+class FeatureFlagError(SettingsError):
+    """Dangerous or disallowed feature flag state."""
+
+
+class PreflightError(PlatformError):
+    """Startup preflight failed. Process must not continue toward ready/running."""
 
 
 class RegistryError(PlatformError):

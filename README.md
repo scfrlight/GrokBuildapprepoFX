@@ -2,7 +2,7 @@
 
 Institutional modular Forex system for **MT5 Demo**, EURUSD first.
 
-This repository is in **Sequence 01 — Contract-First Domain Foundation + PM1 platform kernel**. It is **not** ready for demo trading, paper trading, or production. Live trading is disabled by design.
+This repository is in **Sequence 02 — Configuration, Secrets & Bootstrap Governance**. It is **not** ready for demo trading, paper trading, or production. Live trading is disabled by design.
 
 Git home: [scfrlight/GrokBuildapprepoFX](https://github.com/scfrlight/GrokBuildapprepoFX)
 
@@ -10,19 +10,25 @@ Git home: [scfrlight/GrokBuildapprepoFX](https://github.com/scfrlight/GrokBuilda
 
 | Key | Value |
 |---|---|
-| `TRADING_MODE` | `demo` |
-| `LIVE_TRADING_ENABLED` | `false` |
-| Feature flags | all `false` |
+| Profile | `demo` (test/backtest/research allowed; `live` refused) |
+| `BOTMODULEPROJECT1_SAFETY__TRADING_MODE` | `demo` |
+| `BOTMODULEPROJECT1_SAFETY__LIVE_TRADING_ENABLED` | `false` |
+| Feature flags | all `false`; dangerous flags are env-only |
 | Secrets in git | never |
+| Python | 3.11+ (fail-fast; ADR-008) |
 
-Unknown state, stale data, incomplete recovery, or ledger inconsistency must later force **safe halt / observe-only**. That invariant is documented now and enforced in later sequences.
+Unknown state, stale data, incomplete recovery, or ledger inconsistency must later force **safe halt / observe-only**.
 
-CLI mode `live` is **recognized then refused** (exit code 2). Demo is a venue label, not permission to trade.
+CLI mode `live` and profile `live` are **recognized then refused**. Demo is a venue label, not permission to trade.
+
+Unprefixed ambient env (`DATABASE_URL`, `TRADING_MODE`, …) is ignored.
 
 ## What exists now
 
-- Architecture baseline, dependency graph, runtime-mode policy, ADRs 001–007
-- Safe config templates (`.env.example`, `configs/*.example.yaml`)
+- Architecture baseline, dependency graph, runtime-mode policy, ADRs 001–008
+- Profiles: demo / test / backtest / research / live (blocked)
+- pydantic-settings with prefix `BOTMODULEPROJECT1_`, secret allowlist, redaction
+- Typed feature flags + startup preflight (`preflight_checked` lifecycle state)
 - Versioned domain contracts in `botmoduleproject1/contracts/v1/` (schema 1.0.0)
 - PM1 composition root: settings, registry, lifecycle, health, diagnostics, CLI
 - Fail-closed stubs: `NullRiskGate` always DENY, `DisabledExecution` raises
@@ -32,25 +38,6 @@ CLI mode `live` is **recognized then refused** (exit code 2). Demo is a venue la
 
 Trading strategies, indicators, TradeIntent generation, QRF/ML, risk math, order sending, MT5 connection, Telegram bot, database schema, migrations.
 
-## Normalized module map
-
-| File (when added) | Function | Package | Sequence |
-|---|---|---|---|
-| `PM1_Master_Prompt.md` | Platform bootstrap, DI, lifecycle | `botmoduleproject1.app` | **01 — kernel** |
-| `PM2_Master_Prompt.md` | Market data, session, regime | `modules.pm2_market_context` | later |
-| `PM3_Strategy_Engine_Master_Prompt.md` | **PM3-Strategy Engine**, TradeIntent | `modules.pm3_strategy_engine` | later |
-| `PM3_Master_Prompt.md` | Forecasting / QRF (not Strategy Engine) | `modules.pm3_forecasting` | later |
-| `PM4_Master_Prompt.md` | Risk gate (exclusive) | `modules.pm4_risk` | later |
-| `PM5_Master_Prompt.md` | MT5 OMS/EMS | `modules.pm5_execution` | later |
-| `PM6_Master_Prompt.md` | Surveillance | `modules.pm6_monitoring` | later |
-| `PM7_Master_Prompt.md` | Ledger / evidence | `modules.pm7_ledger` | later |
-| `PM8_Master_Prompt.md` | Persistence / recovery | `modules.pm8_persistence` | later |
-| `PM8a_Build_Spec.md` | PM8 build spec (not a module) | — | later |
-| `PM9_…Telegram…` | Operator control plane | `modules.pm9_operator_ux` | later |
-| `PM9a_…Studio…` | Fine-tune studio (operator layer) | `modules.pm9_operator_ux` | later |
-
-`docs/prompts/PM1_Master_Prompt.md` is the persisted Sequence 01 source of truth. Other PM files are still missing.
-
 ## Local onboarding (safe)
 
 Requires Python 3.11+. Do not install the `mt5` extra on Linux.
@@ -59,8 +46,8 @@ Requires Python 3.11+. Do not install the `mt5` extra on Linux.
 python -m venv .venv
 source .venv/bin/activate
 pip install -r requirements-dev.txt
-cp .env.example .env          # leave secrets empty
-PYTHONPATH=. python -m botmoduleproject1 doctor --config configs/test.example.yaml
+cp .env.example .env          # leave secrets empty; never commit
+PYTHONPATH=. python -m botmoduleproject1 doctor --profile test --config configs/test.example.yaml
 PYTHONPATH=. python -m pytest tests
 ```
 
@@ -68,15 +55,14 @@ Do **not** connect MetaTrader 5. Do **not** put tokens in `.env` until PM9/PM5 a
 
 `python -m botmoduleproject1 live` must fail closed.
 
-Windows: `scripts\bot\start.bat doctor --config configs\test.example.yaml`
+Windows: `scripts\bot\start.bat doctor --profile test --config configs\test.example.yaml`
 
 ## Next step
 
-**Sequence 02 — Configuration, Secrets & Bootstrap Governance.**
+**Sequence 03 — PM2 Market Data & Session Regime Engine.**
 
 Read:
 
-- `docs/architecture/architecture_baseline.md`
-- `docs/architecture/sequence_01_report.md`
-- `docs/prompts/PM1_Master_Prompt.md`
-- `docs/adr/`
+- `docs/architecture/bootstrap_governance.md`
+- `docs/architecture/sequence_02_report.md`
+- `docs/adr/ADR-008-python-version-constraint.md`

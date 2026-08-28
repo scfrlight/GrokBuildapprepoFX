@@ -1,18 +1,48 @@
-"""Typed settings. Secrets are SecretStr; live trading fails closed."""
+"""Typed settings via pydantic-settings.
+
+Sources, highest priority first:
+1. explicit init / CLI kwargs
+2. BOTMODULEPROJECT1_* prefixed env (nested via __)
+3. secret allowlist env (MT5_*, TELEGRAM_*, BOTMODULEPROJECT1_DATABASE_URL)
+4. optional .env file (allowlisted keys only)
+5. YAML config (and ``extends`` parents)
+
+Unprefixed ambient env (DATABASE_URL, TRADING_MODE, DEFAULT_SYMBOL, …) is ignored.
+"""
 
 from __future__ import annotations
 
 import hashlib
 import json
+import os
 from pathlib import Path
-from typing import Any, Literal
+from typing import Any, Mapping
 
 import yaml
-from pydantic import BaseModel, ConfigDict, Field, SecretStr, field_validator, model_validator
+from pydantic import BaseModel, Field, SecretStr, field_validator, model_validator
+from pydantic_settings import (
+    BaseSettings,
+    PydanticBaseSettingsSource,
+    SettingsConfigDict,
+)
 
 from botmoduleproject1.app.exceptions import LiveTradingDisabledError, SettingsError
+from botmoduleproject1.app.feature_flags import (
+    FeatureFlag,
+    FeatureFlags,
+    feature_flags_from_environ,
+    validate_feature_flags,
+)
+from botmoduleproject1.app.profiles import ProfileName, ProfilePolicy, parse_profile, policy_for
+from botmoduleproject1.app.python_version import assert_python_version
+from botmoduleproject1.app.secrets import redact_node, secrets_from_environ
 
-CliMode = Literal[
+ENV_PREFIX = "BOTMODULEPROJECT1_"
+
+CliMode = str
+TradingMode = str
+
+_CLI_MODES = (
     "test",
     "doctor",
     "paper",
@@ -23,9 +53,9 @@ CliMode = Literal[
     "research",
     "backtest",
     "live-disabled",
-]
+)
 
-TradingMode = Literal[
+_TRADING_MODES = (
     "test",
     "doctor",
     "backtest",
@@ -35,64 +65,59 @@ TradingMode = Literal[
     "observe-only",
     "live-disabled",
     "live",
-]
+)
 
 
 class AppSection(BaseModel):
-    model_config = ConfigDict(extra="ignore")
-
     name: str = "BotModuleProject1"
     environment: str = "local"
-    timezone: Literal["UTC"] = "UTC"
+    timezone: str = "UTC"
     default_symbol: str = "EURUSD"
+
+    @field_validator("timezone")
+    @classmethod
+    def _tz(cls, value: str) -> str:
+        if value != "UTC":
+            raise ValueError("timezone must be UTC (ADR-003)")
+        return value
 
 
 class SafetySection(BaseModel):
-    model_config = ConfigDict(extra="ignore")
-
-    trading_mode: TradingMode = "demo"
+    trading_mode: str = "demo"
     live_trading_enabled: bool = False
     fail_closed: bool = True
-    on_unknown_state: Literal["observe-only", "halt"] = "observe-only"
-    on_stale_data: Literal["observe-only", "halt"] = "observe-only"
-    on_incomplete_recovery: Literal["halt"] = "halt"
-    on_ledger_inconsistency: Literal["halt"] = "halt"
+    on_unknown_state: str = "observe-only"
+    on_stale_data: str = "observe-only"
+    on_incomplete_recovery: str = "halt"
+    on_ledger_inconsistency: str = "halt"
     require_preflight: bool = True
     require_readiness: bool = True
     require_recovery: bool = True
     require_risk_ready_before_orders: bool = True
 
-
-class FeatureFlags(BaseModel):
-    model_config = ConfigDict(extra="ignore")
-
-    strategy_engine: bool = False
-    forecasting: bool = False
-    risk_engine: bool = False
-    execution: bool = False
-    telegram: bool = False
-    fine_tune_studio: bool = False
+    @field_validator("trading_mode")
+    @classmethod
+    def _mode(cls, value: str) -> str:
+        if value not in _TRADING_MODES:
+            raise ValueError(f"unknown trading_mode {value!r}")
+        return value
 
 
 class LoggingSection(BaseModel):
-    model_config = ConfigDict(extra="ignore", populate_by_name=True)
+    model_config = {"populate_by_name": True, "extra": "ignore"}
 
-    level: Literal["DEBUG", "INFO", "WARNING", "ERROR"] = "INFO"
+    level: str = "INFO"
     json_output: bool = Field(default=True, alias="json")
     redact_secrets: bool = True
 
 
 class ClockSection(BaseModel):
-    model_config = ConfigDict(extra="ignore")
-
-    source: Literal["system", "fake"] = "system"
+    source: str = "system"
     aware: bool = True
     utc_only: bool = True
 
 
 class IdentitySection(BaseModel):
-    model_config = ConfigDict(extra="ignore")
-
     require_event_id: bool = True
     require_correlation_id: bool = True
     require_causation_id: bool = True
@@ -100,10 +125,8 @@ class IdentitySection(BaseModel):
 
 
 class Mt5Section(BaseModel):
-    model_config = ConfigDict(extra="ignore")
-
     enabled: bool = False
-    account_kind: Literal["demo"] = "demo"
+    account_kind: str = "demo"
     terminal_path_env: str = "MT5_TERMINAL_PATH"
     login_env: str = "MT5_LOGIN"
     password_env: str = "MT5_PASSWORD"
@@ -115,63 +138,182 @@ class Mt5Section(BaseModel):
 
 
 class PersistenceSection(BaseModel):
-    model_config = ConfigDict(extra="ignore")
-
     enabled: bool = False
-    dsn_env: str = "DATABASE_URL"
+    dsn_env: str = "BOTMODULEPROJECT1_DATABASE_URL"
     dsn: SecretStr | None = None
     api_is_sole_durable_path: bool = True
 
 
 class TelegramSection(BaseModel):
-    model_config = ConfigDict(extra="ignore")
-
     enabled: bool = False
     token_env: str = "TELEGRAM_BOT_TOKEN"
     chat_id_env: str = "TELEGRAM_CHAT_ID"
     allowed_user_ids_env: str = "TELEGRAM_ALLOWED_USER_IDS"
     token: SecretStr | None = None
     chat_id: str | None = None
+    allowed_user_ids: str | None = None
 
 
 class ModelRegistrySection(BaseModel):
-    model_config = ConfigDict(extra="ignore")
-
     enabled: bool = False
-    uri_env: str = "MODEL_REGISTRY_URI"
+    uri_env: str = "BOTMODULEPROJECT1_MODEL_REGISTRY_URI"
     uri: str | None = None
 
 
 class NotificationsSection(BaseModel):
-    model_config = ConfigDict(extra="ignore")
-
     enabled: bool = False
 
 
 class ModulesSection(BaseModel):
-    model_config = ConfigDict(extra="ignore")
-
-    load_policy: Literal["manual", "discover"] = "manual"
+    load_policy: str = "manual"
     allowlist: tuple[str, ...] = ()
     denylist: tuple[str, ...] = ()
 
 
 class HealthSection(BaseModel):
-    model_config = ConfigDict(extra="ignore")
-
     fail_on_critical: bool = True
     include_non_critical_in_ready: bool = False
 
 
 class DiagnosticsSection(BaseModel):
-    model_config = ConfigDict(extra="ignore")
-
     enabled: bool = True
     heartbeat_seconds: float = Field(default=5.0, gt=0)
 
 
-class Settings(BaseModel):
-    model_config = ConfigDict(extra="ignore")
+class PathsSection(BaseModel):
+    log_dir: str = "logs"
+    data_dir: str = "data/local"
+
+
+class MappingSource(PydanticBaseSettingsSource):
+    """Inject a precomputed nested mapping as a settings source."""
+
+    def __init__(self, settings_cls: type[BaseSettings], data: dict[str, Any]) -> None:
+        super().__init__(settings_cls)
+        self._data = data
+
+    def get_field_value(self, field: Any, field_name: str) -> tuple[Any, str, bool]:
+        if field_name in self._data:
+            return self._data[field_name], field_name, False
+        return None, field_name, False
+
+    def prepare_field_value(
+        self, field_name: str, field: Any, value: Any, value_is_complex: bool
+    ) -> Any:
+        return value
+
+    def __call__(self) -> dict[str, Any]:
+        return dict(self._data)
+
+
+def _coerce_scalar(raw: str) -> Any:
+    text = raw.strip()
+    lowered = text.lower()
+    if lowered in {"true", "yes", "on"}:
+        return True
+    if lowered in {"false", "no", "off"}:
+        return False
+    if lowered in {"null", "none", ""}:
+        return None
+    try:
+        if "." in text:
+            return float(text)
+        return int(text)
+    except ValueError:
+        return text
+
+
+def nested_from_prefixed_env(environ: Mapping[str, str], *, prefix: str = ENV_PREFIX) -> dict[str, Any]:
+    """Parse BOTMODULEPROJECT1_FOO__BAR into {foo: {bar: value}}. Ignores other keys."""
+    root: dict[str, Any] = {}
+    for key, raw in environ.items():
+        if not key.startswith(prefix):
+            continue
+        path = key[len(prefix) :].split("__")
+        if not path or not path[0]:
+            continue
+        cursor: dict[str, Any] = root
+        for part in path[:-1]:
+            name = part.lower()
+            nxt = cursor.get(name)
+            if not isinstance(nxt, dict):
+                nxt = {}
+                cursor[name] = nxt
+            cursor = nxt
+        cursor[path[-1].lower()] = _coerce_scalar(str(raw))
+    return root
+
+
+def deep_merge(base: dict[str, Any], overlay: dict[str, Any]) -> dict[str, Any]:
+    merged: dict[str, Any] = dict(base)
+    for key, value in overlay.items():
+        if isinstance(value, dict) and isinstance(merged.get(key), dict):
+            merged[key] = deep_merge(merged[key], value)
+        else:
+            merged[key] = value
+    return merged
+
+
+def load_yaml(path: Path) -> dict[str, Any]:
+    try:
+        raw = path.read_text(encoding="utf-8")
+    except OSError as exc:
+        raise SettingsError(f"cannot read config file {path}: {exc}") from exc
+    loaded = yaml.safe_load(raw) or {}
+    if not isinstance(loaded, dict):
+        raise SettingsError(f"config file {path} must be a mapping")
+    return loaded
+
+
+def load_composed_yaml(path: Path, *, _seen: frozenset[Path] | None = None) -> dict[str, Any]:
+    resolved = path.resolve()
+    seen = _seen or frozenset()
+    if resolved in seen:
+        raise SettingsError(f"config extends cycle at {resolved}")
+    data = load_yaml(resolved)
+    extends = data.pop("extends", None)
+    if not extends:
+        return data
+    parent_path = Path(str(extends))
+    if not parent_path.is_absolute():
+        parent_path = resolved.parent / parent_path
+    parent = load_composed_yaml(parent_path, _seen=seen | {resolved})
+    return deep_merge(parent, data)
+
+
+def load_dotenv_allowlisted(path: Path) -> dict[str, str]:
+    from dotenv import dotenv_values
+
+    from botmoduleproject1.app.secrets import SECRET_ALLOWLIST
+
+    if not path.is_file():
+        raise SettingsError(f"env file not found: {path}")
+    raw = dotenv_values(path)
+    out: dict[str, str] = {}
+    for key, value in raw.items():
+        if not key or value is None or str(value).strip() == "":
+            continue
+        if key.startswith(ENV_PREFIX) or key in SECRET_ALLOWLIST:
+            out[str(key)] = str(value)
+    return out
+
+
+class Settings(BaseSettings):
+    """Composition-root settings. Not a trading configuration surface."""
+
+    model_config = SettingsConfigDict(
+        env_prefix=ENV_PREFIX,
+        env_nested_delimiter="__",
+        extra="ignore",
+        populate_by_name=True,
+        case_sensitive=False,
+        env_ignore_empty=True,
+        nested_model_default_partial_update=True,
+        env_file=None,
+        # Default env source is replaced in settings_customise_sources so
+        # unprefixed process env cannot leak in.
+        enable_decoding=True,
+    )
 
     app: AppSection = Field(default_factory=AppSection)
     safety: SafetySection = Field(default_factory=SafetySection)
@@ -187,24 +329,48 @@ class Settings(BaseModel):
     modules: ModulesSection = Field(default_factory=ModulesSection)
     health: HealthSection = Field(default_factory=HealthSection)
     diagnostics: DiagnosticsSection = Field(default_factory=DiagnosticsSection)
-    cli_mode: CliMode = "doctor"
+    paths: PathsSection = Field(default_factory=PathsSection)
+    profile: ProfileName = ProfileName.DEMO
+    cli_mode: str = "doctor"
     config_path: str | None = None
 
-    @field_validator("app")
     @classmethod
-    def _tz(cls, value: AppSection) -> AppSection:
-        if value.timezone != "UTC":
-            raise ValueError("timezone must be UTC (ADR-003)")
+    def settings_customise_sources(
+        cls,
+        settings_cls: type[BaseSettings],
+        init_settings: PydanticBaseSettingsSource,
+        env_settings: PydanticBaseSettingsSource,
+        dotenv_settings: PydanticBaseSettingsSource,
+        file_secret_settings: PydanticBaseSettingsSource,
+    ) -> tuple[PydanticBaseSettingsSource, ...]:
+        # Drop default env_settings / dotenv_settings: they would scan os.environ
+        # and dotenv without an allowlist. load_settings binds explicit sources.
+        return (init_settings, file_secret_settings)
+
+    @field_validator("cli_mode")
+    @classmethod
+    def _cli(cls, value: str) -> str:
+        if value not in _CLI_MODES:
+            raise ValueError(f"unknown cli_mode {value!r}")
         return value
 
+    @field_validator("profile", mode="before")
+    @classmethod
+    def _profile(cls, value: Any) -> Any:
+        if value is None or value == "":
+            return ProfileName.DEMO
+        return parse_profile(value)
+
     @model_validator(mode="after")
-    def _refuse_live(self) -> Settings:
+    def _refuse_live_and_missing_secrets(self) -> Settings:
         if self.safety.live_trading_enabled:
             raise LiveTradingDisabledError("LIVE_TRADING_ENABLED=true")
         if self.safety.trading_mode == "live":
             raise LiveTradingDisabledError("TRADING_MODE=live")
         if self.cli_mode == "live":
             raise LiveTradingDisabledError("CLI mode=live")
+        if self.profile is ProfileName.LIVE:
+            raise LiveTradingDisabledError("profile=live")
         if self.mt5.enabled and self.mt5.account_kind != "demo":
             raise SettingsError("MT5 account_kind must be demo")
         if self.mt5.enabled and not self.mt5.password:
@@ -212,121 +378,112 @@ class Settings(BaseModel):
         if self.telegram.enabled and not self.telegram.token:
             raise SettingsError("Telegram is enabled but token secret is missing")
         if self.persistence.enabled and not self.persistence.dsn:
-            raise SettingsError("Persistence is enabled but DATABASE_URL is missing")
+            raise SettingsError("Persistence is enabled but BOTMODULEPROJECT1_DATABASE_URL is missing")
+        policy = self.profile_policy
+        if self.mt5.enabled and not policy.allows_mt5_demo_network:
+            raise SettingsError(
+                f"profile {self.profile.value} forbids MT5 network operations"
+            )
+        validate_feature_flags(self.feature_flags, self.profile)
         return self
 
+    @property
+    def profile_policy(self) -> ProfilePolicy:
+        return policy_for(self.profile)
+
+    def feature_catalog(self) -> tuple[FeatureFlag, ...]:
+        return self.feature_flags.catalog(self.profile)
+
     def public_dict(self) -> dict[str, Any]:
-        """Redacted snapshot: secrets become present/absent, never values."""
         data = self.model_dump(mode="json")
-        _redact(data)
-        return data
+        data.pop("feature_flags", None)
+        data["feature_flags"] = self.feature_flags.enabled_map()
+        return redact_node(data)
 
     def fingerprint(self) -> str:
         payload = json.dumps(self.public_dict(), sort_keys=True, separators=(",", ":"))
         return hashlib.sha256(payload.encode("utf-8")).hexdigest()
 
 
-def _redact(node: Any) -> None:
-    secret_keys = {"password", "token", "dsn", "secret"}
-    if isinstance(node, dict):
-        for key, value in list(node.items()):
-            lowered = str(key).lower()
-            if any(s in lowered for s in secret_keys):
-                node[key] = "present" if value not in (None, "", {}) else "absent"
-            else:
-                _redact(value)
-    elif isinstance(node, list):
-        for item in node:
-            _redact(item)
+def _bound_settings_class(
+    *,
+    yaml_data: dict[str, Any],
+    prefix_env: dict[str, Any],
+    secret_data: dict[str, Any],
+    flag_data: dict[str, Any],
+) -> type[Settings]:
+    class BoundSettings(Settings):
+        @classmethod
+        def settings_customise_sources(
+            cls,
+            settings_cls: type[BaseSettings],
+            init_settings: PydanticBaseSettingsSource,
+            env_settings: PydanticBaseSettingsSource,
+            dotenv_settings: PydanticBaseSettingsSource,
+            file_secret_settings: PydanticBaseSettingsSource,
+        ) -> tuple[PydanticBaseSettingsSource, ...]:
+            return (
+                init_settings,
+                MappingSource(settings_cls, flag_data),
+                MappingSource(settings_cls, prefix_env),
+                MappingSource(settings_cls, secret_data),
+                MappingSource(settings_cls, yaml_data),
+            )
 
-
-def _bind_secrets(data: dict[str, Any], environ: dict[str, str]) -> None:
-    mt5 = data.setdefault("mt5", {})
-    if isinstance(mt5, dict):
-        mt5["login"] = environ.get(str(mt5.get("login_env", "MT5_LOGIN"))) or mt5.get("login")
-        raw_pw = environ.get(str(mt5.get("password_env", "MT5_PASSWORD")))
-        if raw_pw:
-            mt5["password"] = raw_pw
-        mt5["server"] = environ.get(str(mt5.get("server_env", "MT5_SERVER"))) or mt5.get("server")
-        mt5["terminal_path"] = (
-            environ.get(str(mt5.get("terminal_path_env", "MT5_TERMINAL_PATH")))
-            or mt5.get("terminal_path")
-        )
-    persistence = data.setdefault("persistence", {})
-    if isinstance(persistence, dict):
-        dsn = environ.get(str(persistence.get("dsn_env", "DATABASE_URL")))
-        if dsn:
-            persistence["dsn"] = dsn
-    telegram = data.setdefault("telegram", {})
-    if isinstance(telegram, dict):
-        token = environ.get(str(telegram.get("token_env", "TELEGRAM_BOT_TOKEN")))
-        if token:
-            telegram["token"] = token
-        chat = environ.get(str(telegram.get("chat_id_env", "TELEGRAM_CHAT_ID")))
-        if chat:
-            telegram["chat_id"] = chat
-
-
-def load_yaml(path: Path) -> dict[str, Any]:
-    try:
-        raw = path.read_text(encoding="utf-8")
-    except OSError as exc:
-        raise SettingsError(f"cannot read config file {path}: {exc}") from exc
-    loaded = yaml.safe_load(raw) or {}
-    if not isinstance(loaded, dict):
-        raise SettingsError(f"config file {path} must be a mapping")
-    return loaded
+    return BoundSettings
 
 
 def load_settings(
     *,
     config_path: str | Path | None = None,
     environ: dict[str, str] | None = None,
-    cli_mode: CliMode = "doctor",
+    cli_mode: str = "doctor",
     extra: dict[str, Any] | None = None,
+    profile: str | ProfileName | None = None,
+    env_file: str | Path | None = None,
+    enforce_python: bool = True,
 ) -> Settings:
-    """Load YAML, overlay process env aliases, then validate."""
-    import os
+    """Load YAML + allowlisted env + optional dotenv, then validate."""
+    if enforce_python:
+        assert_python_version()
 
-    env = dict(environ if environ is not None else os.environ)
-    data: dict[str, Any] = {}
+    env: dict[str, str] = dict(environ if environ is not None else os.environ)
+    if env_file is not None:
+        env = {**load_dotenv_allowlisted(Path(env_file)), **env}
+
+    yaml_data: dict[str, Any] = {}
     path: Path | None = Path(config_path) if config_path else None
     if path is not None:
-        data.update(load_yaml(path))
-        data["config_path"] = str(path)
+        yaml_data = load_composed_yaml(path)
+        yaml_data["config_path"] = str(path)
 
-    safety = data.setdefault("safety", {})
-    if isinstance(safety, dict):
-        if "TRADING_MODE" in env:
-            safety["trading_mode"] = env["TRADING_MODE"]
-        if "LIVE_TRADING_ENABLED" in env:
-            safety["live_trading_enabled"] = env["LIVE_TRADING_ENABLED"].lower() in {
-                "1",
-                "true",
-                "yes",
-            }
-    app = data.setdefault("app", {})
-    if isinstance(app, dict):
-        if "APP_NAME" in env:
-            app["name"] = env["APP_NAME"]
-        if "ENVIRONMENT" in env:
-            app["environment"] = env["ENVIRONMENT"]
-        if "DEFAULT_SYMBOL" in env:
-            app["default_symbol"] = env["DEFAULT_SYMBOL"]
-    logging = data.setdefault("logging", {})
-    if isinstance(logging, dict) and "LOG_LEVEL" in env:
-        logging["level"] = env["LOG_LEVEL"].upper()
+    prefix_env = nested_from_prefixed_env(env)
+    # feature_flags from prefixed nested env already sit in prefix_env; dedicated
+    # source still records env_opt_in and enable_* aliases.
+    secret_data = secrets_from_environ(env)
+    flag_data = feature_flags_from_environ(env)
 
-    _bind_secrets(data, env)
-    data["cli_mode"] = cli_mode
+    init_kwargs: dict[str, Any] = {"cli_mode": cli_mode}
+    if path is not None:
+        init_kwargs["config_path"] = str(path)
+    if profile is not None:
+        init_kwargs["profile"] = parse_profile(profile)
     if extra:
-        data.update(extra)
+        init_kwargs = deep_merge(init_kwargs, extra)
 
+    bound = _bound_settings_class(
+        yaml_data=yaml_data,
+        prefix_env=prefix_env,
+        secret_data=secret_data,
+        flag_data=flag_data,
+    )
     try:
-        return Settings.model_validate(data)
-    except LiveTradingDisabledError:
+        return bound(**init_kwargs)
+    except (LiveTradingDisabledError, SettingsError):
         raise
-    except Exception as exc:  # pydantic ValidationError among others
-        if isinstance(exc, SettingsError):
-            raise
+    except Exception as exc:
+        from pydantic import ValidationError
+
+        if isinstance(exc, ValidationError):
+            raise SettingsError(str(exc)) from exc
         raise SettingsError(str(exc)) from exc

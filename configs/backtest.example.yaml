@@ -1,0 +1,29 @@
+# Historical replay overlay. No live connections, no production ledger.
+
+extends: base.example.yaml
+
+profile: backtest
+
+app:
+  environment: backtest
+
+safety:
+  trading_mode: backtest
+  live_trading_enabled: false
+
+clock:
+  source: fake
+
+mt5:
+  enabled: false
+
+persistence:
+  enabled: false
+
+telegram:
+  enabled: false
+
+feature_flags:
+  execution: false
+  live_trading: false
+  telegram: false

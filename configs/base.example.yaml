@@ -1,5 +1,8 @@
 # Public baseline configuration. No secrets.
 # Secrets are referenced by environment variable name only.
+# Process env must use BOTMODULEPROJECT1_ prefix (ADR-006 / Sequence 02).
+
+profile: demo
 
 app:
   name: BotModuleProject1
@@ -15,6 +18,10 @@ safety:
   on_stale_data: observe-only
   on_incomplete_recovery: halt
   on_ledger_inconsistency: halt
+  require_preflight: true
+  require_readiness: true
+  require_recovery: true
+  require_risk_ready_before_orders: true
 
 feature_flags:
   strategy_engine: false
@@ -23,6 +30,8 @@ feature_flags:
   execution: false
   telegram: false
   fine_tune_studio: false
+  market_data: false
+  live_trading: false
 
 logging:
   level: INFO
@@ -50,7 +59,7 @@ mt5:
 
 persistence:
   enabled: false
-  dsn_env: DATABASE_URL
+  dsn_env: BOTMODULEPROJECT1_DATABASE_URL
   api_is_sole_durable_path: true
 
 telegram:
@@ -61,7 +70,11 @@ telegram:
 
 model_registry:
   enabled: false
-  uri_env: MODEL_REGISTRY_URI
+  uri_env: BOTMODULEPROJECT1_MODEL_REGISTRY_URI
 
 notifications:
   enabled: false
+
+paths:
+  log_dir: logs
+  data_dir: data/local

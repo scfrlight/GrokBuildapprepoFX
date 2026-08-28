@@ -1,7 +1,7 @@
 """BotModuleProject1 platform kernel.
 
-Sequence 01: contracts + PM1 composition root.
-Not trade-ready. Live trading is disabled.
+Sequence 02: configuration, secrets, bootstrap governance.
+Not trade-ready. Live trading is disabled. Python 3.11+ required.
 """
 
 from botmoduleproject1.app.exceptions import LiveTradingDisabledError

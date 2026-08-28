@@ -3,6 +3,7 @@
 | File | Status |
 |---|---|
 | `PM1_Master_Prompt.md` | Present — Sequence 01 (prompt persisted in full) |
+| `PM1_Sequence02_Configuration_Governance_Prompt.md` | Present — Sequence 02 (prompt persisted in full) |
 | `Grok_Build_Master_Orchestration_Prompt.md` | Missing |
 | `PM2_Master_Prompt.md` | Missing |
 | `PM3_Master_Prompt.md` | Missing (forecasting) |
@@ -17,4 +18,4 @@
 | `PM9a_Strategy_Fine_Tune_Studio_Master_Prompt.md` | Missing |
 | `# PM1–PM9a Modular Forex Trading Bot — Installation & Setup Guide.md` | Missing |
 
-Until the remaining files arrive, the normalized map in `docs/architecture/architecture_baseline.md` plus `PM1_Master_Prompt.md` is authoritative for Sequence 01.
+Until the remaining files arrive, the normalized map in `docs/architecture/architecture_baseline.md` plus the persisted Sequence 01 and Sequence 02 prompts is authoritative.

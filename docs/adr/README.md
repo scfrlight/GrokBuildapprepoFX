@@ -9,3 +9,4 @@
 | [ADR-005](./ADR-005-persistence-idempotency-recovery.md) | Persistence, idempotency, recovery and reconciliation | Accepted |
 | [ADR-006](./ADR-006-configuration-secrets-governance.md) | Configuration and secrets governance | Accepted |
 | [ADR-007](./ADR-007-risk-gate-exclusivity.md) | Risk-gate exclusivity before execution | Accepted |
+| [ADR-008](./ADR-008-python-version-constraint.md) | Python version constraint and sandbox deviation | Accepted |

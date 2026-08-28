@@ -1,6 +1,6 @@
-# BotModuleProject1 — Sequence 00 bootstrap.
+# BotModuleProject1 — bootstrap dependencies.
 # No MT5, Telegram, or ML stack yet.
-# Python 3.11+ required.
+# Python 3.11+ required (ADR-008).
 
 pydantic>=2.9,<3
 pydantic-settings>=2.5,<3

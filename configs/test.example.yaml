@@ -1,5 +1,9 @@
 # Deterministic test overlay.
 
+extends: base.example.yaml
+
+profile: test
+
 app:
   environment: test
 

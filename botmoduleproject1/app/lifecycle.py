@@ -1,4 +1,8 @@
-"""Explicit lifecycle state machine. Invalid transitions raise."""
+"""Explicit lifecycle state machine. Invalid transitions raise.
+
+Sequence 02 inserts PREFLIGHT_CHECKED between VALIDATED and REGISTRY_READY.
+That is the documented initialize → validate → preflight → connect/wire path.
+"""
 
 from __future__ import annotations
 
@@ -12,6 +16,7 @@ class LifecycleState(str, Enum):
     CREATED = "created"
     CONFIG_LOADED = "config_loaded"
     VALIDATED = "validated"
+    PREFLIGHT_CHECKED = "preflight_checked"
     REGISTRY_READY = "registry_ready"
     WIRED = "wired"
     STARTUP_CHECKED = "startup_checked"
@@ -32,6 +37,9 @@ _ALLOWED: dict[LifecycleState, frozenset[LifecycleState]] = {
         {LifecycleState.VALIDATED, LifecycleState.FAILED}
     ),
     LifecycleState.VALIDATED: frozenset(
+        {LifecycleState.PREFLIGHT_CHECKED, LifecycleState.FAILED}
+    ),
+    LifecycleState.PREFLIGHT_CHECKED: frozenset(
         {LifecycleState.REGISTRY_READY, LifecycleState.FAILED}
     ),
     LifecycleState.REGISTRY_READY: frozenset(

@@ -1,5 +1,9 @@
 # Offline research overlay (future PM9a). No broker, no orders.
 
+extends: base.example.yaml
+
+profile: research
+
 app:
   environment: research
 
@@ -13,6 +17,7 @@ feature_flags:
   forecasting: false
   execution: false
   telegram: false
+  live_trading: false
 
 mt5:
   enabled: false

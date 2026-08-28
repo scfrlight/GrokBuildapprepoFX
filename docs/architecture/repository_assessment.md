@@ -38,6 +38,21 @@ Searched in `/workspace`, GitHub (user `scfrlight`), and Google Drive.
 
 **Impact:** Sequence 00 proceeded from the normalized module map embedded in the Sequence 00 prompt. Sequence 01 received the PM1 spec and Contract-First Domain Foundation **inline in the Sequence 01 prompt**, not as a pre-existing Drive/GitHub file. That inline spec is now persisted at `docs/prompts/PM1_Master_Prompt.md`.
 
+## 3b. Sequence 02 inputs
+
+Configuration, secrets, and bootstrap governance were **not** recovered from an external master-prompt file. They were supplied in full inside the Sequence 02 user prompt on 2026-08-28.
+
+Traceability:
+
+| Input | Source | Persisted as |
+|---|---|---|
+| Sequence 02 specification | Sequence 02 prompt (complete) | `docs/prompts/PM1_Sequence02_Configuration_Governance_Prompt.md` |
+| Gate-fix: Python 3.11+ | Sequence 02 prompt, section 1.1 | ADR-008 + `python_version.py` |
+| Gate-fix: pydantic-settings | Sequence 02 prompt, section 1.2 | `botmoduleproject1/app/settings.py` |
+| Profiles / flags / preflight | Sequence 02 prompt, section 4 | `profiles.py`, `feature_flags.py`, `preflight.py`, `bootstrap_governance.md` |
+
+No original PM2–PM9a files were present. Sequence 02 does not implement those modules.
+
 ## 3. Sequence 01 inputs
 
 PM1 specification and Contract-First Domain Foundation were **not** recovered from an external master-prompt file. They were supplied in full inside the Sequence 01 user prompt on 2026-08-28.
