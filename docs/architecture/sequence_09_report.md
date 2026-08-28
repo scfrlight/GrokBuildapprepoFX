@@ -6,10 +6,10 @@ Display name: **PM7 Persistence / Journal / Evidence / Replay**
 
 ## 1. Git commit hash
 
-This App Builder workspace has no `.git` directory. Sequence 09 lands on
-`scfrlight/GrokBuildapprepoFX` after push. Hash recorded below.
+This App Builder workspace has no `.git` directory. Sequence 09 landed on
+`scfrlight/GrokBuildapprepoFX` as `a25e7db003b633c3869227b9c1ef42427724ea41`.
 
-Kernel commit: **pending push**
+Kernel commit: **a25e7db003b633c3869227b9c1ef42427724ea41**
 
 ## 2. Created / updated files
 
