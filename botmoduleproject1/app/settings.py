@@ -296,6 +296,55 @@ class Pm4RiskGateSection(BaseModel):
         return value
 
 
+class Pm5ExecutionSection(BaseModel):
+    """Public PM5 knobs. Enabling is a feature flag, not this block. No live mode."""
+
+    operating_mode: str = "disabled"
+    observe_only: bool = True
+    allowed_order_types: tuple[str, ...] = ("market", "limit")
+    symbol_allowlist: tuple[str, ...] = ("EURUSD", "GBPUSD", "USDJPY", "AUDUSD")
+    execution_policy: str = "simulation_only"
+    stale_ttl_seconds: int = Field(default=14400, ge=60)
+    idempotency_ttl_seconds: int = Field(default=86400, ge=1)
+    submit_timeout_ms: int = Field(default=5000, ge=1)
+    max_retries: int = Field(default=2, ge=0, le=5)
+    submit_burst: int = Field(default=8, ge=1)
+    reject_burst: int = Field(default=6, ge=1)
+    cancel_burst: int = Field(default=12, ge=1)
+    modify_burst: int = Field(default=8, ge=1)
+    burst_window_seconds: int = Field(default=60, ge=1)
+    recovery_cooldown_seconds: int = Field(default=300, ge=1)
+    require_manual_recovery: bool = True
+    auto_rearm: bool = False
+    broker_adapter_enabled: bool = False
+    mt5_enabled: bool = False
+    simulation_auto_fill: bool = True
+    slippage_limit: str = "0.00050"
+    cancel_on_disconnect: bool = True
+    telemetry_verbose: bool = True
+
+    @field_validator("operating_mode")
+    @classmethod
+    def _mode(cls, value: str) -> str:
+        if value not in {"disabled", "shadow", "simulation"}:
+            raise ValueError("pm5_execution.operating_mode must be disabled|shadow|simulation")
+        return value
+
+    @field_validator("auto_rearm")
+    @classmethod
+    def _no_auto_rearm(cls, value: bool) -> bool:
+        if value:
+            raise ValueError("pm5_execution.auto_rearm must stay false")
+        return value
+
+    @field_validator("broker_adapter_enabled", "mt5_enabled")
+    @classmethod
+    def _no_broker(cls, value: bool) -> bool:
+        if value:
+            raise ValueError("pm5 broker/mt5 cannot be enabled in Sequence 07")
+        return value
+
+
 class MappingSource(PydanticBaseSettingsSource):
     """Inject a precomputed nested mapping as a settings source."""
 
@@ -445,6 +494,7 @@ class Settings(BaseSettings):
     pm3_strategy_engine: Pm3StrategySection = Field(default_factory=Pm3StrategySection)
     pm3_forecasting: Pm3ForecastingSection = Field(default_factory=Pm3ForecastingSection)
     pm4_risk_gate: Pm4RiskGateSection = Field(default_factory=Pm4RiskGateSection)
+    pm5_execution: Pm5ExecutionSection = Field(default_factory=Pm5ExecutionSection)
     profile: ProfileName = ProfileName.DEMO
     cli_mode: str = "doctor"
     config_path: str | None = None

@@ -49,7 +49,8 @@ profiles, safety classification.
 | `requires-review` | Yes | Yes | false |
 | `dangerous` | **No** — load fails | Required | false |
 
-Dangerous flags currently: `enable_pm5_execution`, `enable_telegram_control`,
+Dangerous flags currently: `enable_pm5_execution`, `enable_pm5_broker_adapter`,
+`enable_mt5_demo_execution`, `enable_live_execution`, `enable_telegram_control`,
 `enable_live_trading`. `enable_live_trading` has **no** override: env opt-in
 still raises `LiveTradingDisabledError`.
 

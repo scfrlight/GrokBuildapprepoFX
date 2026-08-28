@@ -66,6 +66,16 @@ def _risk_module(settings: Settings, overrides: dict[str, Any], clock: ClockPort
     return NullRiskGate()
 
 
+def _execution_module(settings: Settings, overrides: dict[str, Any], clock: ClockPort):
+    if "execution" in overrides:
+        return overrides["execution"]
+    if getattr(settings.feature_flags, "pm5_simulation", False):
+        from botmoduleproject1.modules.pm5_execution.module import PM5ExecutionModule
+
+        return PM5ExecutionModule.from_settings(settings, clock)
+    return DisabledExecution()
+
+
 @dataclass
 class Container:
     settings: Settings
@@ -104,7 +114,7 @@ def build_container(
         _strategy_engine_module(settings, overrides, clock),
         _forecasting_module(settings, overrides, clock),
         _risk_module(settings, overrides, clock),
-        overrides.get("execution") or DisabledExecution(),
+        _execution_module(settings, overrides, clock),
         overrides.get("storage") or NullStorage(),
         overrides.get("notifications") or NullNotifications(),
         overrides.get("monitoring") or NullMonitoring(),

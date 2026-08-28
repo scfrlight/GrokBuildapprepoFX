@@ -209,3 +209,23 @@ fake-useragent, textblob, pytz, flask, yfinance, pytest>=8.0
 5. **Legacy user id in FXTGBOT `.env.example`:** treat as a hygiene defect; placeholders only here.
 6. **Settings vs pydantic-settings:** Sequence 01 uses Pydantic `BaseModel` with explicit YAML + env overlay rather than `BaseSettings` auto-env, to avoid ambient env pollution. `pydantic-settings` remains a declared dependency for Sequence 02 governance.
 7. **Readiness vs doctor boot:** `NullRiskGate` fails critical READINESS (fail-closed) when `enable_pm4_risk_gate` is off. Diagnostic boot uses `fail_on_critical=False` on readiness so `doctor` can still produce a DEGRADED snapshot. Orders remain impossible. When the flag is on in test/research, PM4 can evaluate; ALLOW is still not an order.
+
+## Sequence 07 inputs
+
+Sequence 07 consumes:
+
+- Canonical `RiskPublicationBundle` from PM4 (the only authorization object).
+- `DisabledExecution` as the fail-closed default bind (must not be deleted).
+- Existing `contracts/v1/execution.py` types (`OrderRequest`, `ExecutionReport`, `ReconciliationRecord`) extended backward-compatibly.
+- Feature-flag catalog and profile policy from Sequence 02.
+- In-memory repository pattern from PM4 (no durable ledger until PM7/PM8).
+
+Hard constraints carried in:
+
+- `execution_permitted` frozen false.
+- Live profile hard-blocked.
+- No MetaTrader5 on Linux tests.
+- No Telegram, no paper loop, no database migrations.
+
+Outputs: OMS/EMS simulation fabric, independent control plane, recon default `degraded`, architecture desk Sequence 07 panel. Next: Sequence 08 PM6.
+

@@ -13,3 +13,4 @@
 | [ADR-009](./ADR-009-pm3-strategy-engine-governance.md) | PM3-Strategy Engine governance | Accepted |
 | [ADR-010](./ADR-010-pm3-forecasting-research-kernel.md) | PM3 forecasting / QRF research kernel | Accepted |
 | [ADR-011](./ADR-011-pm4-risk-gate-governance.md) | PM4 Risk Gate governance | Accepted |
+| [ADR-012](./ADR-012-pm5-execution-boundary.md) | PM5 Execution boundary | Accepted |

@@ -4,12 +4,13 @@
 | `PM3_Strategy_Engine_Sequence04_Prompt.md` | Present — Sequence 04 (PM3-Strategy Engine) |
 | `PM3_Forecasting_Sequence05_Prompt.md` | Present — Sequence 05 (PM3 forecasting / QRF) |
 | `PM4_Risk_Gate_Sequence06_Prompt.md` | Present — Sequence 06 (PM4 Risk Gate) |
+| `PM5_Execution_Sequence07_Prompt.md` | Present — Sequence 07 (PM5 Execution) |
 | `Grok_Build_Master_Orchestration_Prompt.md` | Missing |
 | `PM2_Master_Prompt.md` | Covered by Sequence 03 prompt |
 | `PM3_Master_Prompt.md` | Covered by Sequence 05 prompt (forecasting / QRF — not the Strategy Engine) |
 | `PM3_Strategy_Engine_Master_Prompt.md` | Covered by Sequence 04 prompt |
 | `PM4_Master_Prompt.md` | Covered by Sequence 06 prompt |
-| `PM5_Master_Prompt.md` | Missing |
+| `PM5_Master_Prompt.md` | Covered by Sequence 07 prompt |
 | `PM6_Master_Prompt.md` | Missing |
 | `PM7_Master_Prompt.md` | Missing |
 | `PM8_Master_Prompt.md` | Missing |

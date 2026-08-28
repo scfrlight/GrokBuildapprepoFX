@@ -28,6 +28,10 @@ feature_flags:
   forecasting: false
   risk_engine: false
   execution: false
+  pm5_simulation: false
+  pm5_broker_adapter: false
+  mt5_demo_execution: false
+  live_execution: false
   telegram: false
   fine_tune_studio: false
   market_data: false
@@ -144,3 +148,21 @@ pm4_risk_gate:
   recovery_cooldown_seconds: 300
   require_manual_recovery_after_kill: true
   risk_reducing_only_on_kill: true
+
+# PM5 Execution knobs. Flags stay false. Simulation only when env-opted in test/research.
+# No MT5, no broker adapter, no live path.
+pm5_execution:
+  operating_mode: disabled
+  observe_only: true
+  execution_policy: simulation_only
+  stale_ttl_seconds: 14400
+  max_retries: 2
+  submit_burst: 8
+  reject_burst: 6
+  cancel_burst: 12
+  auto_rearm: false
+  broker_adapter_enabled: false
+  mt5_enabled: false
+  simulation_auto_fill: true
+  recovery_cooldown_seconds: 300
+  require_manual_recovery: true

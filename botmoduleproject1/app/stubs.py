@@ -135,7 +135,8 @@ class DisabledExecution:
 
     def submit(self, request: OrderRequest) -> ExecutionReport:
         raise ExecutionDisabledError(
-            "PM1 kernel refuses order submission. PM5 is not implemented."
+            "PM1 kernel refuses order submission. PM5 is closed unless "
+            "enable_pm5_simulation is on (test/research). No MT5 send."
         )
 
     def health_checks(self, kind: CheckKind) -> list[CheckResult]:
@@ -145,7 +146,7 @@ class DisabledExecution:
                 kind=kind,
                 passed=True,
                 critical=False,
-                message="execution disabled in Sequence 01",
+                message="execution disabled in Sequence 07; DisabledExecution default bind",
             )
         ]
 

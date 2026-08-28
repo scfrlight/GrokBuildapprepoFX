@@ -1,0 +1,35 @@
+# PM5 Execution public knobs. Enabling is a feature flag, not this file.
+# Sequence 07: simulation/shadow only. No broker adapter. No MT5.
+
+extends: base.example.yaml
+
+pm5_execution:
+  operating_mode: disabled
+  observe_only: true
+  allowed_order_types:
+    - market
+    - limit
+  symbol_allowlist:
+    - EURUSD
+    - GBPUSD
+    - USDJPY
+    - AUDUSD
+  execution_policy: simulation_only
+  stale_ttl_seconds: 14400
+  idempotency_ttl_seconds: 86400
+  submit_timeout_ms: 5000
+  max_retries: 2
+  submit_burst: 8
+  reject_burst: 6
+  cancel_burst: 12
+  modify_burst: 8
+  burst_window_seconds: 60
+  recovery_cooldown_seconds: 300
+  require_manual_recovery: true
+  auto_rearm: false
+  broker_adapter_enabled: false
+  mt5_enabled: false
+  simulation_auto_fill: true
+  slippage_limit: "0.00050"
+  cancel_on_disconnect: true
+  telemetry_verbose: true

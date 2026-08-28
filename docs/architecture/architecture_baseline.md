@@ -1,11 +1,11 @@
 # Architecture Baseline — BotModuleProject1
 
-Status: Accepted for Sequence 00; PM1 kernel Sequence 01; config governance Sequence 02; PM2 market context Sequence 03; PM3-Strategy Engine Sequence 04; PM3 forecasting / QRF Sequence 05; PM4 Risk Gate Sequence 06  
+Status: Accepted for Sequence 00; PM1 kernel Sequence 01; config governance Sequence 02; PM2 market context Sequence 03; PM3-Strategy Engine Sequence 04; PM3 forecasting / QRF Sequence 05; PM4 Risk Gate Sequence 06; PM5 Execution Sequence 07  
 Date (UTC): 2026-08-28  
 Scope: EURUSD on MT5 Demo, expandable to additional FX symbols  
-Trading readiness: **not ready**. PM3-Strategy Engine emits analytical TradeIntent only. PM3 forecasting / QRF may attach a ForecastOutput envelope. PM4 may ALLOW a risk-governed handoff. That ALLOW is not an order. PM5 remains closed. No live path is implemented.
+Trading readiness: **not ready**. PM3-Strategy Engine emits analytical TradeIntent only. PM3 forecasting / QRF may attach a ForecastOutput envelope. PM4 may ALLOW a risk-governed handoff. That ALLOW is not an order. PM5 may shadow-record an OMS lifecycle in simulation. It does not send to MT5. No live path is implemented.
 
-This document is the Sequence 00 source of truth for structure, bounded contexts, and safety invariants. Sequence 01 implemented the composition root and v1 contracts against this baseline. Sequence 02 added profiles, pydantic-settings, feature flags, and preflight. Sequence 03 implemented PM2 as a ranking/context layer behind `enable_pm2_market_data` (test/research env opt-in). Sequence 04 implemented the **PM3-Strategy Engine** behind `enable_pm3_strategy_engine` (test/research env opt-in; TradeIntent is not an order). Sequence 05 implemented **PM3 forecasting / QRF** behind `enable_forecasting` (demo/test/research env opt-in; ForecastOutput is not an order; residual quantile envelope, not a fitted QRF). Sequence 06 implemented the **PM4 Risk Gate** behind `enable_pm4_risk_gate` (test/research env opt-in; ALLOW is not an order). The module map is unchanged.
+This document is the Sequence 00 source of truth for structure, bounded contexts, and safety invariants. Sequence 01 implemented the composition root and v1 contracts against this baseline. Sequence 02 added profiles, pydantic-settings, feature flags, and preflight. Sequence 03 implemented PM2 as a ranking/context layer behind `enable_pm2_market_data` (test/research env opt-in). Sequence 04 implemented the **PM3-Strategy Engine** behind `enable_pm3_strategy_engine` (test/research env opt-in; TradeIntent is not an order). Sequence 05 implemented **PM3 forecasting / QRF** behind `enable_forecasting` (demo/test/research env opt-in; ForecastOutput is not an order; residual quantile envelope, not a fitted QRF). Sequence 06 implemented the **PM4 Risk Gate** behind `enable_pm4_risk_gate` (test/research env opt-in; ALLOW is not an order). Sequence 07 implemented **PM5 Execution** behind `enable_pm5_simulation` (test/research env opt-in; simulation only; `DisabledExecution` default). The module map is unchanged.
 
 
 ## 1. Target monorepo structure
@@ -78,7 +78,7 @@ Python composition root lives at `botmoduleproject1/app`, not workspace-root `ap
 | PM3-Strategy Engine | `modules/pm3_strategy_engine` | Templates, profiles, registry, symbol pipes, consensus, TradeIntent (Sequence 04 kernel, flag off) |
 | Forecasting | `modules/pm3_forecasting` (PM3 forecasting / QRF) | Residual quantile envelope, ForecastOutput, conformal coverage (Sequence 05 kernel, flag off). Not the Strategy Engine. Not a fitted QRF. |
 | Risk | `modules/pm4_risk` (PM4) | Allocation, sizing, heat, drawdown governor, kill-switch. **Sole final gate** |
-| Execution | `modules/pm5_execution` (PM5) | OMS/EMS, broker reconciliation, routing, exit lifecycle |
+| Execution | `modules/pm5_execution` (PM5) | OMS/EMS simulation, independent control, recon (degraded without venue). No MT5 send. |
 | Surveillance | `modules/pm6_monitoring` (PM6) | Post-trade controls, incidents, governance |
 | Ledger / evidence | `modules/pm7_ledger` (PM7) | Trade ledger, evidence, replay, reporting |
 | Persistence / recovery | `modules/pm8_persistence` (PM8 + PM8a spec) | CQRS, outbox/inbox, idempotency, snapshots, reconciliation |

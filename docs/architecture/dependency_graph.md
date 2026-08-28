@@ -1,6 +1,6 @@
 # Dependency Graph — BotModuleProject1
 
-Status: Accepted for Sequence 00; PM4 Risk Gate producer live in Sequence 06 (flag off, deny-by-default)  
+Status: Accepted for Sequence 00; PM5 Execution producer live in Sequence 07 (flag off, simulation only, DisabledExecution default)  
 Date (UTC): 2026-08-28
 
 ## 1. Canonical data flow
@@ -27,6 +27,7 @@ Hard cuts in this flow:
 - A `TradeIntent` is not an order.
 - A forecast does not create or mutate an intent's side; it only enriches uncertainty fields.
 - PM5 is unreachable without `RiskVerdict.status == ALLOW`.
+- A PM5 simulation fill is not broker truth.
 - Persistence is append/reconcile, not a second decision maker.
 - Operator UX observes and issues *commands to application ports*, never raw broker calls.
 
@@ -39,7 +40,7 @@ Hard cuts in this flow:
 | PM3-Strategy Engine | Snapshot, regime, profiles, RankedCandidate | TradeIntent / NoTradeDecision (shadow; no lot size) | contracts, PM2 public outputs | Decision-critical (non-fatal if flag off) | Invalid profile / stale / handoff-false → NoTradeDecision |
 | PM3 forecasting / QRF | Intent, confirmed synthetic bars | ForecastOutput (quantiles, model version; not an order) | contracts, synthetic feed, in-memory registry | Degraded-ok (non-critical) | Insufficient history / lookahead → None; risk must still fail closed |
 | PM4 risk gate | Intent, forecast, ranked candidate, book placeholders | RiskVerdict + RiskPublicationBundle (not an order) | contracts, in-memory control state | Execution-critical | Any doubt → DENY / HALT; ALLOW still pending PM5 |
-| PM5 execution | ALLOW verdict + intent | Order events, fills | contracts, MT5 adapter, PM4 | Execution-critical | Broker error → safe halt, no retry storms |
+| PM5 execution | RiskPublicationBundle | ExecutionPublicationBundle (simulation; not a broker order) | contracts, PM4, in-memory OMS | Execution-critical (non-fatal if flag off) | No venue → recon degraded; submit() raises |
 | PM6 monitoring | Events from PM5/PM7/PM8 | Incidents, alerts | contracts | Ops-critical | Alert failure → log locally, do not hide halt |
 | PM7 ledger | Execution/risk events | Evidence, reports | PM8 persistence API | Recovery-critical | Inconsistency → halt |
 | PM8 persistence | All durable writes | Repositories, snapshots, outbox | DB adapter | Recovery-critical | Incomplete recovery → halt |

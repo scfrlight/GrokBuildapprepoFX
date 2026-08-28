@@ -41,6 +41,10 @@ _ALIAS_ENV = {
     "forecasting": "BOTMODULEPROJECT1_FEATURE__ENABLE_FORECASTING",
     "risk_engine": "BOTMODULEPROJECT1_FEATURE__ENABLE_PM4_RISK_GATE",
     "execution": "BOTMODULEPROJECT1_FEATURE__ENABLE_PM5_EXECUTION",
+    "pm5_simulation": "BOTMODULEPROJECT1_FEATURE__ENABLE_PM5_SIMULATION",
+    "pm5_broker_adapter": "BOTMODULEPROJECT1_FEATURE__ENABLE_PM5_BROKER_ADAPTER",
+    "mt5_demo_execution": "BOTMODULEPROJECT1_FEATURE__ENABLE_MT5_DEMO_EXECUTION",
+    "live_execution": "BOTMODULEPROJECT1_FEATURE__ENABLE_LIVE_EXECUTION",
     "telegram": "BOTMODULEPROJECT1_FEATURE__ENABLE_TELEGRAM_CONTROL",
     "fine_tune_studio": "BOTMODULEPROJECT1_FEATURE__ENABLE_FINE_TUNE_STUDIO",
     "live_trading": "BOTMODULEPROJECT1_FEATURE__ENABLE_LIVE_TRADING",
@@ -88,12 +92,47 @@ FEATURE_FLAG_CATALOG: tuple[FeatureFlagSpec, ...] = (
         env_key=_ALIAS_ENV["risk_engine"],
     ),
     FeatureFlagSpec(
+        name="enable_pm5_simulation",
+        field="pm5_simulation",
+        description=(
+            "PM5 OMS/EMS simulation. Env opt-in; test and research only. "
+            "Records simulated lifecycle. Does not send to a broker. Tickets are SIM-*."
+        ),
+        allowed_profiles=(ProfileName.TEST, ProfileName.RESEARCH),
+        safety=SafetyClassification.REQUIRES_REVIEW,
+        env_key=_ALIAS_ENV["pm5_simulation"],
+    ),
+    FeatureFlagSpec(
         name="enable_pm5_execution",
         field="execution",
         description="PM5 order send. Dangerous. Env opt-in only. Kernel still refuses orders.",
         allowed_profiles=(ProfileName.DEMO,),
         safety=SafetyClassification.DANGEROUS,
         env_key=_ALIAS_ENV["execution"],
+    ),
+    FeatureFlagSpec(
+        name="enable_pm5_broker_adapter",
+        field="pm5_broker_adapter",
+        description="PM5 real broker adapter. Refused in Sequence 07.",
+        allowed_profiles=(),
+        safety=SafetyClassification.DANGEROUS,
+        env_key=_ALIAS_ENV["pm5_broker_adapter"],
+    ),
+    FeatureFlagSpec(
+        name="enable_mt5_demo_execution",
+        field="mt5_demo_execution",
+        description="MT5 demo execution. Future-controlled. Refused in Sequence 07.",
+        allowed_profiles=(),
+        safety=SafetyClassification.DANGEROUS,
+        env_key=_ALIAS_ENV["mt5_demo_execution"],
+    ),
+    FeatureFlagSpec(
+        name="enable_live_execution",
+        field="live_execution",
+        description="Live execution. Always fail-closed in Sequence 07.",
+        allowed_profiles=(),
+        safety=SafetyClassification.DANGEROUS,
+        env_key=_ALIAS_ENV["live_execution"],
     ),
     FeatureFlagSpec(
         name="enable_telegram_control",
@@ -143,6 +182,10 @@ class FeatureFlags(BaseModel):
     forecasting: bool = False
     risk_engine: bool = False
     execution: bool = False
+    pm5_simulation: bool = False
+    pm5_broker_adapter: bool = False
+    mt5_demo_execution: bool = False
+    live_execution: bool = False
     telegram: bool = False
     fine_tune_studio: bool = False
     market_data: bool = False
@@ -216,8 +259,13 @@ def validate_feature_flags(flags: FeatureFlags, profile: ProfileName) -> None:
                 f"dangerous feature flag {spec.name} is default-disabled and "
                 f"requires explicit env opt-in ({spec.env_key}=true); YAML cannot enable it"
             )
-        if spec.field == "live_trading":
-            raise LiveTradingDisabledError("feature flag enable_live_trading")
+        if spec.field in {"live_trading", "live_execution"}:
+            raise LiveTradingDisabledError(f"feature flag {spec.name}")
+        if spec.field in {"pm5_broker_adapter", "mt5_demo_execution"}:
+            raise FeatureFlagError(
+                f"feature flag {spec.name} is refused in Sequence 07; "
+                "no broker adapter and no MT5 demo execution"
+            )
         if profile not in spec.allowed_profiles:
             raise FeatureFlagError(
                 f"feature flag {spec.name} is not allowed in profile {profile.value}"
