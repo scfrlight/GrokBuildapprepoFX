@@ -6,7 +6,7 @@ Display name: **PM3 forecasting / QRF** (never shortened to “PM3”)
 
 ## 1. Git commit hash
 
-Kernel not yet committed (parent will push). Sequence 04 parent on GitHub is `8619730`. This workspace has no `.git`; the Sequence 05 kernel is complete in `/workspace` and ready for the parent process to commit.
+`8cfdc3d3006305b2cf7e4a7bd4b7aa2944e45bdf` (short `8cfdc3d`). Sequence 05 kernel commit on `main`.
 
 ## 2. Created / updated files
 
