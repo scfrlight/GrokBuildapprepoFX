@@ -82,8 +82,8 @@ FEATURE_FLAG_CATALOG: tuple[FeatureFlagSpec, ...] = (
     FeatureFlagSpec(
         name="enable_pm4_risk_gate",
         field="risk_engine",
-        description="PM4 exclusive risk engine. Placeholder remains DENY until PM4 ships.",
-        allowed_profiles=_NON_LIVE,
+        description="PM4 exclusive risk engine. Authoritative deny-by-default gate. Env opt-in; test and research only. ALLOW is not an order; PM5 stays closed.",
+        allowed_profiles=(ProfileName.TEST, ProfileName.RESEARCH),
         safety=SafetyClassification.REQUIRES_REVIEW,
         env_key=_ALIAS_ENV["risk_engine"],
     ),

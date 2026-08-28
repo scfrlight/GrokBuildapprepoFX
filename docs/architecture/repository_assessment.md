@@ -102,6 +102,23 @@ Traceability:
 
 Original `PM3_Master_Prompt.md` was not found on Drive/GitHub. Sequence 05 treats the embedded spec as source of truth for this stage.
 
+## 3f. Sequence 06 inputs
+
+PM4 Risk Gate was **not** recovered from an external `PM4_Master_Prompt.md`.
+It was supplied in full inside the Sequence 06 user prompt on 2026-08-28.
+
+Traceability:
+
+| Input | Source | Persisted as |
+|---|---|---|
+| PM4 Risk Gate spec | Sequence 06 prompt (complete) | `docs/prompts/PM4_Risk_Gate_Sequence06_Prompt.md` |
+| Integration plan (pre-implementation) | Sequence 06 requirement | `docs/architecture/pm4_risk_gate_integration_plan.md` |
+| Feature flag `enable_pm4_risk_gate` | Sequence 02 catalog, narrowed in Sequence 06 | test + research env opt-in; YAML false |
+| RiskVerdict / publication cards | Sequence 01 contracts, extended | `contracts/v1/risk.py` |
+| Package | Sequence 06 section 12 | `modules/pm4_risk_gate/` (registry name `pm4_risk`) |
+
+Original `PM4_Master_Prompt.md` was not found on Drive/GitHub. Sequence 06 treats the embedded spec as source of truth for this stage.
+
 ## 3. Sequence 01 inputs
 
 PM1 specification and Contract-First Domain Foundation were **not** recovered from an external master-prompt file. They were supplied in full inside the Sequence 01 user prompt on 2026-08-28.
@@ -191,4 +208,4 @@ fake-useragent, textblob, pytz, flask, yfinance, pytest>=8.0
 4. **Auth/DB in App Builder:** remain OFF. Do not reuse `src/lib/db.ts` for the trading ledger.
 5. **Legacy user id in FXTGBOT `.env.example`:** treat as a hygiene defect; placeholders only here.
 6. **Settings vs pydantic-settings:** Sequence 01 uses Pydantic `BaseModel` with explicit YAML + env overlay rather than `BaseSettings` auto-env, to avoid ambient env pollution. `pydantic-settings` remains a declared dependency for Sequence 02 governance.
-7. **Readiness vs doctor boot:** `NullRiskGate` fails critical READINESS (fail-closed). Diagnostic boot uses `fail_on_critical=False` on readiness so `doctor` can still produce a DEGRADED snapshot. Orders remain impossible.
+7. **Readiness vs doctor boot:** `NullRiskGate` fails critical READINESS (fail-closed) when `enable_pm4_risk_gate` is off. Diagnostic boot uses `fail_on_critical=False` on readiness so `doctor` can still produce a DEGRADED snapshot. Orders remain impossible. When the flag is on in test/research, PM4 can evaluate; ALLOW is still not an order.

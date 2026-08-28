@@ -1,0 +1,76 @@
+# PM4 Risk Gate knobs. The engine stays off until env opt-in in test/research.
+# ALLOW is not an order. PM5 remains closed. No auto-rearm.
+# Merge under `pm4_risk_gate:` in a profile YAML. Enabling is a feature flag,
+# not this block.
+
+pm4_risk_gate:
+  operating_mode: shadow
+  observe_only: true
+  account_equity: "100000"
+  account_currency: USD
+  contract_size: "100000"
+  lot_step: "0.01"
+  min_lots: "0.01"
+  max_lots: "5.0"
+
+  # Hierarchical budgets (fractions of equity)
+  account_risk_pct: "0.020"
+  sleeve_risk_pct: "0.010"
+  regime_risk_pct: "0.008"
+  symbol_risk_pct: "0.005"
+  cluster_risk_pct: "0.010"
+  candidate_risk_pct: "0.005"
+  max_per_trade_risk_pct: "0.005"
+  max_open_risk_pct: "0.020"
+  max_intraday_loss_pct: "0.015"
+  max_daily_loss_pct: "0.020"
+
+  # Effective heat
+  heat_warm: "0.008"
+  heat_hot: "0.014"
+  heat_critical: "0.018"
+  max_effective_heat: "0.020"
+
+  # Drawdown ladder (mild <= reduced <= restricted <= freeze <= kill)
+  dd_mild: "0.020"
+  dd_reduced: "0.040"
+  dd_restricted: "0.060"
+  dd_freeze: "0.080"
+  dd_kill: "0.100"
+  losing_streak_throttle: 4
+
+  # Concentration
+  cluster_cap: "0.012"
+  usd_concentration_cap: "0.015"
+  european_basket_cap: "0.012"
+  crowding_block: "0.80"
+  one_per_cluster: true
+
+  # Intake / pre-trade
+  stale_ttl_seconds: 14400
+  min_forecast_samples: 20
+  wide_interval_pct: "0.008"
+  min_liquidity_score: 40.0
+  min_stop_distance: "0.00010"
+  max_stop_distance: "0.05000"
+  price_collar_bps: "50"
+  max_notional: "500000"
+  burst_limit: 8
+  burst_window_seconds: 60
+  duplicate_ttl_seconds: 86400
+  verdict_ttl_seconds: 3600
+
+  session_allow:
+    - london
+    - new_york
+    - overlap
+    - asia
+
+  # Kill-switch / recovery — auto_rearm must stay false
+  risk_reducing_only_on_kill: true
+  recovery_cooldown_seconds: 300
+  require_manual_recovery_after_kill: true
+  auto_rearm: false
+  telemetry_verbose: true
+  cancel_on_disconnect: true
+  route_name: pm5_pending

@@ -1,0 +1,41 @@
+"""PM4 domain enums re-exported from canonical contracts."""
+
+from botmoduleproject1.contracts.v1.risk import (
+    ConcentrationState,
+    ControlBreachType,
+    DrawdownStage,
+    HandoffEligibility,
+    HeatRegime,
+    KillSwitchScope,
+    KillSwitchStatus,
+    PreTradeControlType,
+    RecoveryStage,
+    RiskAdmissionDecision,
+    RiskControlState,
+    RiskDecisionTier,
+    RiskEventType,
+    RiskMode,
+    RiskRejectionReason,
+    RiskSeverity,
+    RiskVerdictStatus,
+)
+
+__all__ = [
+    "ConcentrationState",
+    "ControlBreachType",
+    "DrawdownStage",
+    "HandoffEligibility",
+    "HeatRegime",
+    "KillSwitchScope",
+    "KillSwitchStatus",
+    "PreTradeControlType",
+    "RecoveryStage",
+    "RiskAdmissionDecision",
+    "RiskControlState",
+    "RiskDecisionTier",
+    "RiskEventType",
+    "RiskMode",
+    "RiskRejectionReason",
+    "RiskSeverity",
+    "RiskVerdictStatus",
+]

@@ -127,3 +127,20 @@ pm3_forecasting:
   timeframe: H1
   operating_mode: shadow
   observe_only: true
+
+# PM4 Risk Gate knobs. Flag stays false. Deny-by-default. ALLOW is not an order.
+pm4_risk_gate:
+  operating_mode: shadow
+  observe_only: true
+  account_equity: "100000"
+  max_per_trade_risk_pct: "0.005"
+  max_open_risk_pct: "0.020"
+  max_intraday_loss_pct: "0.015"
+  max_daily_loss_pct: "0.020"
+  one_per_cluster: true
+  stale_ttl_seconds: 14400
+  min_forecast_samples: 20
+  auto_rearm: false
+  recovery_cooldown_seconds: 300
+  require_manual_recovery_after_kill: true
+  risk_reducing_only_on_kill: true

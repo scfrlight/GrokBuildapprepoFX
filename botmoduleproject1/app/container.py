@@ -56,6 +56,16 @@ def _forecasting_module(settings: Settings, overrides: dict[str, Any], clock: Cl
     return NullModel()
 
 
+def _risk_module(settings: Settings, overrides: dict[str, Any], clock: ClockPort):
+    if "risk" in overrides:
+        return overrides["risk"]
+    if settings.feature_flags.risk_engine:
+        from botmoduleproject1.modules.pm4_risk_gate.module import PM4RiskGateModule
+
+        return PM4RiskGateModule.from_settings(settings, clock)
+    return NullRiskGate()
+
+
 @dataclass
 class Container:
     settings: Settings
@@ -93,7 +103,7 @@ def build_container(
         _market_data_module(settings, overrides, clock),
         _strategy_engine_module(settings, overrides, clock),
         _forecasting_module(settings, overrides, clock),
-        overrides.get("risk") or NullRiskGate(),
+        _risk_module(settings, overrides, clock),
         overrides.get("execution") or DisabledExecution(),
         overrides.get("storage") or NullStorage(),
         overrides.get("notifications") or NullNotifications(),

@@ -1,6 +1,6 @@
 """BotModuleProject1 platform kernel.
 
-Sequence 05: PM3 forecasting / QRF (ForecastOutput enrichment only).
+Sequence 06: PM4 Risk Gate (RiskVerdict / RiskPublicationBundle; not an order).
 Not trade-ready. Live trading is disabled. Python 3.11+ required.
 """
 

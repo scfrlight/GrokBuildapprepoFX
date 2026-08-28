@@ -231,6 +231,71 @@ class Pm3ForecastingSection(BaseModel):
     observe_only: bool = True
 
 
+class Pm4RiskGateSection(BaseModel):
+    """Public PM4 knobs. Enabling the gate is a feature flag, not this block."""
+
+    operating_mode: str = "shadow"
+    observe_only: bool = True
+    account_equity: str = "100000"
+    account_currency: str = "USD"
+    contract_size: str = "100000"
+    lot_step: str = "0.01"
+    min_lots: str = "0.01"
+    max_lots: str = "5.0"
+    account_risk_pct: str = "0.020"
+    sleeve_risk_pct: str = "0.010"
+    regime_risk_pct: str = "0.008"
+    symbol_risk_pct: str = "0.005"
+    cluster_risk_pct: str = "0.010"
+    candidate_risk_pct: str = "0.005"
+    max_per_trade_risk_pct: str = "0.005"
+    max_open_risk_pct: str = "0.020"
+    max_intraday_loss_pct: str = "0.015"
+    max_daily_loss_pct: str = "0.020"
+    heat_warm: str = "0.008"
+    heat_hot: str = "0.014"
+    heat_critical: str = "0.018"
+    max_effective_heat: str = "0.020"
+    dd_mild: str = "0.020"
+    dd_reduced: str = "0.040"
+    dd_restricted: str = "0.060"
+    dd_freeze: str = "0.080"
+    dd_kill: str = "0.100"
+    losing_streak_throttle: int = Field(default=4, ge=1)
+    cluster_cap: str = "0.012"
+    usd_concentration_cap: str = "0.015"
+    european_basket_cap: str = "0.012"
+    crowding_block: str = "0.80"
+    one_per_cluster: bool = True
+    stale_ttl_seconds: int = Field(default=14400, ge=60)
+    min_forecast_samples: int = Field(default=20, ge=1)
+    wide_interval_pct: str = "0.008"
+    min_liquidity_score: float = 40.0
+    min_stop_distance: str = "0.00010"
+    max_stop_distance: str = "0.05000"
+    price_collar_bps: str = "50"
+    max_notional: str = "500000"
+    burst_limit: int = Field(default=8, ge=1)
+    burst_window_seconds: int = Field(default=60, ge=1)
+    duplicate_ttl_seconds: int = Field(default=86400, ge=1)
+    verdict_ttl_seconds: int = Field(default=3600, ge=60)
+    session_allow: tuple[str, ...] = ("london", "new_york", "overlap", "asia")
+    risk_reducing_only_on_kill: bool = True
+    recovery_cooldown_seconds: int = Field(default=300, ge=1)
+    require_manual_recovery_after_kill: bool = True
+    auto_rearm: bool = False
+    telemetry_verbose: bool = True
+    cancel_on_disconnect: bool = True
+    route_name: str = "pm5_pending"
+
+    @field_validator("auto_rearm")
+    @classmethod
+    def _no_auto_rearm(cls, value: bool) -> bool:
+        if value:
+            raise ValueError("pm4_risk_gate.auto_rearm must stay false")
+        return value
+
+
 class MappingSource(PydanticBaseSettingsSource):
     """Inject a precomputed nested mapping as a settings source."""
 
@@ -379,6 +444,7 @@ class Settings(BaseSettings):
     pm2: Pm2Section = Field(default_factory=Pm2Section)
     pm3_strategy_engine: Pm3StrategySection = Field(default_factory=Pm3StrategySection)
     pm3_forecasting: Pm3ForecastingSection = Field(default_factory=Pm3ForecastingSection)
+    pm4_risk_gate: Pm4RiskGateSection = Field(default_factory=Pm4RiskGateSection)
     profile: ProfileName = ProfileName.DEMO
     cli_mode: str = "doctor"
     config_path: str | None = None

@@ -1,3 +1,5 @@
 # Bounded context packages
 
 One folder per PM. Cross-talk only via `contracts`.
+
+`pm4_risk` is a compatibility re-export. Implementation: `pm4_risk_gate`.

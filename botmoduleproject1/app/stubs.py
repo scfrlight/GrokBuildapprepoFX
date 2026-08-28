@@ -93,7 +93,7 @@ class NullRiskGate:
             capabilities=(Capability.RISK_GATING,),
             critical=True,
             readiness_required=True,
-            description="Placeholder risk gate. Always DENY.",
+            description="Placeholder risk gate. Always DENY. Bound when enable_pm4_risk_gate is off.",
         )
 
     def is_ready(self) -> bool:

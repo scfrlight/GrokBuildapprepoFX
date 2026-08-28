@@ -1,11 +1,11 @@
 # Architecture Baseline — BotModuleProject1
 
-Status: Accepted for Sequence 00; PM1 kernel Sequence 01; config governance Sequence 02; PM2 market context Sequence 03; PM3-Strategy Engine Sequence 04; PM3 forecasting / QRF Sequence 05  
+Status: Accepted for Sequence 00; PM1 kernel Sequence 01; config governance Sequence 02; PM2 market context Sequence 03; PM3-Strategy Engine Sequence 04; PM3 forecasting / QRF Sequence 05; PM4 Risk Gate Sequence 06  
 Date (UTC): 2026-08-28  
 Scope: EURUSD on MT5 Demo, expandable to additional FX symbols  
-Trading readiness: **not ready**. PM3-Strategy Engine emits analytical TradeIntent only. PM3 forecasting / QRF may attach a ForecastOutput envelope. No risk ALLOW, execution, or live path is implemented.
+Trading readiness: **not ready**. PM3-Strategy Engine emits analytical TradeIntent only. PM3 forecasting / QRF may attach a ForecastOutput envelope. PM4 may ALLOW a risk-governed handoff. That ALLOW is not an order. PM5 remains closed. No live path is implemented.
 
-This document is the Sequence 00 source of truth for structure, bounded contexts, and safety invariants. Sequence 01 implemented the composition root and v1 contracts against this baseline. Sequence 02 added profiles, pydantic-settings, feature flags, and preflight. Sequence 03 implemented PM2 as a ranking/context layer behind `enable_pm2_market_data` (test/research env opt-in). Sequence 04 implemented the **PM3-Strategy Engine** behind `enable_pm3_strategy_engine` (test/research env opt-in; TradeIntent is not an order). Sequence 05 implemented **PM3 forecasting / QRF** behind `enable_forecasting` (demo/test/research env opt-in; ForecastOutput is not an order; residual quantile envelope, not a fitted QRF). The module map is unchanged.
+This document is the Sequence 00 source of truth for structure, bounded contexts, and safety invariants. Sequence 01 implemented the composition root and v1 contracts against this baseline. Sequence 02 added profiles, pydantic-settings, feature flags, and preflight. Sequence 03 implemented PM2 as a ranking/context layer behind `enable_pm2_market_data` (test/research env opt-in). Sequence 04 implemented the **PM3-Strategy Engine** behind `enable_pm3_strategy_engine` (test/research env opt-in; TradeIntent is not an order). Sequence 05 implemented **PM3 forecasting / QRF** behind `enable_forecasting` (demo/test/research env opt-in; ForecastOutput is not an order; residual quantile envelope, not a fitted QRF). Sequence 06 implemented the **PM4 Risk Gate** behind `enable_pm4_risk_gate` (test/research env opt-in; ALLOW is not an order). The module map is unchanged.
 
 
 ## 1. Target monorepo structure
@@ -32,7 +32,8 @@ GrokBuildapprepoFX / workspace
 │   │   ├── pm2_market_context/
 │   │   ├── pm3_strategy_engine/  # Sequence 04 kernel (flag off)
 │   │   ├── pm3_forecasting/      # Sequence 05 kernel (flag off; not a fitted QRF)
-│   │   ├── pm4_risk/
+│   │   ├── pm4_risk_gate/        # Sequence 06 kernel (flag off; ALLOW ≠ order)
+│   │   ├── pm4_risk/             # compatibility re-export of pm4_risk_gate
 │   │   ├── pm5_execution/
 │   │   ├── pm6_monitoring/
 │   │   ├── pm7_ledger/
