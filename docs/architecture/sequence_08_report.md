@@ -6,10 +6,10 @@ Display name: **PM6 Post-Trade Controls / Surveillance / Governance**
 
 ## 1. Git commit hash
 
-This App Builder workspace has no `.git` directory. Sequence 08 lands on
-`scfrlight/GrokBuildapprepoFX` after push. Hash recorded below.
+This App Builder workspace has no `.git` directory. Sequence 08 landed on
+`scfrlight/GrokBuildapprepoFX` as `77ba06798813aa7512c1a48e2ab776ddc782c3ba`.
 
-Kernel commit: **pending push**
+Kernel commit: **77ba06798813aa7512c1a48e2ab776ddc782c3ba**
 
 ## 2. Created / updated files
 
