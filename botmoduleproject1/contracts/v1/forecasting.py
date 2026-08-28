@@ -8,20 +8,32 @@ from __future__ import annotations
 
 from datetime import datetime
 from decimal import Decimal
+from typing import Any
 from uuid import UUID
 
-from pydantic import Field, field_validator
+from pydantic import Field, field_validator, model_validator
 
 from botmoduleproject1.contracts.v1.identity import ContractModel
 from botmoduleproject1.contracts.v1.time import ensure_aware_utc
 
 
 class QuantileSet(ContractModel):
+    """Price-space quantile envelope. Non-decreasing. Not a direction vote."""
+
     q05: Decimal
     q25: Decimal
     q50: Decimal
     q75: Decimal
     q95: Decimal
+
+    @model_validator(mode="after")
+    def _non_decreasing(self) -> QuantileSet:
+        ordered = (self.q05, self.q25, self.q50, self.q75, self.q95)
+        if any(ordered[i] > ordered[i + 1] for i in range(len(ordered) - 1)):
+            raise ValueError(
+                "quantiles must be non-decreasing: q05 <= q25 <= q50 <= q75 <= q95"
+            )
+        return self
 
 
 class ModelVersionInfo(ContractModel):
@@ -52,6 +64,10 @@ class ForecastOutput(ContractModel):
     quantiles: QuantileSet
     model: ModelVersionInfo
     producer: str = "pm3_forecasting"
+    coverage: float | None = Field(default=None, ge=0.0, le=1.0)
+    sample_size: int | None = Field(default=None, ge=0)
+    horizon_seconds: int | None = Field(default=None, ge=1)
+    diagnostics: dict[str, Any] = Field(default_factory=dict)
 
     @field_validator("occurred_at")
     @classmethod

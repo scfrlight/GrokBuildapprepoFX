@@ -74,7 +74,7 @@ FEATURE_FLAG_CATALOG: tuple[FeatureFlagSpec, ...] = (
     FeatureFlagSpec(
         name="enable_forecasting",
         field="forecasting",
-        description="PM3 forecasting / QRF. Not implemented.",
+        description="PM3 forecasting / QRF residual quantile envelope. Env opt-in; demo/test/research. Enriches uncertainty only; never orders, never mutates side.",
         allowed_profiles=(ProfileName.DEMO, ProfileName.RESEARCH, ProfileName.TEST),
         safety=SafetyClassification.REQUIRES_REVIEW,
         env_key=_ALIAS_ENV["forecasting"],

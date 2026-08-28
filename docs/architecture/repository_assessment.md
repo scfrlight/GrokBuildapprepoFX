@@ -85,6 +85,23 @@ Traceability:
 
 Original `PM3_Strategy_Engine_Master_Prompt.md` was not found on Drive/GitHub. Sequence 04 treats the embedded spec as source of truth. Forecasting/QRF remains a different module.
 
+## 3e. Sequence 05 inputs
+
+PM3 forecasting / QRF was **not** recovered from an external `PM3_Master_Prompt.md`.
+It was supplied in full inside the Sequence 05 user prompt on 2026-08-28.
+
+Traceability:
+
+| Input | Source | Persisted as |
+|---|---|---|
+| PM3 forecasting / QRF spec | Sequence 05 prompt (complete) | `docs/prompts/PM3_Forecasting_Sequence05_Prompt.md` |
+| Integration plan (pre-implementation) | Sequence 05 requirement | `docs/architecture/pm3_forecasting_integration_plan.md` |
+| Feature flag `enable_forecasting` | Sequence 02 catalog, description updated | demo + test + research env opt-in; YAML false |
+| ForecastOutput / QuantileSet | Sequence 01 contracts, extended | `contracts/v1/forecasting.py` |
+| Estimator | Sequence 05: residual quantile envelope (not fitted QRF) | `modules/pm3_forecasting/inference/envelope.py` |
+
+Original `PM3_Master_Prompt.md` was not found on Drive/GitHub. Sequence 05 treats the embedded spec as source of truth for this stage.
+
 ## 3. Sequence 01 inputs
 
 PM1 specification and Contract-First Domain Foundation were **not** recovered from an external master-prompt file. They were supplied in full inside the Sequence 01 user prompt on 2026-08-28.

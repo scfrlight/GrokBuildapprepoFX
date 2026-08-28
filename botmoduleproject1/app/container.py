@@ -46,6 +46,16 @@ def _strategy_engine_module(settings: Settings, overrides: dict[str, Any], clock
     return NullSignals()
 
 
+def _forecasting_module(settings: Settings, overrides: dict[str, Any], clock: ClockPort):
+    if "forecasting" in overrides:
+        return overrides["forecasting"]
+    if settings.feature_flags.forecasting:
+        from botmoduleproject1.modules.pm3_forecasting.module import PM3ForecastingModule
+
+        return PM3ForecastingModule.from_settings(settings, clock)
+    return NullModel()
+
+
 @dataclass
 class Container:
     settings: Settings
@@ -82,7 +92,7 @@ def build_container(
         overrides.get("platform") or PlatformHealth(),
         _market_data_module(settings, overrides, clock),
         _strategy_engine_module(settings, overrides, clock),
-        overrides.get("forecasting") or NullModel(),
+        _forecasting_module(settings, overrides, clock),
         overrides.get("risk") or NullRiskGate(),
         overrides.get("execution") or DisabledExecution(),
         overrides.get("storage") or NullStorage(),

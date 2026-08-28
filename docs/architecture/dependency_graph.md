@@ -1,6 +1,6 @@
 # Dependency Graph — BotModuleProject1
 
-Status: Accepted for Sequence 00; PM3-Strategy Engine producer live in Sequence 04 (flag off, shadow)  
+Status: Accepted for Sequence 00; PM3 forecasting / QRF producer live in Sequence 05 (flag off, shadow)  
 Date (UTC): 2026-08-28
 
 ## 1. Canonical data flow
@@ -37,7 +37,7 @@ Hard cuts in this flow:
 | PM1 platform | Config, clock, env | Process, registry, health | contracts, runtime | Startup-critical | Config error → halt |
 | PM2 market context | Synthetic/broker bars, calendar | PublicationBundle (shortlist/watchlist/suppressed), RankedCandidate, regime | contracts, synthetic feed (MT5 adapter later) | Ready-critical (non-fatal if flag off) | Stale data → no shortlist; observe-only |
 | PM3-Strategy Engine | Snapshot, regime, profiles, RankedCandidate | TradeIntent / NoTradeDecision (shadow; no lot size) | contracts, PM2 public outputs | Decision-critical (non-fatal if flag off) | Invalid profile / stale / handoff-false → NoTradeDecision |
-| PM3 forecasting | Intent, features | ForecastEnvelope | contracts, model registry | Degraded-ok | Model missing → intent unmarked, risk must fail closed |
+| PM3 forecasting / QRF | Intent, confirmed synthetic bars | ForecastOutput (quantiles, model version; not an order) | contracts, synthetic feed, in-memory registry | Degraded-ok (non-critical) | Insufficient history / lookahead → None; risk must still fail closed |
 | PM4 risk | Intent, portfolio, ledger | RiskVerdict | contracts, PM7/PM8 reads | Execution-critical | Any doubt → DENY + halt/observe-only |
 | PM5 execution | ALLOW verdict + intent | Order events, fills | contracts, MT5 adapter, PM4 | Execution-critical | Broker error → safe halt, no retry storms |
 | PM6 monitoring | Events from PM5/PM7/PM8 | Incidents, alerts | contracts | Ops-critical | Alert failure → log locally, do not hide halt |

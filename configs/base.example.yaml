@@ -117,3 +117,13 @@ pm3_strategy_engine:
   min_selected_votes: 1
   conflict_no_trade: 0.35
   stale_ttl_hours: 4
+
+# PM3 forecasting / QRF knobs. Flag stays false. Enrichment only. Not orders.
+pm3_forecasting:
+  horizon_bars: 4
+  lookback_bars: 64
+  min_samples: 20
+  embargo_bars: 1
+  timeframe: H1
+  operating_mode: shadow
+  observe_only: true

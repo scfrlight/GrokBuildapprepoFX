@@ -1,0 +1,11 @@
+# PM3 forecasting / QRF public knobs. Feature flag stays false.
+# Residual quantile envelope research kernel. Not a fitted QRF.
+# Does not create TradeIntent, mutate side, size lots, or send orders.
+
+horizon_bars: 4
+lookback_bars: 64
+min_samples: 20
+embargo_bars: 1
+timeframe: H1
+operating_mode: shadow
+observe_only: true

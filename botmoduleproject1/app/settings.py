@@ -219,6 +219,18 @@ class Pm3StrategySection(BaseModel):
     stale_ttl_hours: int = Field(default=4, ge=1, le=48)
 
 
+class Pm3ForecastingSection(BaseModel):
+    """Public PM3 forecasting / QRF knobs. Enabling is a feature flag, not this block."""
+
+    horizon_bars: int = Field(default=4, ge=1, le=48)
+    lookback_bars: int = Field(default=64, ge=16, le=512)
+    min_samples: int = Field(default=20, ge=1, le=512)
+    embargo_bars: int = Field(default=1, ge=1, le=16)
+    timeframe: str = "H1"
+    operating_mode: str = "shadow"
+    observe_only: bool = True
+
+
 class MappingSource(PydanticBaseSettingsSource):
     """Inject a precomputed nested mapping as a settings source."""
 
@@ -366,6 +378,7 @@ class Settings(BaseSettings):
     paths: PathsSection = Field(default_factory=PathsSection)
     pm2: Pm2Section = Field(default_factory=Pm2Section)
     pm3_strategy_engine: Pm3StrategySection = Field(default_factory=Pm3StrategySection)
+    pm3_forecasting: Pm3ForecastingSection = Field(default_factory=Pm3ForecastingSection)
     profile: ProfileName = ProfileName.DEMO
     cli_mode: str = "doctor"
     config_path: str | None = None

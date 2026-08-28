@@ -1,6 +1,6 @@
 """BotModuleProject1 platform kernel.
 
-Sequence 04: PM3-Strategy Engine (TradeIntent / NoTradeDecision only).
+Sequence 05: PM3 forecasting / QRF (ForecastOutput enrichment only).
 Not trade-ready. Live trading is disabled. Python 3.11+ required.
 """
 

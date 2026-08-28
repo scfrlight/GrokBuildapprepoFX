@@ -11,3 +11,4 @@
 | [ADR-007](./ADR-007-risk-gate-exclusivity.md) | Risk-gate exclusivity before execution | Accepted |
 | [ADR-008](./ADR-008-python-version-constraint.md) | Python version constraint and sandbox deviation | Accepted |
 | [ADR-009](./ADR-009-pm3-strategy-engine-governance.md) | PM3-Strategy Engine governance | Accepted |
+| [ADR-010](./ADR-010-pm3-forecasting-research-kernel.md) | PM3 forecasting / QRF research kernel | Accepted |
