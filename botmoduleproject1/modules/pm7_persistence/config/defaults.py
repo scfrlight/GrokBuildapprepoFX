@@ -1,0 +1,2 @@
+DEFAULT_MODE = 'memory'
+GENESIS_HASH = '0' * 64

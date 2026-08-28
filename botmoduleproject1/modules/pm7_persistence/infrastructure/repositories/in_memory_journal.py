@@ -1,0 +1,3 @@
+from botmoduleproject1.modules.pm7_persistence.journal.append_only import AppendOnlyJournal
+
+InMemoryJournal = AppendOnlyJournal

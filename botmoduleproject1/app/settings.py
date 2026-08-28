@@ -382,6 +382,49 @@ class Pm6PostTradeSection(BaseModel):
         return value
 
 
+class Pm7PersistenceSection(BaseModel):
+    """Public PM7 knobs. Enabling is a feature flag, not this block."""
+
+    operating_mode: str = "memory"
+    observe_only: bool = True
+    storage_path: str = "data/local/pm7"
+    schema_version: int = Field(default=1, ge=1)
+    query_limit: int = Field(default=50, ge=1, le=500)
+    snapshot_cadence_events: int = Field(default=10, ge=1)
+    replay_event_limit: int = Field(default=1000, ge=1)
+    simulate_archive: bool = True
+    allow_purge: bool = False
+    hash_algorithm: str = "sha256"
+    mt5_enabled: bool = False
+    broker_commands: bool = False
+    production_durable: bool = False
+    auto_rearm: bool = False
+    telemetry_verbose: bool = True
+
+    @field_validator("operating_mode")
+    @classmethod
+    def _mode(cls, value: str) -> str:
+        if value == "production_durable":
+            raise ValueError("production_durable is refused in Sequence 09")
+        if value not in {"disabled", "memory", "file_backed", "sqlite_local", "durable_candidate"}:
+            raise ValueError("pm7_persistence.operating_mode must be disabled|memory|file_backed|sqlite_local|durable_candidate")
+        return value
+
+    @field_validator("auto_rearm")
+    @classmethod
+    def _no_auto_rearm(cls, value: bool) -> bool:
+        if value:
+            raise ValueError("pm7_persistence.auto_rearm must stay false")
+        return value
+
+    @field_validator("mt5_enabled", "broker_commands", "production_durable")
+    @classmethod
+    def _no_unsafe(cls, value: bool) -> bool:
+        if value:
+            raise ValueError("PM7 cannot enable MT5, broker commands, or production_durable")
+        return value
+
+
 class MappingSource(PydanticBaseSettingsSource):
     """Inject a precomputed nested mapping as a settings source."""
 
@@ -533,6 +576,7 @@ class Settings(BaseSettings):
     pm4_risk_gate: Pm4RiskGateSection = Field(default_factory=Pm4RiskGateSection)
     pm5_execution: Pm5ExecutionSection = Field(default_factory=Pm5ExecutionSection)
     pm6_post_trade: Pm6PostTradeSection = Field(default_factory=Pm6PostTradeSection)
+    pm7_persistence: Pm7PersistenceSection = Field(default_factory=Pm7PersistenceSection)
     profile: ProfileName = ProfileName.DEMO
     cli_mode: str = "doctor"
     config_path: str | None = None

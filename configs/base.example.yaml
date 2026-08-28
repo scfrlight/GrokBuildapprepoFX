@@ -41,6 +41,12 @@ feature_flags:
   pm6_incident_response: false
   pm6_governance: false
   pm6_withdrawal: false
+  pm7_persistence: false
+  pm7_journal: false
+  pm7_replay: false
+  pm7_integrity: false
+  pm7_retention: false
+  pm7_reporting: false
 
 logging:
   level: INFO
@@ -184,4 +190,20 @@ pm6_post_trade:
   mt5_enabled: false
   broker_commands: false
   durable: false
+
+# PM7 persistence knobs. Flags stay false. Memory default. Not production durability.
+pm7_persistence:
+  operating_mode: memory
+  observe_only: true
+  storage_path: data/local/pm7
+  schema_version: 1
+  query_limit: 50
+  snapshot_cadence_events: 10
+  simulate_archive: true
+  allow_purge: false
+  hash_algorithm: sha256
+  mt5_enabled: false
+  broker_commands: false
+  production_durable: false
+  auto_rearm: false
 

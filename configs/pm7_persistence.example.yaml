@@ -1,0 +1,18 @@
+# PM7 persistence knobs. Flags stay false. Not orders. Not production durability.
+# Enabling is BOTMODULEPROJECT1_FEATURE__ENABLE_PM7_PERSISTENCE in test/research.
+
+pm7_persistence:
+  operating_mode: memory
+  observe_only: true
+  storage_path: data/local/pm7
+  schema_version: 1
+  query_limit: 50
+  snapshot_cadence_events: 10
+  replay_event_limit: 1000
+  simulate_archive: true
+  allow_purge: false
+  hash_algorithm: sha256
+  mt5_enabled: false
+  broker_commands: false
+  production_durable: false
+  auto_rearm: false

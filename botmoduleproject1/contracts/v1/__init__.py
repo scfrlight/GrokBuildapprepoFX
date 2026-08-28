@@ -26,6 +26,32 @@ from botmoduleproject1.contracts.v1.forecasting import (
 )
 from botmoduleproject1.contracts.v1.identity import SCHEMA_VERSION, EventEnvelope
 from botmoduleproject1.contracts.v1.journal import EventType, JournalEntry
+from botmoduleproject1.contracts.v1.persistence import (
+    ArchiveTier,
+    AuditReport,
+    BackupMetadata,
+    CommittedJournalRecord,
+    EvidenceBundle,
+    ExportPackage,
+    IngestDisposition,
+    IngestResult,
+    IntegrityReport,
+    IntegrityState,
+    JournalCategory,
+    LedgerEvent,
+    PersistenceMode,
+    PersistencePublicationBundle,
+    PersistenceTruthSource,
+    QueryResult,
+    QuerySpec,
+    ReconciliationPersistRecord,
+    ReconciliationPersistState,
+    ReplayResult,
+    ReplayScope,
+    ReportKind,
+    RetentionStatus,
+    SnapshotRecord,
+)
 from botmoduleproject1.contracts.v1.market import OhlcvBar, SymbolMetadata, Tick, Timeframe
 from botmoduleproject1.contracts.v1.pm2 import (
     CandidateContextSnapshot,
@@ -141,6 +167,8 @@ __all__ = [
     "HealthStatus",
     "HeatRegime",
     "JournalEntry",
+    "JournalCategory",
+    "LedgerEvent",
     "KillSwitchScope",
     "KillSwitchState",
     "KillSwitchStatus",

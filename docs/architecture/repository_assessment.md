@@ -264,3 +264,42 @@ Original filename `PM6_Master_Prompt.md` was not found on Drive/GitHub. Sequence
 
 Outputs: post-trade controls, two defence lanes, surveillance, incidents, withdrawal planner, non-durable evidence, architecture desk Sequence 08 board. Next: Sequence 09 PM7.
 
+## Sequence 09 inputs
+
+Sequence 09 consumes:
+
+- Canonical `RiskPublicationBundle` from PM4 (kill/freeze/admission; not mutated).
+- Canonical `ExecutionPublicationBundle` from PM5 (simulation/shadow truth only).
+- Canonical `OperationalTruthBundle` from PM6 (incidents/evidence; not mutated).
+- `NullLedger` as the fail-closed default bind (must not be deleted).
+- Feature-flag catalog and profile policy from Sequence 02.
+- In-memory journal as the default store; file/sqlite are local candidates only.
+
+Hard constraints carried in:
+
+- `execution_permitted` frozen false.
+- Live profile hard-blocked.
+- No MetaTrader5 on Linux tests.
+- No Telegram, no paper loop, no Postgres/Alembic migrations.
+- `SIM-*` never labelled broker truth.
+- Reconciliation without a venue stays `degraded`.
+- Committed journal entries are immutable; corrections are new events.
+- `production_durable` refused.
+- PM7 never submits, never sizes, never ALLOWs, never calls MT5.
+
+Traceability:
+
+| Input | Source | Persisted as |
+|---|---|---|
+| Sequence 09 specification | Sequence 09 prompt (complete) | `docs/prompts/PM7_Persistence_Sequence09_Prompt.md` |
+| Feature flags `enable_pm7_*` | Sequence 09 section 23 | `feature_flags.py` — test + research env opt-in |
+| Output contracts | Sequence 09 sections 7–20 | `botmoduleproject1/contracts/v1/persistence.py` |
+| Folder structure | Sequence 09 section 25 | `botmoduleproject1/modules/pm7_persistence/` |
+| Integration plan | Sequence 09 section 4 | `docs/architecture/pm7_persistence_integration_plan.md` |
+| ADR | Sequence 09 section 29 | `docs/adr/ADR-014-pm7-persistence-and-evidence.md` |
+
+Original filename `PM7_Master_Prompt.md` was not found on Drive/GitHub. Sequence 09 treats the embedded spec as source of truth for this stage.
+
+Outputs: append-only journal, reconciliation store, evidence, replay, integrity chain, retention freeze, architecture desk Sequence 09 ledger board. Next: Sequence 10 PM8 operator control.
+
+

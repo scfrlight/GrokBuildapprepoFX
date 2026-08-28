@@ -1,11 +1,11 @@
 # Architecture Baseline — BotModuleProject1
 
-Status: Accepted for Sequence 00; PM1 kernel Sequence 01; config governance Sequence 02; PM2 market context Sequence 03; PM3-Strategy Engine Sequence 04; PM3 forecasting / QRF Sequence 05; PM4 Risk Gate Sequence 06; PM5 Execution Sequence 07; PM6 Post-Trade Sequence 08  
+Status: Accepted for Sequence 00; PM1 kernel Sequence 01; config governance Sequence 02; PM2 market context Sequence 03; PM3-Strategy Engine Sequence 04; PM3 forecasting / QRF Sequence 05; PM4 Risk Gate Sequence 06; PM5 Execution Sequence 07; PM6 Post-Trade Sequence 08; PM7 Persistence Sequence 09  
 Date (UTC): 2026-08-28  
 Scope: EURUSD on MT5 Demo, expandable to additional FX symbols  
-Trading readiness: **not ready**. PM3-Strategy Engine emits analytical TradeIntent only. PM3 forecasting / QRF may attach a ForecastOutput envelope. PM4 may ALLOW a risk-governed handoff. That ALLOW is not an order. PM5 may shadow-record an OMS lifecycle in simulation. It does not send to MT5. PM6 may observe PM4/PM5, raise incidents, and plan orderly withdrawal. It does not send orders, size risk, or invent broker truth. No live path is implemented.
+Trading readiness: **not ready**. PM3-Strategy Engine emits analytical TradeIntent only. PM3 forecasting / QRF may attach a ForecastOutput envelope. PM4 may ALLOW a risk-governed handoff. That ALLOW is not an order. PM5 may shadow-record an OMS lifecycle in simulation. It does not send to MT5. PM6 may observe PM4/PM5, raise incidents, and plan orderly withdrawal. It does not send orders, size risk, or invent broker truth. PM7 may journal those facts append-only. Memory/file/SQLite are not production durability. No live path is implemented.
 
-This document is the Sequence 00 source of truth for structure, bounded contexts, and safety invariants. Sequence 01 implemented the composition root and v1 contracts against this baseline. Sequence 02 added profiles, pydantic-settings, feature flags, and preflight. Sequence 03 implemented PM2 as a ranking/context layer behind `enable_pm2_market_data` (test/research env opt-in). Sequence 04 implemented the **PM3-Strategy Engine** behind `enable_pm3_strategy_engine` (test/research env opt-in; TradeIntent is not an order). Sequence 05 implemented **PM3 forecasting / QRF** behind `enable_forecasting` (demo/test/research env opt-in; ForecastOutput is not an order; residual quantile envelope, not a fitted QRF). Sequence 06 implemented the **PM4 Risk Gate** behind `enable_pm4_risk_gate` (test/research env opt-in; ALLOW is not an order). Sequence 07 implemented **PM5 Execution** behind `enable_pm5_simulation` (test/research env opt-in; simulation only; `DisabledExecution` default). Sequence 08 implemented **PM6 Post-Trade** behind `enable_pm6_post_trade` (test/research env opt-in; observe-only; `NullMonitoring` default). The module map is unchanged.
+This document is the Sequence 00 source of truth for structure, bounded contexts, and safety invariants. Sequence 01 implemented the composition root and v1 contracts against this baseline. Sequence 02 added profiles, pydantic-settings, feature flags, and preflight. Sequence 03 implemented PM2 as a ranking/context layer behind `enable_pm2_market_data` (test/research env opt-in). Sequence 04 implemented the **PM3-Strategy Engine** behind `enable_pm3_strategy_engine` (test/research env opt-in; TradeIntent is not an order). Sequence 05 implemented **PM3 forecasting / QRF** behind `enable_forecasting` (demo/test/research env opt-in; ForecastOutput is not an order; residual quantile envelope, not a fitted QRF). Sequence 06 implemented the **PM4 Risk Gate** behind `enable_pm4_risk_gate` (test/research env opt-in; ALLOW is not an order). Sequence 07 implemented **PM5 Execution** behind `enable_pm5_simulation` (test/research env opt-in; simulation only; `DisabledExecution` default). Sequence 08 implemented **PM6 Post-Trade** behind `enable_pm6_post_trade` (test/research env opt-in; observe-only; `NullMonitoring` default). Sequence 09 implemented **PM7 Persistence** behind `enable_pm7_persistence` (test/research env opt-in; append-only journal; `NullLedger` default). The module map is unchanged.
 
 
 ## 1. Target monorepo structure
@@ -37,7 +37,8 @@ GrokBuildapprepoFX / workspace
 │   │   ├── pm5_execution/
 │   │   ├── pm6_post_trade/       # Sequence 08 kernel (flag off; NullMonitoring default)
 │   │   ├── pm6_monitoring/       # compatibility re-export of pm6_post_trade
-│   │   ├── pm7_ledger/
+│   │   ├── pm7_persistence/      # Sequence 09 kernel (flag off; NullLedger default)
+│   │   ├── pm7_ledger/           # compatibility re-export of pm7_persistence
 │   │   ├── pm8_persistence/
 │   │   └── pm9_operator_ux/
 │   └── runtime/                # Process host, modes, health
@@ -81,7 +82,7 @@ Python composition root lives at `botmoduleproject1/app`, not workspace-root `ap
 | Risk | `modules/pm4_risk` (PM4) | Allocation, sizing, heat, drawdown governor, kill-switch. **Sole final gate** |
 | Execution | `modules/pm5_execution` (PM5) | OMS/EMS simulation, independent control, recon (degraded without venue). No MT5 send. |
 | Surveillance | `modules/pm6_post_trade` (PM6; registry `pm6_monitoring`) | Post-trade controls, two defence lanes, incidents, governance. Observe-only. |
-| Ledger / evidence | `modules/pm7_ledger` (PM7) | Trade ledger, evidence, replay, reporting |
+| Ledger / evidence | `modules/pm7_persistence` (PM7; registry `pm7_ledger`) | Append-only journal, evidence, replay, integrity, retention. Not production durable. |
 | Persistence / recovery | `modules/pm8_persistence` (PM8 + PM8a spec) | CQRS, outbox/inbox, idempotency, snapshots, reconciliation |
 | Operator UX | `modules/pm9_operator_ux` (PM9 + PM9a) | Telegram control plane and fine-tune studio |
 
@@ -135,7 +136,7 @@ Rules:
 | PM4 | RiskVerdict | Exclusive permission object consumed by PM5 |
 | PM5 | Execution | Accepts only `(TradeIntent, RiskVerdict=ALLOW)` |
 | PM6 | Monitoring | Observes PM4/PM5 publications; never orders; never invents broker truth |
-| PM7 | Ledger/evidence | Append-only via PM8 persistence API |
+| PM7 | Ledger/evidence | Append-only journal of published facts; SHA-256 tamper detection; not production durable |
 | PM8 / PM8a | Persistence + recovery | Repositories, outbox, snapshots |
 | PM9 / PM9a | Operator UX | Commands → application ports; never adapters |
 
@@ -178,5 +179,6 @@ This baseline does **not** authorize:
 - Telegram bots
 - schema migrations
 - ML training
+- production distributed durability
 
-Next authorized step: **Sequence 01 — Contract-First Domain Foundation / PM1**.
+Next authorized step: **Sequence 10 — PM8 Operator Control Plane, Telegram Control Engine & Human-in-the-Loop Operations**.

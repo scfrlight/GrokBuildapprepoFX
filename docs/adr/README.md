@@ -15,3 +15,4 @@
 | [ADR-011](./ADR-011-pm4-risk-gate-governance.md) | PM4 Risk Gate governance | Accepted |
 | [ADR-012](./ADR-012-pm5-execution-boundary.md) | PM5 Execution boundary | Accepted |
 | [ADR-013](./ADR-013-pm6-post-trade-governance.md) | PM6 Post-trade governance | Accepted |
+| [ADR-014](./ADR-014-pm7-persistence-and-evidence.md) | PM7 persistence and evidence | Accepted |

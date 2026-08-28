@@ -243,3 +243,30 @@ class NullMonitoring:
 
     def observe(self, entry: JournalEntry) -> None:
         return None
+
+
+class NullLedger:
+    """Fail-closed PM7 bind. No durable journal until the flag is on."""
+
+    def metadata(self) -> ModuleMetadata:
+        return ModuleMetadata(
+            name="pm7_ledger",
+            version="0.0.0",
+            capabilities=(Capability.LEDGER,),
+            critical=False,
+            description="Placeholder ledger. Bound when enable_pm7_persistence is off.",
+        )
+
+    def ingest(self, source) -> None:
+        return None
+
+    def health_checks(self, kind: CheckKind) -> list[CheckResult]:
+        return [
+            CheckResult(
+                name="ledger.placeholder",
+                kind=kind,
+                passed=True,
+                critical=False,
+                message="NullLedger; enable_pm7_persistence is off",
+            )
+        ]

@@ -21,6 +21,7 @@ class Capability(str, Enum):
     RISK_GATING = "risk_gating"
     EXECUTION = "execution"
     STORAGE = "storage"
+    LEDGER = "ledger"
     NOTIFICATIONS = "notifications"
     TELEMETRY = "telemetry"
     DIAGNOSTICS = "diagnostics"

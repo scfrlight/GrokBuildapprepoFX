@@ -6,6 +6,7 @@
 | `PM4_Risk_Gate_Sequence06_Prompt.md` | Present — Sequence 06 (PM4 Risk Gate) |
 | `PM5_Execution_Sequence07_Prompt.md` | Present — Sequence 07 (PM5 Execution) |
 | `PM6_Post_Trade_Sequence08_Prompt.md` | Present — Sequence 08 (PM6 Post-Trade) |
+| `PM7_Persistence_Sequence09_Prompt.md` | Present — Sequence 09 (PM7 Persistence) |
 | `Grok_Build_Master_Orchestration_Prompt.md` | Missing |
 | `PM2_Master_Prompt.md` | Covered by Sequence 03 prompt |
 | `PM3_Master_Prompt.md` | Covered by Sequence 05 prompt (forecasting / QRF — not the Strategy Engine) |
@@ -13,7 +14,7 @@
 | `PM4_Master_Prompt.md` | Covered by Sequence 06 prompt |
 | `PM5_Master_Prompt.md` | Covered by Sequence 07 prompt |
 | `PM6_Master_Prompt.md` | Covered by Sequence 08 prompt |
-| `PM7_Master_Prompt.md` | Missing |
+| `PM7_Master_Prompt.md` | Covered by Sequence 09 prompt |
 | `PM8_Master_Prompt.md` | Missing |
 | `PM8a_Build_Spec.md` | Missing |
 | `PM9_Operator_UX_Telegram_Control_Engine_Master_Prompt.md` | Missing |

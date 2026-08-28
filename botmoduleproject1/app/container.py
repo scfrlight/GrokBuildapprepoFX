@@ -15,6 +15,7 @@ from botmoduleproject1.app.registry import ModuleRegistry
 from botmoduleproject1.app.settings import Settings
 from botmoduleproject1.app.stubs import (
     DisabledExecution,
+    NullLedger,
     NullMarketData,
     NullModel,
     NullMonitoring,
@@ -86,6 +87,16 @@ def _monitoring_module(settings: Settings, overrides: dict[str, Any], clock: Clo
     return NullMonitoring()
 
 
+def _ledger_module(settings: Settings, overrides: dict[str, Any], clock: ClockPort):
+    if "ledger" in overrides:
+        return overrides["ledger"]
+    if getattr(settings.feature_flags, "pm7_persistence", False):
+        from botmoduleproject1.modules.pm7_persistence.module import PM7PersistenceModule
+
+        return PM7PersistenceModule.from_settings(settings, clock)
+    return NullLedger()
+
+
 @dataclass
 class Container:
     settings: Settings
@@ -125,6 +136,7 @@ def build_container(
         _forecasting_module(settings, overrides, clock),
         _risk_module(settings, overrides, clock),
         _execution_module(settings, overrides, clock),
+        _ledger_module(settings, overrides, clock),
         overrides.get("storage") or NullStorage(),
         overrides.get("notifications") or NullNotifications(),
         _monitoring_module(settings, overrides, clock),

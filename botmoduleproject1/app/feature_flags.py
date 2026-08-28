@@ -53,6 +53,12 @@ _ALIAS_ENV = {
     "pm6_incident_response": "BOTMODULEPROJECT1_FEATURE__ENABLE_PM6_INCIDENT_RESPONSE",
     "pm6_governance": "BOTMODULEPROJECT1_FEATURE__ENABLE_PM6_GOVERNANCE_INTELLIGENCE",
     "pm6_withdrawal": "BOTMODULEPROJECT1_FEATURE__ENABLE_PM6_WITHDRAWAL_PLANNER",
+    "pm7_persistence": "BOTMODULEPROJECT1_FEATURE__ENABLE_PM7_PERSISTENCE",
+    "pm7_journal": "BOTMODULEPROJECT1_FEATURE__ENABLE_PM7_JOURNAL",
+    "pm7_replay": "BOTMODULEPROJECT1_FEATURE__ENABLE_PM7_REPLAY",
+    "pm7_integrity": "BOTMODULEPROJECT1_FEATURE__ENABLE_PM7_INTEGRITY",
+    "pm7_retention": "BOTMODULEPROJECT1_FEATURE__ENABLE_PM7_RETENTION",
+    "pm7_reporting": "BOTMODULEPROJECT1_FEATURE__ENABLE_PM7_REPORTING",
 }
 
 _ALL_PROFILES = tuple(ProfileName)
@@ -203,6 +209,54 @@ FEATURE_FLAG_CATALOG: tuple[FeatureFlagSpec, ...] = (
         safety=SafetyClassification.REQUIRES_REVIEW,
         env_key=_ALIAS_ENV["pm6_withdrawal"],
     ),
+    FeatureFlagSpec(
+        name="enable_pm7_persistence",
+        field="pm7_persistence",
+        description="PM7 append-only journal. Env opt-in; test and research only. Never orders. Not production durability.",
+        allowed_profiles=(ProfileName.TEST, ProfileName.RESEARCH),
+        safety=SafetyClassification.REQUIRES_REVIEW,
+        env_key=_ALIAS_ENV["pm7_persistence"],
+    ),
+    FeatureFlagSpec(
+        name="enable_pm7_journal",
+        field="pm7_journal",
+        description="PM7 journal writer. Test/research. Append-only. No historical mutation.",
+        allowed_profiles=(ProfileName.TEST, ProfileName.RESEARCH),
+        safety=SafetyClassification.REQUIRES_REVIEW,
+        env_key=_ALIAS_ENV["pm7_journal"],
+    ),
+    FeatureFlagSpec(
+        name="enable_pm7_replay",
+        field="pm7_replay",
+        description="PM7 deterministic replay. Test/research. Never mutates source history.",
+        allowed_profiles=(ProfileName.TEST, ProfileName.RESEARCH),
+        safety=SafetyClassification.REQUIRES_REVIEW,
+        env_key=_ALIAS_ENV["pm7_replay"],
+    ),
+    FeatureFlagSpec(
+        name="enable_pm7_integrity",
+        field="pm7_integrity",
+        description="PM7 hash-chain verification. Test/research. Tamper detection, not tamper-proof.",
+        allowed_profiles=(ProfileName.TEST, ProfileName.RESEARCH),
+        safety=SafetyClassification.REQUIRES_REVIEW,
+        env_key=_ALIAS_ENV["pm7_integrity"],
+    ),
+    FeatureFlagSpec(
+        name="enable_pm7_retention",
+        field="pm7_retention",
+        description="PM7 retention/archive. Test/research. Freeze blocks purge. No silent deletion.",
+        allowed_profiles=(ProfileName.TEST, ProfileName.RESEARCH),
+        safety=SafetyClassification.REQUIRES_REVIEW,
+        env_key=_ALIAS_ENV["pm7_retention"],
+    ),
+    FeatureFlagSpec(
+        name="enable_pm7_reporting",
+        field="pm7_reporting",
+        description="PM7 lineage-aware reports. Test/research. insufficient_data when empty.",
+        allowed_profiles=(ProfileName.TEST, ProfileName.RESEARCH),
+        safety=SafetyClassification.REQUIRES_REVIEW,
+        env_key=_ALIAS_ENV["pm7_reporting"],
+    ),
 )
 
 CATALOG_BY_FIELD = {spec.field: spec for spec in FEATURE_FLAG_CATALOG}
@@ -240,6 +294,12 @@ class FeatureFlags(BaseModel):
     pm6_incident_response: bool = False
     pm6_governance: bool = False
     pm6_withdrawal: bool = False
+    pm7_persistence: bool = False
+    pm7_journal: bool = False
+    pm7_replay: bool = False
+    pm7_integrity: bool = False
+    pm7_retention: bool = False
+    pm7_reporting: bool = False
     env_opt_in: tuple[str, ...] = Field(default=())
 
     def enabled_map(self) -> dict[str, bool]:

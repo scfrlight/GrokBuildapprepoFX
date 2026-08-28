@@ -1,6 +1,6 @@
 # Dependency Graph — BotModuleProject1
 
-Status: Accepted for Sequence 00; PM6 Post-Trade producer live in Sequence 08 (flag off, observe-only, NullMonitoring default)  
+Status: Accepted for Sequence 00; PM7 Persistence producer live in Sequence 09 (flag off, append-only, NullLedger default)  
 Date (UTC): 2026-08-28
 
 ## 1. Canonical data flow
@@ -15,7 +15,8 @@ Market Data
   → PM4 Risk Verdict
   → PM5 Execution
   → PM6 Post-Trade / Surveillance / Incidents
-  → PM7 / PM8 Persistence
+  → PM7 Persistence / Journal / Evidence
+  → PM8 Persistence API
   → PM9 Operator UX
 ```
 
@@ -29,7 +30,8 @@ Hard cuts in this flow:
 - A PM5 simulation fill is not broker truth.
 - PM6 observes; it does not authorize, size, or submit.
 - Reconciliation without a venue stays degraded — never a silent pass.
-- Persistence is append/reconcile, not a second decision maker.
+- Persistence is append-only; committed records are immutable; corrections are new events.
+- `SIM-*` remains simulation truth even when journaled.
 - Operator UX observes and issues *commands to application ports*, never raw broker calls.
 
 ## 2. Module I/O table
@@ -43,7 +45,7 @@ Hard cuts in this flow:
 | PM4 risk gate | Intent, forecast, ranked candidate, book placeholders | RiskVerdict + RiskPublicationBundle (not an order) | contracts, in-memory control state | Execution-critical | Any doubt → DENY / HALT; ALLOW still pending PM5 |
 | PM5 execution | RiskPublicationBundle | ExecutionPublicationBundle (simulation; not a broker order) | contracts, PM4, in-memory OMS | Execution-critical (non-fatal if flag off) | No venue → recon degraded; submit() raises |
 | PM6 post-trade | ExecutionPublicationBundle, RiskPublicationBundle | OperationalTruthBundle (observe-only; not an order) | contracts, PM4, PM5, in-memory evidence | Ops-critical (non-fatal if flag off) | No venue → monitoring ≥ degraded; never fabricate broker truth |
-| PM7 ledger | Execution/risk/monitoring events | Evidence, reports | PM8 persistence API | Recovery-critical | Inconsistency → halt |
+| PM7 ledger | PM4/PM5/PM6 publications, LedgerEvent | PersistencePublicationBundle, evidence, replay (not an order) | contracts, in-memory/file/sqlite journal | Recovery-critical (non-fatal if flag off) | Integrity mismatch → compromised; never rewrite; production_durable refused |
 | PM8 persistence | All durable writes | Repositories, snapshots, outbox | DB adapter | Recovery-critical | Incomplete recovery → halt |
 | PM9 operator UX | Commands, queries | Operator views, command receipts | application ports | Ops-non-fatal | Transport down → local observe-only |
 | PM9a studio | Research artifacts | Parameter proposals | PM9, contracts | Research-only | Never auto-promotes to live |
