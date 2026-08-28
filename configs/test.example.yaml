@@ -1,0 +1,24 @@
+# Deterministic test overlay.
+
+app:
+  environment: test
+
+safety:
+  trading_mode: test
+  live_trading_enabled: false
+
+clock:
+  source: fake
+
+mt5:
+  enabled: false
+
+persistence:
+  enabled: false
+
+telegram:
+  enabled: false
+
+logging:
+  level: DEBUG
+  json: false

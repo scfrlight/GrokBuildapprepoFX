@@ -1,0 +1,59 @@
+[build-system]
+requires = ["setuptools>=69", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "botmoduleproject1"
+version = "0.0.0"
+description = "Institutional modular Forex system for MT5 Demo (EURUSD first). Sequence 00 baseline — not trade-ready."
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "Proprietary" }
+authors = [{ name = "BotModuleProject1" }]
+dependencies = [
+  "pydantic>=2.9,<3",
+  "pydantic-settings>=2.5,<3",
+  "PyYAML>=6.0.2,<7",
+  "python-dotenv>=1.0.1,<2",
+  "structlog>=24.4,<26",
+  "orjson>=3.10,<4",
+  "tenacity>=9.0,<10",
+  "typing-extensions>=4.12,<5",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=8.3,<9",
+  "pytest-asyncio>=0.24,<1",
+  "ruff>=0.6,<1",
+  "mypy>=1.11,<2",
+  "types-PyYAML>=6.0.12",
+]
+# Windows-only extra. Must never be a hard dependency (does not install on Linux).
+mt5 = [
+  "MetaTrader5>=5.0.45",
+]
+
+[tool.setuptools.packages.find]
+include = ["botmoduleproject1*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+addopts = "-q"
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP"]
+
+[tool.mypy]
+python_version = "3.11"
+strict = true
+packages = ["botmoduleproject1"]
+
+[tool.botmoduleproject1]
+trading_mode_default = "demo"
+live_trading_enabled_default = false

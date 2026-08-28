@@ -1,0 +1,18 @@
+# Offline research overlay (future PM9a). No broker, no orders.
+
+app:
+  environment: research
+
+safety:
+  trading_mode: research
+  live_trading_enabled: false
+
+feature_flags:
+  fine_tune_studio: false
+  strategy_engine: false
+  forecasting: false
+  execution: false
+  telegram: false
+
+mt5:
+  enabled: false

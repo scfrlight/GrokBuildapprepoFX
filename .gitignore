@@ -1,0 +1,68 @@
+# secrets
+.env
+.env.*
+!.env.example
+!.env*.example
+*.pem
+*.key
+credentials*.json
+secrets*.yaml
+secrets*.yml
+
+# python
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+coverage/
+htmlcov/
+dist/
+build/
+
+# node / app builder (workspace)
+node_modules/
+.output/
+.tanstack/
+.nitro/
+
+# logs, local data, artifacts
+logs/
+*.log
+data/local/
+data/cache/
+artifacts/
+tmp/
+
+# local databases
+*.sqlite
+*.sqlite3
+*.db
+*.pgdata
+
+# MT5 terminal local files if placed beside the repo
+*.hcc
+*.ex5
+*.ex4
+terminal.ini
+metaeditor.ini
+Common/Files/
+MQL5/Profiles/
+MQL5/Bases/
+
+# generated scans / ledgers (legacy names, keep ignored)
+latest_scan*.json
+v7_execution_ledger.json
+health_v7.json
+cot_cache.json
+live_rates_cache.json
+
+# OS / IDE
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/

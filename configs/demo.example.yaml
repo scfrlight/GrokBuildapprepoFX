@@ -1,0 +1,20 @@
+# Demo venue overlay. Still does not authorize order sending.
+# Compose: base.example.yaml + this file.
+
+app:
+  environment: demo
+
+safety:
+  trading_mode: demo
+  live_trading_enabled: false
+  require_preflight: true
+  require_readiness: true
+  require_recovery: true
+  require_risk_ready_before_orders: true
+
+mt5:
+  enabled: false          # Sequence 00: do not connect
+  account_kind: demo
+
+feature_flags:
+  execution: false

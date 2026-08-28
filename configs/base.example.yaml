@@ -1,0 +1,67 @@
+# Public baseline configuration. No secrets.
+# Secrets are referenced by environment variable name only.
+
+app:
+  name: BotModuleProject1
+  environment: local
+  timezone: UTC
+  default_symbol: EURUSD
+
+safety:
+  trading_mode: demo
+  live_trading_enabled: false
+  fail_closed: true
+  on_unknown_state: observe-only
+  on_stale_data: observe-only
+  on_incomplete_recovery: halt
+  on_ledger_inconsistency: halt
+
+feature_flags:
+  strategy_engine: false
+  forecasting: false
+  risk_engine: false
+  execution: false
+  telegram: false
+  fine_tune_studio: false
+
+logging:
+  level: INFO
+  json: true
+  redact_secrets: true
+
+clock:
+  source: system
+  aware: true
+  utc_only: true
+
+identity:
+  require_event_id: true
+  require_correlation_id: true
+  require_causation_id: true
+  require_idempotency_key_on_commands: true
+
+mt5:
+  enabled: false
+  account_kind: demo
+  terminal_path_env: MT5_TERMINAL_PATH
+  login_env: MT5_LOGIN
+  password_env: MT5_PASSWORD
+  server_env: MT5_SERVER
+
+persistence:
+  enabled: false
+  dsn_env: DATABASE_URL
+  api_is_sole_durable_path: true
+
+telegram:
+  enabled: false
+  token_env: TELEGRAM_BOT_TOKEN
+  chat_id_env: TELEGRAM_CHAT_ID
+  allowed_user_ids_env: TELEGRAM_ALLOWED_USER_IDS
+
+model_registry:
+  enabled: false
+  uri_env: MODEL_REGISTRY_URI
+
+notifications:
+  enabled: false
