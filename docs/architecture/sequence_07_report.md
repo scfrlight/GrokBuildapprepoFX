@@ -6,8 +6,8 @@ Display name: **PM5 Execution & Broker Routing** (OMS/EMS, simulation only)
 
 ## 1. Git commit hash
 
-This App Builder workspace has no `.git` directory. Sequence 07 lands on
-`scfrlight/GrokBuildapprepoFX` after this report is written. Hash recorded on push.
+This App Builder workspace has no `.git` directory. Sequence 07 landed on
+`scfrlight/GrokBuildapprepoFX` as `9f9e84fcf244221c6c2c94a92e77229bd7273887`.
 
 ## 2. Created / updated files
 
