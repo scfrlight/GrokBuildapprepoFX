@@ -16,3 +16,4 @@
 | [ADR-012](./ADR-012-pm5-execution-boundary.md) | PM5 Execution boundary | Accepted |
 | [ADR-013](./ADR-013-pm6-post-trade-governance.md) | PM6 Post-trade governance | Accepted |
 | [ADR-014](./ADR-014-pm7-persistence-and-evidence.md) | PM7 persistence and evidence | Accepted |
+| [ADR-015](./ADR-015-pm8-operator-control-plane.md) | PM8 operator control plane and HITL boundary | Accepted |

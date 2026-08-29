@@ -47,6 +47,9 @@ feature_flags:
   pm7_integrity: false
   pm7_retention: false
   pm7_reporting: false
+  pm8_operator: false
+  pm8_hitl: false
+  pm8_command_audit: false
 
 logging:
   level: INFO
@@ -206,4 +209,16 @@ pm7_persistence:
   broker_commands: false
   production_durable: false
   auto_rearm: false
+
+# PM8 operator knobs. Flags stay false. Simulated transport. Not a trading UI.
+pm8_operator:
+  operating_mode: simulated
+  observe_only: true
+  approval_ttl_seconds: 900
+  halt_requires_dual_control: false
+  mt5_enabled: false
+  broker_commands: false
+  telegram_api: false
+  auto_rearm: false
+  auto_promote_to_live: false
 

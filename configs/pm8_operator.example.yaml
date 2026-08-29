@@ -1,0 +1,13 @@
+# PM8 operator overlay. Enabling still requires env opt-in in test/research.
+# Copy knobs only. Never put tokens here.
+
+pm8_operator:
+  operating_mode: simulated
+  observe_only: true
+  approval_ttl_seconds: 900
+  halt_requires_dual_control: false
+  mt5_enabled: false
+  broker_commands: false
+  telegram_api: false
+  auto_rearm: false
+  auto_promote_to_live: false

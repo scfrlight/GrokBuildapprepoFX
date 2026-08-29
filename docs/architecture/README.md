@@ -26,3 +26,6 @@
 - [PM6 Post-Trade test traceability](./pm6_post_trade_test_traceability.md)
 - [PM7 Persistence integration plan](./pm7_persistence_integration_plan.md)
 - [PM7 Persistence test traceability](./pm7_persistence_test_traceability.md)
+- [Sequence 10 report](./sequence_10_report.md)
+- [PM8 Operator integration plan](./pm8_operator_integration_plan.md)
+- [PM8 Operator test traceability](./pm8_operator_test_traceability.md)

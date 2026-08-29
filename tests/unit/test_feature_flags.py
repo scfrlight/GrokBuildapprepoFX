@@ -29,6 +29,8 @@ def test_catalog_has_required_stubs() -> None:
     assert "enable_pm7_persistence" in names
     assert "enable_pm7_journal" in names
     assert "enable_telegram_control" in names
+    assert "enable_pm8_operator" in names
+    assert "enable_pm8_hitl" in names
     dangerous = [s for s in FEATURE_FLAG_CATALOG if s.safety is SafetyClassification.DANGEROUS]
     assert dangerous
     assert all(s.default is False for s in FEATURE_FLAG_CATALOG)

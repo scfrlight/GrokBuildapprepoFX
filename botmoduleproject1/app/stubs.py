@@ -270,3 +270,46 @@ class NullLedger:
                 message="NullLedger; enable_pm7_persistence is off",
             )
         ]
+
+
+class NullOperator:
+    """Fail-closed PM8 bind. No commands until the flag is on."""
+
+    def metadata(self) -> ModuleMetadata:
+        return ModuleMetadata(
+            name="pm8_operator",
+            version="0.0.0",
+            capabilities=(Capability.OPERATOR_CONTROL,),
+            critical=False,
+            description="Placeholder operator plane. Bound when enable_pm8_operator is off.",
+        )
+
+    def handle(self, command):
+        from botmoduleproject1.contracts.v1.operator import CommandDisposition, CommandReceipt
+
+        return CommandReceipt(
+            correlation_id=getattr(command, "correlation_id"),
+            causation_id=getattr(command, "event_id", None),
+            idempotency_key=getattr(command, "idempotency_key", "null"),
+            occurred_at=utc_now(),
+            verb=getattr(command, "verb"),
+            disposition=CommandDisposition.REFUSED,
+            actor_id=getattr(getattr(command, "actor", None), "actor_id", "unknown"),
+            role=getattr(getattr(command, "actor", None), "role", None) or __import__(
+                "botmoduleproject1.contracts.v1.roles", fromlist=["OperatorRole"]
+            ).OperatorRole.OBSERVER,
+            message="NullOperator; enable_pm8_operator is off",
+            reason_code="operator_disabled",
+        )
+
+    def health_checks(self, kind: CheckKind) -> list[CheckResult]:
+        return [
+            CheckResult(
+                name="operator.placeholder",
+                kind=kind,
+                passed=True,
+                critical=False,
+                message="NullOperator; enable_pm8_operator is off",
+            )
+        ]
+

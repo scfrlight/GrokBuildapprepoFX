@@ -20,6 +20,7 @@ from botmoduleproject1.app.stubs import (
     NullModel,
     NullMonitoring,
     NullNotifications,
+    NullOperator,
     NullRiskGate,
     NullSignals,
     NullStorage,
@@ -97,6 +98,17 @@ def _ledger_module(settings: Settings, overrides: dict[str, Any], clock: ClockPo
     return NullLedger()
 
 
+
+def _operator_module(settings: Settings, overrides: dict[str, Any], clock: ClockPort):
+    if "operator" in overrides:
+        return overrides["operator"]
+    if getattr(settings.feature_flags, "pm8_operator", False):
+        from botmoduleproject1.modules.pm8_operator.module import PM8OperatorModule
+
+        return PM8OperatorModule.from_settings(settings, clock)
+    return NullOperator()
+
+
 @dataclass
 class Container:
     settings: Settings
@@ -140,6 +152,7 @@ def build_container(
         overrides.get("storage") or NullStorage(),
         overrides.get("notifications") or NullNotifications(),
         _monitoring_module(settings, overrides, clock),
+        _operator_module(settings, overrides, clock),
     ]
 
     # Always ensure platform metadata is known even if caller replaced instance.

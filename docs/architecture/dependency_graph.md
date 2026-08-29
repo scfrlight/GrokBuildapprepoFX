@@ -1,6 +1,6 @@
 # Dependency Graph — BotModuleProject1
 
-Status: Accepted for Sequence 00; PM7 Persistence producer live in Sequence 09 (flag off, append-only, NullLedger default)  
+Status: Accepted for Sequence 00; PM8 Operator live in Sequence 10 (flag off, NullOperator default, simulated transport)  
 Date (UTC): 2026-08-28
 
 ## 1. Canonical data flow

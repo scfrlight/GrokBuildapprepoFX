@@ -59,6 +59,9 @@ _ALIAS_ENV = {
     "pm7_integrity": "BOTMODULEPROJECT1_FEATURE__ENABLE_PM7_INTEGRITY",
     "pm7_retention": "BOTMODULEPROJECT1_FEATURE__ENABLE_PM7_RETENTION",
     "pm7_reporting": "BOTMODULEPROJECT1_FEATURE__ENABLE_PM7_REPORTING",
+    "pm8_operator": "BOTMODULEPROJECT1_FEATURE__ENABLE_PM8_OPERATOR",
+    "pm8_hitl": "BOTMODULEPROJECT1_FEATURE__ENABLE_PM8_HITL",
+    "pm8_command_audit": "BOTMODULEPROJECT1_FEATURE__ENABLE_PM8_COMMAND_AUDIT",
 }
 
 _ALL_PROFILES = tuple(ProfileName)
@@ -148,8 +151,8 @@ FEATURE_FLAG_CATALOG: tuple[FeatureFlagSpec, ...] = (
     FeatureFlagSpec(
         name="enable_telegram_control",
         field="telegram",
-        description="PM9 Telegram transport. Dangerous. Env opt-in only.",
-        allowed_profiles=(ProfileName.DEMO, ProfileName.RESEARCH),
+        description="Real Telegram Bot API. Refused in Sequence 10. Use enable_pm8_operator (simulated transport).",
+        allowed_profiles=(),
         safety=SafetyClassification.DANGEROUS,
         env_key=_ALIAS_ENV["telegram"],
     ),
@@ -257,6 +260,30 @@ FEATURE_FLAG_CATALOG: tuple[FeatureFlagSpec, ...] = (
         safety=SafetyClassification.REQUIRES_REVIEW,
         env_key=_ALIAS_ENV["pm7_reporting"],
     ),
+    FeatureFlagSpec(
+        name="enable_pm8_operator",
+        field="pm8_operator",
+        description="PM8 operator control plane. Env opt-in; test and research only. Simulated transport. Commands are not orders.",
+        allowed_profiles=(ProfileName.TEST, ProfileName.RESEARCH),
+        safety=SafetyClassification.REQUIRES_REVIEW,
+        env_key=_ALIAS_ENV["pm8_operator"],
+    ),
+    FeatureFlagSpec(
+        name="enable_pm8_hitl",
+        field="pm8_hitl",
+        description="PM8 human-in-the-loop approval queue. Test/research. Approvals do not skip PM4.",
+        allowed_profiles=(ProfileName.TEST, ProfileName.RESEARCH),
+        safety=SafetyClassification.REQUIRES_REVIEW,
+        env_key=_ALIAS_ENV["pm8_hitl"],
+    ),
+    FeatureFlagSpec(
+        name="enable_pm8_command_audit",
+        field="pm8_command_audit",
+        description="PM8 command audit trail. Test/research. Not a durable ledger.",
+        allowed_profiles=(ProfileName.TEST, ProfileName.RESEARCH),
+        safety=SafetyClassification.REQUIRES_REVIEW,
+        env_key=_ALIAS_ENV["pm8_command_audit"],
+    ),
 )
 
 CATALOG_BY_FIELD = {spec.field: spec for spec in FEATURE_FLAG_CATALOG}
@@ -300,6 +327,9 @@ class FeatureFlags(BaseModel):
     pm7_integrity: bool = False
     pm7_retention: bool = False
     pm7_reporting: bool = False
+    pm8_operator: bool = False
+    pm8_hitl: bool = False
+    pm8_command_audit: bool = False
     env_opt_in: tuple[str, ...] = Field(default=())
 
     def enabled_map(self) -> dict[str, bool]:
@@ -375,6 +405,11 @@ def validate_feature_flags(flags: FeatureFlags, profile: ProfileName) -> None:
             raise FeatureFlagError(
                 f"feature flag {spec.name} is refused in Sequence 07; "
                 "no broker adapter and no MT5 demo execution"
+            )
+        if spec.field == "telegram":
+            raise FeatureFlagError(
+                f"feature flag {spec.name} is refused in Sequence 10; "
+                "no Telegram Bot API. Use enable_pm8_operator with SimulatedTransport"
             )
         if profile not in spec.allowed_profiles:
             raise FeatureFlagError(

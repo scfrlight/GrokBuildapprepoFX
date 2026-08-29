@@ -425,6 +425,38 @@ class Pm7PersistenceSection(BaseModel):
         return value
 
 
+
+class Pm8OperatorSection(BaseModel):
+    """Public PM8 knobs. Enabling is a feature flag, not this block. No Telegram API."""
+
+    operating_mode: str = "simulated"
+    observe_only: bool = True
+    approval_ttl_seconds: int = Field(default=900, ge=30, le=86400)
+    halt_requires_dual_control: bool = False
+    mt5_enabled: bool = False
+    broker_commands: bool = False
+    telegram_api: bool = False
+    auto_rearm: bool = False
+    auto_promote_to_live: bool = False
+    telemetry_verbose: bool = True
+
+    @field_validator("operating_mode")
+    @classmethod
+    def _mode(cls, value: str) -> str:
+        if value == "telegram_api":
+            raise ValueError("telegram_api transport is refused in Sequence 10")
+        if value not in {"disabled", "simulated"}:
+            raise ValueError("pm8_operator.operating_mode must be disabled|simulated")
+        return value
+
+    @field_validator("auto_rearm", "mt5_enabled", "broker_commands", "telegram_api", "auto_promote_to_live")
+    @classmethod
+    def _no_unsafe(cls, value: bool) -> bool:
+        if value:
+            raise ValueError("PM8 cannot enable MT5, broker commands, telegram API, auto-rearm, or auto-promote")
+        return value
+
+
 class MappingSource(PydanticBaseSettingsSource):
     """Inject a precomputed nested mapping as a settings source."""
 
@@ -577,6 +609,7 @@ class Settings(BaseSettings):
     pm5_execution: Pm5ExecutionSection = Field(default_factory=Pm5ExecutionSection)
     pm6_post_trade: Pm6PostTradeSection = Field(default_factory=Pm6PostTradeSection)
     pm7_persistence: Pm7PersistenceSection = Field(default_factory=Pm7PersistenceSection)
+    pm8_operator: Pm8OperatorSection = Field(default_factory=Pm8OperatorSection)
     profile: ProfileName = ProfileName.DEMO
     cli_mode: str = "doctor"
     config_path: str | None = None
@@ -622,6 +655,8 @@ class Settings(BaseSettings):
             raise SettingsError("MT5 account_kind must be demo")
         if self.mt5.enabled and not self.mt5.password:
             raise SettingsError("MT5 is enabled but password secret is missing")
+        if self.telegram.enabled:
+            raise SettingsError("Telegram Bot API is refused in Sequence 10; telegram.enabled cannot be true")
         if self.telegram.enabled and not self.telegram.token:
             raise SettingsError("Telegram is enabled but token secret is missing")
         if self.persistence.enabled and not self.persistence.dsn:

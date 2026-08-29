@@ -2,7 +2,7 @@
 
 Institutional modular Forex system for **MT5 Demo**, EURUSD first.
 
-This repository is in **Sequence 09 — PM7 Persistence, Event Ledger, Reconciliation Store & Durable Audit Layer**. It is **not** ready for demo trading, paper trading, or production. Live trading is disabled by design.
+This repository is in **Sequence 10 — PM8 Operator Control Plane, Telegram Control Engine & Human-in-the-Loop Operations**. It is **not** ready for demo trading, paper trading, or production. Live trading is disabled by design.
 
 Git home: [scfrlight/GrokBuildapprepoFX](https://github.com/scfrlight/GrokBuildapprepoFX)
 
@@ -11,11 +11,11 @@ Git home: [scfrlight/GrokBuildapprepoFX](https://github.com/scfrlight/GrokBuilda
 | Key | Value |
 |---|---|
 | Profile | `demo` (test/backtest/research allowed; `live` refused) |
-| Feature flags | all `false`; PM2–PM7 opt-in only via env (test/research) |
+| Feature flags | all `false`; PM2–PM8 opt-in only via env (test/research) |
 | Secrets in git | never |
 | Python | 3.11+ (fail-fast; ADR-008) |
 
-**PM4** is the authoritative risk gate. **PM5** is the OMS/EMS fabric (simulation/shadow; `SIM-*` is not a venue ticket). **PM6** is continuous post-trade monitoring. **PM7** is the append-only journal of those facts. It never sends orders, never sizes risk, never ALLOWs, and never calls MT5. Reconciliation without a venue stays **degraded**. Memory/file/SQLite are not production durability. `DisabledExecution` / `NullMonitoring` / `NullLedger` remain the default binds.
+**PM4** is the authoritative risk gate. **PM5** is the OMS/EMS fabric (simulation/shadow; `SIM-*` is not a venue ticket). **PM6** is continuous post-trade monitoring. **PM7** is the append-only journal of those facts. It never sends orders, never sizes risk, never ALLOWs, and never calls MT5. Reconciliation without a venue stays **degraded**. Memory/file/SQLite are not production durability. `DisabledExecution` / `NullMonitoring` / `NullLedger` / `NullOperator` remain the default binds.
 
 Unprefixed ambient env (`DATABASE_URL`, `TRADING_MODE`, …) is ignored.
 
@@ -26,11 +26,12 @@ Unprefixed ambient env (`DATABASE_URL`, `TRADING_MODE`, …) is ignored.
 - PM5 Execution OMS/EMS simulation (flag off; `DisabledExecution` when off)
 - PM6 Post-Trade (flag off; `NullMonitoring` when off)
 - **PM7 Persistence**: append-only journal, evidence, replay, integrity chain, retention freeze (flag off; `NullLedger` when off)
-- Architecture console in the App Builder preview (read-only; not a trading UI)
+- **PM8 Operator**: command plane, RBAC, HITL, simulated transport (flag off; `NullOperator` when off). Telegram Bot API refused.
+- Architecture console in the App Builder preview (operator desk; not a trading UI)
 
 ## What does not exist yet
 
-Fitted QRF/ML, real order sending, MT5 connection, Telegram bot, production distributed database, schema migrations, production-grade durability.
+Fitted QRF/ML, real order sending, MT5 connection, live Telegram bot, production distributed database, schema migrations, production-grade durability, CQRS persistence API.
 
 ## Durable journal (Sequence 09)
 
@@ -58,8 +59,16 @@ PYTHONPATH=. python -m pytest tests
 
 `python -m botmoduleproject1 live` must fail closed.
 
+## Operator plane (Sequence 10)
+
+- Commands are not orders. `/buy` `/sell` `/order` `/live` `/mt5` `/resume` `/rearm` are refused.
+- HITL approval records consent and **does not skip PM4**.
+- Transport is simulated. Real Telegram Bot API is refused.
+- Studio proposals cannot auto-promote to live.
+- Enabling `enable_pm8_operator` in test/research still cannot trade.
+
 ## Next step
 
-**Sequence 10 — PM8 Operator Control Plane, Telegram Control Engine & Human-in-the-Loop Operations.**
+**Sequence 11 — PM8 persistence CQRS/outbox (`pending_pm8`) and/or PM9a studio hardening.**
 
 The system is NOT ready for live trading, demo trading, paper trading, or production.

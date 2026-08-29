@@ -96,6 +96,18 @@ from botmoduleproject1.contracts.v1.risk import (
     RiskVerdict,
     RiskVerdictStatus,
 )
+from botmoduleproject1.contracts.v1.operator import (
+    CommandDisposition,
+    CommandReceipt,
+    HaltState,
+    OperatorAlert,
+    OperatorCommand,
+    OperatorIdentity,
+    OperatorPublicationBundle,
+    OperatorVerb,
+    REFUSED_VERBS,
+    TransportMode,
+)
 from botmoduleproject1.contracts.v1.roles import OperatorRole, PermissionScope
 from botmoduleproject1.contracts.v1.session import (
     RegimeState,
@@ -232,5 +244,15 @@ __all__ = [
     "ensure_aware_utc",
     "quality_tier_for",
     "utc_now",
+    "CommandDisposition",
+    "CommandReceipt",
+    "HaltState",
+    "OperatorAlert",
+    "OperatorCommand",
+    "OperatorIdentity",
+    "OperatorPublicationBundle",
+    "OperatorVerb",
+    "REFUSED_VERBS",
+    "TransportMode",
     "EntryType",
 ]
