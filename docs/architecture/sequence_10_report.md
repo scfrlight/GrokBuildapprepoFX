@@ -6,7 +6,10 @@ Display name: **PM8 Operator / HITL / Simulated Transport**
 
 ## 1. Git commit hash
 
-Recorded after push. Kernel lands on `scfrlight/GrokBuildapprepoFX`.
+This App Builder workspace has no `.git` directory. Sequence 10 landed on
+`scfrlight/GrokBuildapprepoFX` as `40b3dc644b3da42df370a1f814075cdf75b8ba1e`.
+
+Kernel commit: **40b3dc644b3da42df370a1f814075cdf75b8ba1e**
 
 ## 2. Created / updated files
 
