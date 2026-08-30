@@ -1,0 +1,15 @@
+git_sha=5ba4216cc06591059ca94afac40f485723d4c5d4
+utc=2026-08-30T12:15:37Z
+interpreter=CPython 3.11.2 (/workspace/.venv311/bin/python)
+command=doctor+live+flags
+exit_code=0
+result=trading_readiness false; live exit 2; flags false
+storage_scope=n/a
+limitations=SQLite local/test; PostgreSQL BLOCKED; Sequence 15 BLOCKED
+live_exit=2
+doctor_py310_exit=1
+doctor_py311_exit=0 NOT TRADE READY
+trading_readiness=false
+accept_trade=false
+telegram=refused
+sequence_15=absent

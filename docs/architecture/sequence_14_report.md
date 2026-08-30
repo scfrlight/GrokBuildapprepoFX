@@ -46,7 +46,7 @@ Trading, risk, and broker execution modules were not behavior-changed.
 | PM5 | `pm5_execution` | COMPLETE, `SIM-*` not broker truth |
 | PM6 | **`pm6_post_trade` only** | COMPLETE Seq 08 in-memory; not Seq 14 |
 | PM7 | `pm7_persistence` | **PARTIAL / evidence-journal subset**, flag off |
-| PM8 persistence | `pm8_persistence` | **PARTIAL** vs reconstructed PM8a (named projections ABSENT) |
+| PM8 persistence | `pm8_persistence` | SQLite local remediation; named projections as read models; PG **BLOCKED** |
 | PM8a | same package, Seq 10 identity | verify COMPLETE; restore-apply ABSENT; spec SOURCE-MISSING |
 | PM8 operator / PM9 UX | `pm8_operator` | COMPLETE Seq 13, Telegram refused |
 | Seq 11 | `mt5_execution_engine` | COMPLETE, `DEMO-*` not broker truth |

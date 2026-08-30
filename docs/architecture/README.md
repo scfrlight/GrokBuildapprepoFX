@@ -1,7 +1,9 @@
 # Architecture
 
 - [**Architecture inventory (reconciliation)**](../ARCHITECTURE_INVENTORY.md)
-- [**PM8 / PM8a gap matrix**](../PM8_PM8A_GAP_MATRIX.md)
+- [**PM7 / PM8 remediation plan**](../PM7_PM8_REMEDIATION_PLAN.md)
+- [**PM7 / PM8a gap matrix (after remediation)**](../PM7_PM8A_GAP_MATRIX.md)
+- [**PM8 / PM8a gap matrix (reconciliation)**](../PM8_PM8A_GAP_MATRIX.md)
 - [**Reconciliation report 2026-08-30**](./reconciliation_report.md)
 
 - [Known limitations](../known_limitations.md)

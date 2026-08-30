@@ -1,0 +1,9 @@
+git_sha=5ba4216cc06591059ca94afac40f485723d4c5d4
+utc=2026-08-30T12:15:37Z
+interpreter=CPython 3.11.2 (/workspace/.venv311/bin/python)
+command=pytest test_inbox_retry_dead_letter_and_duplicate
+exit_code=0
+result=PASS inbox retry/DLQ/dedupe
+storage_scope=sqlite-file
+limitations=SQLite local/test; PostgreSQL BLOCKED; Sequence 15 BLOCKED
+.                                                                        [100%]

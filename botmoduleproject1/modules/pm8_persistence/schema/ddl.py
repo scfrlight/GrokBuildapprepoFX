@@ -1,4 +1,8 @@
-"""Consolidated SQLite DDL for canonical Sequence 09 (schema v1) and Sequence 10 (v2)."""
+"""Consolidated SQLite DDL for canonical Sequence 09 (schema v1) and Sequence 10 (v2).
+
+SCHEMA_V3 is the 2026-08-30 remediation overlay (CREATE IF NOT EXISTS).
+It is applied on every open and does not bump the Seq 10 migration catalog.
+"""
 
 from __future__ import annotations
 
@@ -190,4 +194,90 @@ SCHEMA_V2_DOWN = """
 DROP TABLE IF EXISTS restart_drills;
 DROP TABLE IF EXISTS restore_verifications;
 DROP TABLE IF EXISTS backup_schedules;
+"""
+
+SCHEMA_V3 = """
+CREATE TABLE IF NOT EXISTS named_projection_meta (
+    name TEXT PRIMARY KEY,
+    version INTEGER NOT NULL,
+    last_event_seq INTEGER NOT NULL,
+    rebuilt_at TEXT NOT NULL,
+    status TEXT NOT NULL,
+    lag_seq INTEGER NOT NULL DEFAULT 0
+);
+CREATE TABLE IF NOT EXISTS named_projection_rows (
+    projection TEXT NOT NULL,
+    row_key TEXT NOT NULL,
+    payload_json TEXT NOT NULL,
+    source_seq INTEGER NOT NULL,
+    updated_at TEXT NOT NULL,
+    PRIMARY KEY (projection, row_key)
+);
+CREATE TABLE IF NOT EXISTS processed_events (
+    projection_name TEXT NOT NULL,
+    event_id TEXT NOT NULL,
+    source_seq INTEGER NOT NULL,
+    applied_at TEXT NOT NULL,
+    PRIMARY KEY (projection_name, event_id)
+);
+CREATE TABLE IF NOT EXISTS reconciliation_runs (
+    run_id TEXT PRIMARY KEY,
+    state TEXT NOT NULL,
+    venue_available INTEGER NOT NULL,
+    started_at TEXT NOT NULL,
+    updated_at TEXT NOT NULL,
+    closed_at TEXT,
+    payload_json TEXT NOT NULL
+);
+CREATE TABLE IF NOT EXISTS reconciliation_items (
+    item_id TEXT PRIMARY KEY,
+    run_id TEXT NOT NULL,
+    local_ref TEXT NOT NULL,
+    venue_ref TEXT,
+    classification TEXT NOT NULL,
+    severity TEXT NOT NULL,
+    state TEXT NOT NULL,
+    payload_json TEXT NOT NULL,
+    created_at TEXT NOT NULL,
+    FOREIGN KEY (run_id) REFERENCES reconciliation_runs(run_id)
+);
+CREATE TABLE IF NOT EXISTS mismatch_actions (
+    action_id TEXT PRIMARY KEY,
+    item_id TEXT NOT NULL,
+    run_id TEXT NOT NULL,
+    action TEXT NOT NULL,
+    actor TEXT NOT NULL,
+    occurred_at TEXT NOT NULL,
+    payload_json TEXT NOT NULL
+);
+CREATE TABLE IF NOT EXISTS restore_applies (
+    apply_id TEXT PRIMARY KEY,
+    backup_id TEXT NOT NULL,
+    target_path TEXT NOT NULL,
+    stage TEXT NOT NULL,
+    checksum_ok INTEGER NOT NULL,
+    schema_ok INTEGER NOT NULL,
+    mutated INTEGER NOT NULL,
+    trading_blocked INTEGER NOT NULL,
+    detail_json TEXT NOT NULL,
+    occurred_at TEXT NOT NULL
+);
+CREATE TABLE IF NOT EXISTS money_records (
+    record_id TEXT PRIMARY KEY,
+    family TEXT NOT NULL,
+    field TEXT NOT NULL,
+    amount_canonical TEXT NOT NULL,
+    scale INTEGER NOT NULL,
+    currency TEXT NOT NULL,
+    source_event_id TEXT,
+    committed_at TEXT NOT NULL
+);
+CREATE TABLE IF NOT EXISTS inbox_dead_letters (
+    event_id TEXT PRIMARY KEY,
+    source TEXT NOT NULL,
+    attempts INTEGER NOT NULL,
+    last_error TEXT NOT NULL,
+    payload_json TEXT NOT NULL,
+    created_at TEXT NOT NULL
+);
 """

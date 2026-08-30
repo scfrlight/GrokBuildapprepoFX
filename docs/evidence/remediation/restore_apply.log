@@ -1,0 +1,10 @@
+git_sha=5ba4216cc06591059ca94afac40f485723d4c5d4
+utc=2026-08-30T12:15:37Z
+interpreter=CPython 3.11.2 (/workspace/.venv311/bin/python)
+command=pytest test_isolated_restore_apply
+exit_code=0
+result=PASS isolated sqlite restore-apply
+storage_scope=sqlite isolated target; live refused
+limitations=SQLite local/test; PostgreSQL BLOCKED; Sequence 15 BLOCKED
+PostgreSQL restore-apply = BLOCKED — environment unavailable
+.                                                                        [100%]

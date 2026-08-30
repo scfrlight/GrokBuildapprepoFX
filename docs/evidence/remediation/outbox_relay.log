@@ -1,0 +1,10 @@
+git_sha=5ba4216cc06591059ca94afac40f485723d4c5d4
+utc=2026-08-30T12:15:37Z
+interpreter=CPython 3.11.2 (/workspace/.venv311/bin/python)
+command=pytest test_outbox_relay_retry_dead_letter_and_restart
+exit_code=0
+result=PASS relay retry/DLQ
+storage_scope=sqlite-file local/test-only
+limitations=SQLite local/test; PostgreSQL BLOCKED; Sequence 15 BLOCKED
+SQLite relay is local/test-only; PostgreSQL is required for production multi-worker concurrency.
+.                                                                        [100%]

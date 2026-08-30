@@ -1,4 +1,4 @@
-> **RECONCILIATION 2026-08-30.** Sequence 09 **delivery** remains. Capability vs reconstructed PM8a is **PARTIAL**: named projections ABSENT, restore-apply ABSENT, Decimal domain records ABSENT, outbox relay ABSENT, family-row UoW PARTIAL. Original Drive spec SOURCE-MISSING. See `docs/PM8_PM8A_GAP_MATRIX.md`. Do not read the §4 COMPLETE table as a full PM8a Master.
+> **REMEDIATION 2026-08-30.** SQLite local/test: named projections, isolated restore-apply, Decimal persist_* keys, nested UoW, outbox relay. PostgreSQL production durability remains BLOCKED. See `docs/PM7_PM8_REMEDIATION_PLAN.md`.
 
 # Sequence 09 Report — PM8 Database Consolidation & Data Integrity
 

@@ -1,0 +1,23 @@
+# Run-specific evidence hashes. NOT canonical payload hashes.
+# test_result_hash sha256(pytest-3.11.junit.xml) = 91c65fe3623ee05ff92e989f8f7e46bcb40bd33fce40941d3196c3a04d008c34
+# payload_canonical_sha256 is PM8 dump comparable hash (not this dir).
+# event hash-chain digest is store.last_hash() per run.
+
+9fb9670adc955ea8d011b1eafe2c3b918786827bc1e46ce5b0f340fa5ae56f72       426  backup_file_checksum  decimal_roundtrip.log
+2d55c8d5ccbb3b9d6138317c380147a99260b67cc377aefa9d3f77f96f56b2d7       536  backup_file_checksum  doctor-3.10.log
+b406522b728bcab19f4470de01e1a4e18c80e097d4e7c1aaa6c1697f44ee115b       425  backup_file_checksum  durable_restart.log
+06b0f49bec1af35396f42987c66d892e6f7c61a7c44e9886481cf6c1f7d8108b       557  backup_file_checksum  exact_commands.txt
+552dc03ec6ce3450424b6faa23ae852462a6517b536c70c710ad2705daca849b       416  backup_file_checksum  inbox_dedupe.log
+cde897f74ad8b87157e91e1ba9a6f1d081ad0cbdf132d53ca44eb42a593a67c5       485  backup_file_checksum  inventory.txt
+d30e3e1beb50fd2dad8d105208a5e97806835b33e425522892106bcb2f854c28       527  backup_file_checksum  outbox_relay.log
+d8e2bdf58468e0989aeaaee472bebb7f1778028c9f8e47434a54cbdbbc91e0ce       407  backup_file_checksum  pm7_capability.log
+60b54c24c62efafa3d160fbff49909163d570275292d773abedc5a28e5d2d66b      1991  backup_file_checksum  pm8_capability.log
+b2d64c6531ce44b7a18eb2cba3a10a39bf4c3d3a56190642c99f869d98bec151       421  backup_file_checksum  projection_rebuild.log
+91c65fe3623ee05ff92e989f8f7e46bcb40bd33fce40941d3196c3a04d008c34     62024  backup_file_checksum  pytest-3.11.junit.xml
+a24d933bad4dd36bb9ee70525369afd7aec8d609b18de06f5b562fa3b8ddec89       386  backup_file_checksum  pytest-3.11.log
+098426362f2b96cb96c1ea457a91b78d4083dd1a37411ab6cdefe0e5de48acdb       441  backup_file_checksum  pytest-3.12.log
+3382b9e34183a2026dbdf1c616da6e6533574853cf1c21fba4700d2b37db4dee       429  backup_file_checksum  reconciliation_lifecycle.log
+7b5da8129d44675c6368a7e1f57818f67c118c026e6588562d1f1a98a16a8cd8       496  backup_file_checksum  restore_apply.log
+c3d1a38c702192140ed5a0425393dbd7aa9b3766b1325fb8417ced24f4d1ae19       465  backup_file_checksum  safety_invariants.log
+5273826f9844c31e7bcefbc6a16d86881576d5c80a56eef4a6deed08c12c0127       416  backup_file_checksum  uow_failure_injection.log
+3da9457b74e06a2f17c400b71a990645a521670daeafb2b1c5131f2b65ac5d38      2307  backup_file_checksum  checksums.txt

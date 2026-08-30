@@ -1,0 +1,14 @@
+git_sha=5ba4216cc06591059ca94afac40f485723d4c5d4
+utc=2026-08-30T12:15:37Z
+interpreter=CPython 3.11.2 (/workspace/.venv311/bin/python)
+command=docs inventory
+exit_code=0
+result=ok
+storage_scope=n/a
+limitations=SQLite local/test; PostgreSQL BLOCKED; Sequence 15 BLOCKED
+parent_at_generation=5ba4216cc06591059ca94afac40f485723d4c5d4
+pm6=pm6_post_trade
+pm7=pm7_persistence PARTIAL warehouse / sqlite reload COMPLETE
+pm8=pm8_persistence PersistenceApiV1
+pm8a=same package
+seq15=NOT STARTED

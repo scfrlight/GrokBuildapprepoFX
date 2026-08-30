@@ -19,7 +19,7 @@ COMPLETE requires implementation path **and** test or evidence. Catalog-only nam
 | Enums (families, edges, dispositions) | reconstructed §13, §19 | `contracts/v1/pm8_persistence.py` | same | `test_protocol_and_service_minimums` | Seq 09 report | COMPLETE | reconstructed spec |
 | Typed write records | audit A | unused `PersistRecord`; writes are `dict`+JSON | `PersistRecord` unused on write path | none for typed rows | — | PARTIAL | no Signal/Order/Fill records in PM8 contract |
 | Timezone-aware timestamps | ADR-003 | `utc_now().isoformat()` on writes | `ensure_aware_utc` on unused PersistRecord | ADR-003 tests elsewhere | — | PARTIAL | SQLite stores ISO strings |
-| Decimal for accounting | audit A | **none** (`qty`/`avg_px` TEXT) | none | none | — | ABSENT | do not treat TEXT as money type |
+| Decimal for accounting | audit A / rem | `money.py` + persist_* sanitize | canonical string | `test_decimal_round_trip_and_reject_float` | remediation | COMPLETE persist_* keys | residual JSON bags |
 | Trade-intent / no-trade records | audit B | **none** | none | none | — | ABSENT | PM3 intents not first-class here |
 
 ## B. Write side
@@ -73,15 +73,15 @@ COMPLETE requires implementation path **and** test or evidence. Catalog-only nam
 
 | Projection | Status | Notes |
 |---|---|---|
-| open orders | **ABSENT** | do not invent |
-| open positions | PARTIAL | `positions_proj` TEXT qty/avg_px; not Decimal |
-| closed trades | **ABSENT** | |
-| symbol performance | **ABSENT** | |
-| profile performance | **ABSENT** | |
-| daily summary | **ABSENT** | |
-| operator dashboard view | **ABSENT** | operator is Seq 13, not a PM8 projection |
+| open orders | COMPLETE (read model) | rebuilt from ORDER events; not canonical |
+| open positions | COMPLETE (read model) | Decimal canonical qty/avg_px |
+| closed trades | COMPLETE (read model) | filled/cancelled states |
+| symbol performance | COMPLETE (read model) | last-event bag |
+| profile performance | COMPLETE (read model) | producer bag |
+| daily summary | COMPLETE (read model) | day key |
+| operator dashboard view | COMPLETE (read model) | latest audit pointer |
 
-Generic `projections` table + `family_counts` rebuild exists. That is **not** the named set.
+Generic `projections` table + `family_counts` rebuild still exists. Named projections are rebuildable read models, not canonical truth.
 
 ## G. Data API
 
@@ -100,7 +100,7 @@ Generic `projections` table + `family_counts` rebuild exists. That is **not** th
 | Migrations + rollback policy | COMPLETE | v2→v1 allowed; v1 drop with journal refused |
 | Backup file + checksum | COMPLETE | run-specific dump hash; `payload_canonical_sha256` is comparable |
 | Restore **verification** | COMPLETE | mismatch raises; live seq untouched |
-| Restore **apply** | **ABSENT** | no `restore()` into a live store |
+| Restore **apply** | COMPLETE isolated SQLite | live store refused; PostgreSQL BLOCKED |
 | Integrity hash chain | COMPLETE | compromised → no rewrite |
 | Venue-vs-ledger drift suite | PARTIAL | tamper + corrupt backup; not venue drift |
 | `backup_schedules` table | PARTIAL | DDL v2 exists; not written by API |
@@ -115,9 +115,9 @@ Generic `projections` table + `family_counts` rebuild exists. That is **not** th
 | C Reliability | PARTIAL |
 | D Recovery | PARTIAL (monotonic checkpoint hardened this recon) |
 | E Reconciliation | PARTIAL |
-| F Named projections | ABSENT (generic bag only) |
+| F Named projections | COMPLETE as read models (not canonical) |
 | G Data API | COMPLETE with encapsulation caveats |
-| H Storage | PARTIAL (verify yes, apply no) |
+| H Storage | PARTIAL (SQLite isolated restore-apply COMPLETE; PostgreSQL BLOCKED) |
 
 **Blocked module-wide:** production durability, MT5/broker commands, live/demo/paper trading readiness.
 

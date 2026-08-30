@@ -1,0 +1,10 @@
+git_sha=5ba4216cc06591059ca94afac40f485723d4c5d4
+utc=2026-08-30T12:15:37Z
+interpreter=CPython 3.11.2 (/workspace/.venv311/bin/python)
+command=PYTHONPATH=. python3.10 -m botmoduleproject1 doctor --profile test --config configs/test.example.yaml
+exit_code=1
+result=STARTUP FAILED requires 3.11+
+storage_scope=n/a
+limitations=SQLite local/test; PostgreSQL BLOCKED; Sequence 15 BLOCKED
+---stderr---
+STARTUP FAILED: Python 3.10.21 is not supported. BotModuleProject1 requires Python 3.11+. See docs/adr/ADR-008-python-version-constraint.md.

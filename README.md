@@ -38,13 +38,14 @@ Unprefixed ambient env (`DATABASE_URL`, `TRADING_MODE`, …) is ignored.
 
 - PM6 = `pm6_post_trade` (post-trade monitoring/governance). Sequence 14 observability is **not** PM6.
 - Sequence 11 = `mt5_execution_engine` (Demo execution/exit **simulation**)
-- PM7 = PARTIAL evidence-journal subset (in-memory / local sqlite write-append; not production durable)
-- PM8 = persistence/consolidation data API (`PersistenceApiV1`); named projections ABSENT
+- PM7 = PARTIAL evidence-journal subset (sqlite/file now reload; not production durable; not the downstream API)
+- PM8 = persistence/consolidation data API (`PersistenceApiV1`); named projections are rebuildable read models
 - PM8a = implementation/hardening specification for PM8 (same package)
 - Sequence 09 = PM8 consolidation
 - Sequence 10 = PM8a hardening
 - Sequence 13 = operator UX reuse
 - Sequence 14 = observability/operations/documentation
+- Durability remediation 2026-08-30 = SQLite local/test (PostgreSQL BLOCKED)
 - Sequence 15+ = **BLOCKED**
 
 ## What does not exist yet

@@ -47,7 +47,7 @@ Sources of truth (priority): (1) live safety constraints in this repo; (2) persi
 | 06 | PM4 risk gate | `modules/pm4_risk_gate` | COMPLETE | COMPLETE as exclusive deny-by-default gate (flag off) | no | no | `NullRiskGate` DENY | `enable_pm4_risk_gate` |
 | 07 | PM5 OMS/EMS sim | `modules/pm5_execution` | COMPLETE | COMPLETE for simulation; broker adapter **BLOCKED** | no (SIM-* not broker) | no | `DisabledExecution` | `enable_pm5_simulation` |
 | 08 | PM6 post-trade | `modules/pm6_post_trade` | COMPLETE | COMPLETE for in-memory Seq 08; not Seq 14 | no | no | `NullMonitoring` | `enable_pm6_post_trade` |
-| 09 | PM8 DB consolidation | `modules/pm8_persistence` | COMPLETE | **PARTIAL** vs reconstructed PM8a (see gap matrix) | no | **yes** (canonical downstream API when flag on) | `NullStorage` | `enable_pm8_persistence` |
+| 09 | PM8 DB consolidation | `modules/pm8_persistence` | COMPLETE | **PARTIAL vs PG**; SQLite named projections / isolated restore-apply present | no | **yes** (canonical downstream API when flag on) | `NullStorage` | `enable_pm8_persistence` |
 | 10 | PM8a hardening | same package | COMPLETE | **PARTIAL** (verify exists; restore-apply **ABSENT**) | no | yes (same API) | off | same |
 | 11 | MT5 demo engine | `modules/mt5_execution_engine` | COMPLETE (sim/test-safe) | Demo simulation; real terminal **BLOCKED** | no (`DEMO-*` not broker truth) | no | fail-closed / unused unless flags | `enable_mt5_demo_adapter` |
 | 12 | unified runtime | `botmoduleproject1/runtime` | COMPLETE | COMPLETE for observe pipeline; no live path | no | uses PM8 API if injected | off | `enable_unified_runtime` |

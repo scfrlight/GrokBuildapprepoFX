@@ -1,4 +1,8 @@
-"""In-memory and SQLite store implementing all 19 Sequence 09 protocols."""
+"""In-memory and SQLite store implementing all 19 Sequence 09 protocols.
+
+File-backed paths survive process restart. `:memory:` is test-only.
+Empty-file first start bootstraps schema; silent fallback to memory is forbidden.
+"""
 
 from __future__ import annotations
 
@@ -9,7 +13,16 @@ from pathlib import Path
 from typing import Any
 from uuid import uuid4
 
-from botmoduleproject1.modules.pm8_persistence.schema.ddl import SCHEMA_V1, SCHEMA_V2_DOWN, SCHEMA_V2_UP
+from botmoduleproject1.modules.pm8_persistence.schema.ddl import (
+    SCHEMA_V1,
+    SCHEMA_V2_DOWN,
+    SCHEMA_V2_UP,
+    SCHEMA_V3,
+)
+
+
+class StorageUnavailable(RuntimeError):
+    pass
 
 
 def _hash_row(prev: str, payload: str) -> str:
@@ -21,16 +34,59 @@ class SqliteStore:
 
     def __init__(self, path: str | Path = ":memory:") -> None:
         self.path = str(path)
-        self.conn = sqlite3.connect(self.path, isolation_level=None)
+        self.backend_identity = "sqlite-memory" if self.path == ":memory:" else "sqlite-file"
+        if self.path != ":memory:":
+            parent = Path(self.path).parent
+            try:
+                parent.mkdir(parents=True, exist_ok=True)
+            except OSError as exc:
+                raise StorageUnavailable(f"configured storage path unavailable: {parent}") from exc
+        try:
+            self.conn = sqlite3.connect(self.path, isolation_level=None, timeout=30.0)
+        except sqlite3.Error as exc:
+            raise StorageUnavailable(f"cannot open sqlite store {self.path}") from exc
         self.conn.row_factory = sqlite3.Row
         self.conn.execute("PRAGMA foreign_keys=ON")
+        if self.path != ":memory:":
+            self.conn.execute("PRAGMA journal_mode=WAL")
+            self.conn.execute("PRAGMA synchronous=NORMAL")
         self._in_tx = False
         self.bootstrap_schema()
 
     def bootstrap_schema(self) -> None:
         self.conn.executescript(SCHEMA_V1)
+        self.conn.executescript(SCHEMA_V3)
+        self._ensure_relay_columns()
         if self.current_version() < 1:
             self.record(1, "sequence09_consolidation", sha256(SCHEMA_V1.encode()).hexdigest(), _now(), "up")
+
+    def _ensure_relay_columns(self) -> None:
+        extras = {
+            "outbox": [
+                ("aggregate_id", "TEXT"),
+                ("correlation_id", "TEXT"),
+                ("causation_id", "TEXT"),
+                ("payload_version", "TEXT"),
+                ("claimed_by", "TEXT"),
+                ("claimed_until", "TEXT"),
+                ("next_attempt_at", "TEXT"),
+                ("failure_reason", "TEXT"),
+            ],
+            "inbox": [
+                ("attempts", "INTEGER DEFAULT 0"),
+                ("request_hash", "TEXT"),
+                ("payload_json", "TEXT"),
+                ("last_error", "TEXT"),
+            ],
+            "idempotency_keys": [
+                ("request_hash", "TEXT"),
+            ],
+        }
+        for table, cols in extras.items():
+            present = {r[1] for r in self._exec(f"PRAGMA table_info({table})").fetchall()}
+            for name, decl in cols:
+                if name not in present:
+                    self._exec(f"ALTER TABLE {table} ADD COLUMN {name} {decl}")
 
     def begin(self) -> None:
         if not self._in_tx:
@@ -144,10 +200,22 @@ class SqliteStore:
         row = cur.fetchone()
         return dict(row) if row else None
 
-    def put_if_absent(self, edge: str, scope: str, key: str, result_ref: str, created_at: str) -> bool:
+    def put_if_absent(
+        self,
+        edge: str,
+        scope: str,
+        key: str,
+        result_ref: str,
+        created_at: str,
+        request_hash: str = "",
+    ) -> bool:
+        existing = self.get_idempotency(edge, scope, key)
+        if existing is not None:
+            return False
         cur = self._exec(
-            "INSERT OR IGNORE INTO idempotency_keys (edge, scope, key, result_ref, created_at) VALUES (?,?,?,?,?)",
-            (edge, scope, key, result_ref, created_at),
+            """INSERT OR IGNORE INTO idempotency_keys
+               (edge, scope, key, result_ref, created_at, request_hash) VALUES (?,?,?,?,?,?)""",
+            (edge, scope, key, result_ref, created_at, request_hash),
         )
         return cur.rowcount == 1
 
@@ -159,10 +227,21 @@ class SqliteStore:
         row = cur.fetchone()
         return str(row["result_ref"]) if row else None
 
+    def get_idempotency(self, edge: str, scope: str, key: str) -> dict[str, Any] | None:
+        cur = self._exec(
+            "SELECT * FROM idempotency_keys WHERE edge=? AND scope=? AND key=?",
+            (edge, scope, key),
+        )
+        row = cur.fetchone()
+        return dict(row) if row else None
+
     def enqueue(self, row: dict[str, Any]) -> None:
         self._exec(
-            """INSERT INTO outbox (outbox_id, event_id, topic, payload_json, state, attempts, created_at, published_at)
-               VALUES (?,?,?,?,?,?,?,?)""",
+            """INSERT INTO outbox (
+                outbox_id, event_id, topic, payload_json, state, attempts, created_at, published_at,
+                aggregate_id, correlation_id, causation_id, payload_version, claimed_by, claimed_until,
+                next_attempt_at, failure_reason
+            ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)""",
             (
                 row["outbox_id"],
                 row["event_id"],
@@ -172,6 +251,14 @@ class SqliteStore:
                 row.get("attempts", 0),
                 row["created_at"],
                 row.get("published_at"),
+                row.get("aggregate_id"),
+                row.get("correlation_id"),
+                row.get("causation_id"),
+                row.get("payload_version", "v1"),
+                row.get("claimed_by"),
+                row.get("claimed_until"),
+                row.get("next_attempt_at"),
+                row.get("failure_reason"),
             ),
         )
 
@@ -182,11 +269,45 @@ class SqliteStore:
         )
         return [dict(r) for r in cur.fetchall()]
 
+    def claimable_outbox(self, now_iso: str, limit: int = 50) -> list[dict[str, Any]]:
+        cur = self._exec(
+            """SELECT * FROM outbox
+               WHERE state IN ('pending','failed')
+                  OR (state='claimed' AND (claimed_until IS NULL OR claimed_until < ?))
+               ORDER BY created_at ASC LIMIT ?""",
+            (now_iso, limit),
+        )
+        return [dict(r) for r in cur.fetchall()]
+
+    def claim_outbox(self, outbox_id: str, worker: str, until: str, now_iso: str) -> bool:
+        cur = self._exec(
+            """UPDATE outbox SET state='claimed', claimed_by=?, claimed_until=?
+               WHERE outbox_id=? AND (
+                    state IN ('pending','failed')
+                    OR (state='claimed' AND (claimed_until IS NULL OR claimed_until < ?))
+               )""",
+            (worker, until, outbox_id, now_iso),
+        )
+        return cur.rowcount == 1
+
     def mark(self, outbox_id: str, state: str, published_at: str | None = None) -> None:
         self._exec(
             "UPDATE outbox SET state=?, attempts=attempts+1, published_at=COALESCE(?, published_at) WHERE outbox_id=?",
             (state, published_at, outbox_id),
         )
+
+    def mark_outbox_failed(self, outbox_id: str, reason: str, next_attempt: str, dead: bool) -> None:
+        state = "dead-letter" if dead else "failed"
+        self._exec(
+            """UPDATE outbox SET state=?, attempts=attempts+1, failure_reason=?, next_attempt_at=?,
+               claimed_by=NULL, claimed_until=NULL WHERE outbox_id=?""",
+            (state, reason, next_attempt, outbox_id),
+        )
+
+    def get_outbox(self, outbox_id: str) -> dict[str, Any] | None:
+        cur = self._exec("SELECT * FROM outbox WHERE outbox_id=?", (outbox_id,))
+        row = cur.fetchone()
+        return dict(row) if row else None
 
     def accept(self, event_id: str, source: str, state: str, processed_at: str) -> bool:
         cur = self._exec(
@@ -198,6 +319,32 @@ class SqliteStore:
     def seen(self, event_id: str) -> bool:
         cur = self._exec("SELECT 1 FROM inbox WHERE event_id=?", (event_id,))
         return cur.fetchone() is not None
+
+    def get_inbox(self, event_id: str) -> dict[str, Any] | None:
+        cur = self._exec("SELECT * FROM inbox WHERE event_id=?", (event_id,))
+        row = cur.fetchone()
+        return dict(row) if row else None
+
+    def mark_inbox(self, event_id: str, state: str, processed_at: str, error: str | None = None) -> None:
+        self._exec(
+            """UPDATE inbox SET state=?, processed_at=?, attempts=COALESCE(attempts,0)+1, last_error=?
+               WHERE event_id=?""",
+            (state, processed_at, error, event_id),
+        )
+
+    def insert_inbox_dead_letter(self, row: dict[str, Any]) -> None:
+        self._exec(
+            """INSERT OR REPLACE INTO inbox_dead_letters
+               (event_id, source, attempts, last_error, payload_json, created_at) VALUES (?,?,?,?,?,?)""",
+            (
+                row["event_id"],
+                row["source"],
+                row["attempts"],
+                row["last_error"],
+                row.get("payload_json", "{}"),
+                row["created_at"],
+            ),
+        )
 
     def save_checkpoint(self, row: dict[str, Any]) -> None:
         cursor = int(row["cursor_seq"])
@@ -232,6 +379,140 @@ class SqliteStore:
         cur = self._exec("SELECT * FROM projections WHERE name=?", (name,))
         row = cur.fetchone()
         return dict(row) if row else None
+
+    def upsert_named_row(self, projection: str, row_key: str, payload_json: str, source_seq: int, updated_at: str) -> None:
+        self._exec(
+            """INSERT INTO named_projection_rows (projection, row_key, payload_json, source_seq, updated_at)
+               VALUES (?,?,?,?,?)
+               ON CONFLICT(projection, row_key) DO UPDATE SET
+                 payload_json=excluded.payload_json, source_seq=excluded.source_seq, updated_at=excluded.updated_at""",
+            (projection, row_key, payload_json, source_seq, updated_at),
+        )
+
+    def delete_named_row(self, projection: str, row_key: str) -> None:
+        self._exec("DELETE FROM named_projection_rows WHERE projection=? AND row_key=?", (projection, row_key))
+
+    def list_named_rows(self, projection: str) -> list[dict[str, Any]]:
+        cur = self._exec(
+            "SELECT * FROM named_projection_rows WHERE projection=? ORDER BY source_seq ASC",
+            (projection,),
+        )
+        return [dict(r) for r in cur.fetchall()]
+
+    def clear_named_projection(self, projection: str) -> None:
+        self._exec("DELETE FROM named_projection_rows WHERE projection=?", (projection,))
+        self._exec("DELETE FROM processed_events WHERE projection_name=?", (projection,))
+
+    def set_named_meta(self, name: str, version: int, last_event_seq: int, rebuilt_at: str, status: str, lag_seq: int) -> None:
+        self._exec(
+            """INSERT INTO named_projection_meta (name, version, last_event_seq, rebuilt_at, status, lag_seq)
+               VALUES (?,?,?,?,?,?)
+               ON CONFLICT(name) DO UPDATE SET version=excluded.version, last_event_seq=excluded.last_event_seq,
+               rebuilt_at=excluded.rebuilt_at, status=excluded.status, lag_seq=excluded.lag_seq""",
+            (name, version, last_event_seq, rebuilt_at, status, lag_seq),
+        )
+
+    def get_named_meta(self, name: str) -> dict[str, Any] | None:
+        cur = self._exec("SELECT * FROM named_projection_meta WHERE name=?", (name,))
+        row = cur.fetchone()
+        return dict(row) if row else None
+
+    def mark_processed_event(self, projection_name: str, event_id: str, source_seq: int, applied_at: str) -> bool:
+        cur = self._exec(
+            """INSERT OR IGNORE INTO processed_events (projection_name, event_id, source_seq, applied_at)
+               VALUES (?,?,?,?)""",
+            (projection_name, event_id, source_seq, applied_at),
+        )
+        return cur.rowcount == 1
+
+    def processed_event(self, projection_name: str, event_id: str) -> bool:
+        cur = self._exec(
+            "SELECT 1 FROM processed_events WHERE projection_name=? AND event_id=?",
+            (projection_name, event_id),
+        )
+        return cur.fetchone() is not None
+
+    def insert_recon_run(self, row: dict[str, Any]) -> None:
+        self._exec(
+            """INSERT INTO reconciliation_runs
+               (run_id, state, venue_available, started_at, updated_at, closed_at, payload_json)
+               VALUES (?,?,?,?,?,?,?)""",
+            (
+                row["run_id"],
+                row["state"],
+                1 if row.get("venue_available") else 0,
+                row["started_at"],
+                row["updated_at"],
+                row.get("closed_at"),
+                row["payload_json"],
+            ),
+        )
+
+    def update_recon_run(self, run_id: str, state: str, updated_at: str, closed_at: str | None = None) -> None:
+        self._exec(
+            "UPDATE reconciliation_runs SET state=?, updated_at=?, closed_at=COALESCE(?, closed_at) WHERE run_id=?",
+            (state, updated_at, closed_at, run_id),
+        )
+
+    def get_recon_run(self, run_id: str) -> dict[str, Any] | None:
+        cur = self._exec("SELECT * FROM reconciliation_runs WHERE run_id=?", (run_id,))
+        row = cur.fetchone()
+        return dict(row) if row else None
+
+    def insert_recon_item(self, row: dict[str, Any]) -> None:
+        self._exec(
+            """INSERT INTO reconciliation_items
+               (item_id, run_id, local_ref, venue_ref, classification, severity, state, payload_json, created_at)
+               VALUES (?,?,?,?,?,?,?,?,?)""",
+            (
+                row["item_id"],
+                row["run_id"],
+                row["local_ref"],
+                row.get("venue_ref"),
+                row["classification"],
+                row["severity"],
+                row["state"],
+                row["payload_json"],
+                row["created_at"],
+            ),
+        )
+
+    def list_recon_items(self, run_id: str) -> list[dict[str, Any]]:
+        cur = self._exec("SELECT * FROM reconciliation_items WHERE run_id=?", (run_id,))
+        return [dict(r) for r in cur.fetchall()]
+
+    def insert_mismatch_action(self, row: dict[str, Any]) -> None:
+        self._exec(
+            """INSERT INTO mismatch_actions
+               (action_id, item_id, run_id, action, actor, occurred_at, payload_json)
+               VALUES (?,?,?,?,?,?,?)""",
+            (
+                row["action_id"],
+                row["item_id"],
+                row["run_id"],
+                row["action"],
+                row["actor"],
+                row["occurred_at"],
+                row["payload_json"],
+            ),
+        )
+
+    def insert_money(self, row: dict[str, Any]) -> None:
+        self._exec(
+            """INSERT INTO money_records
+               (record_id, family, field, amount_canonical, scale, currency, source_event_id, committed_at)
+               VALUES (?,?,?,?,?,?,?,?)""",
+            (
+                row["record_id"],
+                row["family"],
+                row["field"],
+                row["amount_canonical"],
+                row["scale"],
+                row.get("currency", "QUOTE"),
+                row.get("source_event_id"),
+                row["committed_at"],
+            ),
+        )
 
     def insert(self, row: dict[str, Any]) -> None:
         table = row.get("_table")
@@ -366,7 +647,6 @@ class SqliteStore:
         row = cur.fetchone()
         return dict(row) if row else None
 
-    # PositionProjectionRepository.upsert — name clash with ProjectionRepository.upsert
     def upsert_named(self, *args: Any, **kwargs: Any) -> None:
         if len(args) == 5:
             self.upsert_position(*args)
@@ -382,6 +662,15 @@ class SqliteStore:
     def dump_events_json(self) -> str:
         events = self.list_events(limit=1_000_000)
         return json.dumps(events, sort_keys=True)
+
+    def diagnostics(self) -> dict[str, Any]:
+        return {
+            "backend": self.backend_identity,
+            "path": self.path,
+            "schema_version": self.current_version(),
+            "event_count": self.last_sequence(),
+            "memory": self.path == ":memory:",
+        }
 
     def close(self) -> None:
         self.conn.close()

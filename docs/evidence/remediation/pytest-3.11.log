@@ -1,0 +1,10 @@
+git_sha=5ba4216cc06591059ca94afac40f485723d4c5d4
+utc=2026-08-30T12:15:37Z
+interpreter=CPython 3.11.2 (/workspace/.venv311/bin/python)
+command=PYTHONPATH=. python3.11 -m pytest tests --tb=short
+exit_code=0
+result=564 passed
+storage_scope=n/a
+limitations=SQLite local/test; PostgreSQL BLOCKED; Sequence 15 BLOCKED
+tests=564 failures=0 errors=0 skipped=0
+junit=/tmp/pytest-remediation.xml

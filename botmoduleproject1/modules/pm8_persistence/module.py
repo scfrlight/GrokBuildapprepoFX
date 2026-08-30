@@ -49,8 +49,12 @@ class PM8PersistenceModule:
         mode = getattr(section, "operating_mode", "memory") if section is not None else "memory"
         path = getattr(section, "storage_path", None) if section is not None else None
         target = int(getattr(section, "schema_version", 2) or 2) if section is not None else 2
-        if mode in {"disabled", "memory"} or not path or path == ":memory:":
+        if mode in {"disabled", "memory"}:
             db = ":memory:"
+        elif not path or path == ":memory:":
+            from botmoduleproject1.modules.pm8_persistence.store import StorageUnavailable
+
+            raise StorageUnavailable("sqlite_local requires an explicit storage_path; memory fallback is forbidden")
         else:
             folder = Path(path)
             folder.mkdir(parents=True, exist_ok=True)
@@ -100,6 +104,13 @@ class PM8PersistenceModule:
                 passed=len(SERVICE_CATALOG) >= 20,
                 critical=False,
                 message=f"{len(SERVICE_CATALOG)} services",
+            ),
+            CheckResult(
+                name="pm8.backend",
+                kind=kind,
+                passed=True,
+                critical=False,
+                message=str(self.store.diagnostics()),
             ),
         ]
 

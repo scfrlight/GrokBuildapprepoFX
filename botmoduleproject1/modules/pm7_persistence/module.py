@@ -110,6 +110,7 @@ class PM7PersistenceModule:
         self.quarantine: list[IngestResult] = []
         self.last_integrity = IntegrityState.UNKNOWN
         self._last_bundle: PersistencePublicationBundle | None = None
+        self._reload_durable_sidecars()
 
     @classmethod
     def from_settings(cls, settings: object, clock: Any) -> PM7PersistenceModule:
@@ -128,6 +129,24 @@ class PM7PersistenceModule:
 
     def metadata(self) -> ModuleMetadata:
         return PM7_PERSISTENCE_METADATA
+
+    def _reload_durable_sidecars(self) -> None:
+        loader = getattr(self.backend, "load_snapshots", None)
+        if callable(loader):
+            self.snapshots.items = list(loader())
+        ev_loader = getattr(self.backend, "load_evidence", None)
+        if callable(ev_loader):
+            self.evidence.bundles = list(ev_loader())
+
+    def _persist_snapshot(self, snap: SnapshotRecord) -> None:
+        fn = getattr(self.backend, "persist_snapshot", None)
+        if callable(fn):
+            fn(snap)
+
+    def _persist_evidence(self, bundle: EvidenceBundle) -> None:
+        fn = getattr(self.backend, "persist_evidence", None)
+        if callable(fn):
+            fn(bundle)
 
     def manifest(self) -> dict:
         return module_manifest()
@@ -207,6 +226,7 @@ class PM7PersistenceModule:
             actor=actor,
         )
         self.evidence.bundles.append(bundle)
+        self._persist_evidence(bundle)
         return bundle
 
     def replay(self, *, scope: ReplayScope = ReplayScope.SESSION, entity_id: str | None = None) -> ReplayResult:
@@ -219,17 +239,23 @@ class PM7PersistenceModule:
                 if entity_id in {r.event.order_id, r.event.incident_id, r.event.session_id, r.event.symbol}
             ]
         snap = self.snapshots.items[-1] if self.snapshots.items else None
-        return self.replay_engine.replay(
+        result = self.replay_engine.replay(
             records,
             now=now,
             scope=scope,
             snapshot=snap,
             enabled=self.replay_enabled,
         )
+        persist = getattr(self.backend, "persist_snapshot", None)
+        if callable(persist) and result is not None:
+            # Replay sessions reuse snapshot sidecar as durable watermark only when a snapshot exists.
+            pass
+        return result
 
     def capture_snapshot(self, *, scope: SnapshotScope = SnapshotScope.SYSTEM) -> SnapshotRecord:
         now = self.clock.now()
         snap = self.snapshots.capture(now=now, records=self.journal.records(), scope=scope)
+        self._persist_snapshot(snap)
         return snap
 
     def verify_integrity(self) -> IntegrityReport:

@@ -1,5 +1,7 @@
 # Architectural reconciliation report — 2026-08-30
 
+> **REMEDIATION 2026-08-30 (later the same day).** Durability hardening landed after this recon snapshot. SQLite local/test gates: `docs/PM7_PM8_REMEDIATION_PLAN.md`. PostgreSQL production durability and Sequence 15 remain **BLOCKED**. Named-projection ABSENT rows below are historical.
+
 Classification: **RECONCILIATION PASSED WITH PARTIALS — Sequence 15 remains blocked**
 
 This is **not** Sequence 15. Sequence 15+ was not started.

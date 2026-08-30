@@ -8,7 +8,9 @@
 - Backup dump checksums differ across runs (UUIDs + timestamps). Compare `payload_canonical_sha256`.
 - Master Orchestration Prompt file is still missing; sequence *order* comes from the correction/authorization prompts.
 - Original PM8a Drive spec is SOURCE-MISSING (reconstructed copy in-repo).
-- PM7 is a PARTIAL evidence-journal subset; PM8 named projections are ABSENT; restore-apply is ABSENT.
+- PM7 sqlite/file journals reload after restart but are not a production warehouse.
+- PM8 named projections exist as read models; restore-apply is isolated SQLite only.
+- PostgreSQL production durability is BLOCKED.
 - Sequence 15+ is blocked.
 
 See also `docs/known_limitations.md` and `docs/ARCHITECTURE_INVENTORY.md`.
