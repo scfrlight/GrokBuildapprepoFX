@@ -31,7 +31,7 @@ class Studio:
             display_name=name,
             group="research",
             type="string",
-            description="Sequence 10 research proposal",
+            description="Sequence 13 research proposal",
             requires_revalidation=True,
             warning_text="Never auto-promotes to live.",
         )

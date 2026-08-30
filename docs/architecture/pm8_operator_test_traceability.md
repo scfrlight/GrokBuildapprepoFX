@@ -1,3 +1,5 @@
+> **RECLASSIFIED 2026-08-30.** Operator tests belong to canonical Sequence 13. See `docs/SEQUENCE_CORRECTION.md`.
+
 # PM8 operator test traceability
 
 | Requirement | Test |

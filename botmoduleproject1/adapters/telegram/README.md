@@ -1,6 +1,7 @@
 # Telegram adapter
 
-Transport only. Sequence 10:
+Transport only. Canonical Sequence 13 (reused from the mislabeled Sequence 10
+operator early build):
 
 - `decoder.decode_update` turns a Telegram update dict into `TelegramInbound`
 - `encoder.encode_receipt` turns a `CommandReceipt` into outbound text

@@ -1,4 +1,4 @@
-"""Operator control-plane contracts (Sequence 10 / PM8)."""
+"""Operator control-plane contracts (canonical Sequence 13 / PM8 operator reuse)."""
 
 from __future__ import annotations
 

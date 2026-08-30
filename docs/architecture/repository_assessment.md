@@ -300,6 +300,6 @@ Traceability:
 
 Original filename `PM7_Master_Prompt.md` was not found on Drive/GitHub. Sequence 09 treats the embedded spec as source of truth for this stage.
 
-Outputs: append-only journal, reconciliation store, evidence, replay, integrity chain, retention freeze, architecture desk Sequence 09 ledger board. Next: Sequence 10 PM8 operator control.
+Outputs: append-only journal, reconciliation store, evidence, replay, integrity chain, retention freeze, architecture desk Sequence 09 ledger board. Historical next: Sequence 10 PM8 operator control. Canonical correction: Sequence 09 is PM8 consolidation; operator is Sequence 13. See `docs/SEQUENCE_CORRECTION.md`.
 
 

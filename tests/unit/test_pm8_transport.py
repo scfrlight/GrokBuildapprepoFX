@@ -40,7 +40,7 @@ def test_real_telegram_refused():
         RealTelegramTransport()
         raise AssertionError("must refuse")
     except FeatureFlagError as exc:
-        assert "Sequence 10" in str(exc)
+        assert "refused" in str(exc).lower()
 
 
 def test_telegram_api_mode_refused_in_config():

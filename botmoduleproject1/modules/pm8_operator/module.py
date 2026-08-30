@@ -54,11 +54,13 @@ class PM8OperatorModule:
         *,
         feature_enabled: bool = True,
         ledger: Any = None,
+        persistence_api: Any = None,
     ) -> None:
         self.config = config
         self.clock = clock
         self.feature_enabled = feature_enabled
         self.ledger = ledger
+        self.persistence_api = persistence_api
         self.transport_mode = (
             TransportMode.SIMULATED if feature_enabled and config.operating_mode == "simulated" else TransportMode.DISABLED
         )
@@ -73,6 +75,11 @@ class PM8OperatorModule:
         self._idempotency: dict[str, CommandReceipt] = {}
         self._last_bundle: OperatorPublicationBundle | None = None
         self._last_disposition: CommandDisposition | None = None
+
+    def bind_persistence(self, storage: Any) -> None:
+        api = getattr(storage, "api", storage)
+        self.persistence_api = api
+        self.ledger = storage
 
     @classmethod
     def from_settings(cls, settings: object, clock: Any, ledger: Any = None) -> "PM8OperatorModule":

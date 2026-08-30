@@ -37,8 +37,10 @@ a broker, a risk engine, or a silent history rewriter.
   `enable_pm7_persistence` is on.
 - Tests must prove append-only, no silent mutation, SIM/broker split, degraded
   recon, unauthorized query reject, freeze, and no orders/MT5.
-- Sequence 10 (PM8 operator control / Telegram) is next. Distributed durability
-  remains later.
+- Sequence 10 (PM8 operator control / Telegram) was the historical next step;
+  the 2026-08-30 correction moved operator work to Sequence 13. Canonical
+  Sequence 09 is now PM8 consolidation. See `docs/SEQUENCE_CORRECTION.md`.
+  Distributed durability remains later.
 
 ## Alternatives considered
 

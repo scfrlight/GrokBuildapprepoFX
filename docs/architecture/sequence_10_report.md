@@ -1,8 +1,13 @@
+> **RECLASSIFIED 2026-08-30.** This report recorded an **early build of the operator / HITL plane** under the wrong sequence number. Canonical home: **Sequence 13** (PM9 Operator UX). The module is reused, not deleted. See `docs/SEQUENCE_CORRECTION.md`. Canonical Sequence 10 is **PM8a Migration, Backup & Recovery Hardening**.
+
 # Sequence 10 Report — PM8 Operator Control Plane, Telegram Control Engine & HITL
+
+**Historical title kept for git archaeology.** Treat as Sequence 13 preview / early build.
 
 Date (UTC): 2026-08-29  
 Git home: `scfrlight/GrokBuildapprepoFX`  
-Display name: **PM8 Operator / HITL / Simulated Transport**
+Display name: **PM8 Operator / HITL / Simulated Transport (mislabeled Sequence 10)**
+
 
 ## 1. Git commit hash
 

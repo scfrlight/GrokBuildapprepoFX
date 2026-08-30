@@ -1,6 +1,8 @@
+> **RECLASSIFIED 2026-08-30.** Historical Sequence 09 = PM7 journal; historical Sequence 10 = operator early build (now Sequence 13). Canonical 09–13: PM8 consolidation, PM8a hardening, Demo MT5 + exit, unified runtime, operator reuse. See `docs/SEQUENCE_CORRECTION.md`.
+
 # Architecture Baseline — BotModuleProject1
 
-Status: Accepted for Sequence 00; PM1 kernel Sequence 01; config governance Sequence 02; PM2 market context Sequence 03; PM3-Strategy Engine Sequence 04; PM3 forecasting / QRF Sequence 05; PM4 Risk Gate Sequence 06; PM5 Execution Sequence 07; PM6 Post-Trade Sequence 08; PM7 Persistence Sequence 09; PM8 Operator Sequence 10  
+Status: Accepted for Sequence 00; PM1 kernel Sequence 01; config governance Sequence 02; PM2 market context Sequence 03; PM3-Strategy Engine Sequence 04; PM3 forecasting / QRF Sequence 05; PM4 Risk Gate Sequence 06; PM5 Execution Sequence 07; PM6 Post-Trade Sequence 08; historical PM7 Persistence Sequence 09; historical PM8 Operator Sequence 10 (reclassified Sequence 13)  
 Date (UTC): 2026-08-28  
 Scope: EURUSD on MT5 Demo, expandable to additional FX symbols  
 Trading readiness: **not ready**. PM3-Strategy Engine emits analytical TradeIntent only. PM3 forecasting / QRF may attach a ForecastOutput envelope. PM4 may ALLOW a risk-governed handoff. That ALLOW is not an order. PM5 may shadow-record an OMS lifecycle in simulation. It does not send to MT5. PM6 may observe PM4/PM5, raise incidents, and plan orderly withdrawal. It does not send orders, size risk, or invent broker truth. PM7 may journal those facts append-only. Memory/file/SQLite are not production durability. No live path is implemented.

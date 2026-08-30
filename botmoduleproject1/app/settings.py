@@ -444,7 +444,7 @@ class Pm8OperatorSection(BaseModel):
     @classmethod
     def _mode(cls, value: str) -> str:
         if value == "telegram_api":
-            raise ValueError("telegram_api transport is refused in Sequence 10")
+            raise ValueError("telegram_api transport is refused")
         if value not in {"disabled", "simulated"}:
             raise ValueError("pm8_operator.operating_mode must be disabled|simulated")
         return value
@@ -454,6 +454,33 @@ class Pm8OperatorSection(BaseModel):
     def _no_unsafe(cls, value: bool) -> bool:
         if value:
             raise ValueError("PM8 cannot enable MT5, broker commands, telegram API, auto-rearm, or auto-promote")
+        return value
+
+
+class Pm8PersistenceSection(BaseModel):
+    """Public PM8 persistence knobs. Enabling is a feature flag. Sequence 09/10."""
+
+    operating_mode: str = "memory"
+    storage_path: str = "data/local/pm8"
+    schema_version: int = Field(default=2, ge=1, le=2)
+    query_limit: int = Field(default=50, ge=1, le=500)
+    max_outbox_attempts: int = Field(default=3, ge=1, le=10)
+    production_durable: bool = False
+    mt5_enabled: bool = False
+    broker_commands: bool = False
+
+    @field_validator("operating_mode")
+    @classmethod
+    def _mode(cls, value: str) -> str:
+        if value not in {"disabled", "memory", "sqlite_local"}:
+            raise ValueError("pm8_persistence.operating_mode must be disabled|memory|sqlite_local")
+        return value
+
+    @field_validator("production_durable", "mt5_enabled", "broker_commands")
+    @classmethod
+    def _no_unsafe(cls, value: bool) -> bool:
+        if value:
+            raise ValueError("PM8 persistence cannot enable MT5, broker commands, or production_durable")
         return value
 
 
@@ -610,6 +637,7 @@ class Settings(BaseSettings):
     pm6_post_trade: Pm6PostTradeSection = Field(default_factory=Pm6PostTradeSection)
     pm7_persistence: Pm7PersistenceSection = Field(default_factory=Pm7PersistenceSection)
     pm8_operator: Pm8OperatorSection = Field(default_factory=Pm8OperatorSection)
+    pm8_persistence: Pm8PersistenceSection = Field(default_factory=Pm8PersistenceSection)
     profile: ProfileName = ProfileName.DEMO
     cli_mode: str = "doctor"
     config_path: str | None = None
@@ -656,7 +684,7 @@ class Settings(BaseSettings):
         if self.mt5.enabled and not self.mt5.password:
             raise SettingsError("MT5 is enabled but password secret is missing")
         if self.telegram.enabled:
-            raise SettingsError("Telegram Bot API is refused in Sequence 10; telegram.enabled cannot be true")
+            raise SettingsError("Telegram Bot API is refused; telegram.enabled cannot be true")
         if self.telegram.enabled and not self.telegram.token:
             raise SettingsError("Telegram is enabled but token secret is missing")
         if self.persistence.enabled and not self.persistence.dsn:

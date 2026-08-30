@@ -1,4 +1,8 @@
-# BOTMODULEPROJECT1 — SEQUENCE 10
+> **RECLASSIFIED 2026-08-30.** This prompt authorized an early operator build
+> under the wrong sequence number. Canonical home is Sequence 13. Canonical
+> Sequence 10 is PM8a hardening. See `docs/SEQUENCE_CORRECTION.md`.
+
+# BOTMODULEPROJECT1 — SEQUENCE 13 PREVIEW (historically labeled SEQUENCE 10)
 # PM8 Operator Control Plane, Telegram Control Engine
 # & Human-in-the-Loop Operations
 

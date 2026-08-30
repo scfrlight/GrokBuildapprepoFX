@@ -99,9 +99,23 @@ def _ledger_module(settings: Settings, overrides: dict[str, Any], clock: ClockPo
 
 
 
+def _storage_module(settings: Settings, overrides: dict[str, Any], clock: ClockPort):
+    if "storage" in overrides:
+        return overrides["storage"]
+    if getattr(settings.feature_flags, "pm8_persistence", False):
+        from botmoduleproject1.modules.pm8_persistence.module import PM8PersistenceModule
+
+        return PM8PersistenceModule.from_settings(settings, clock)
+    return NullStorage()
+
+
 def _operator_module(settings: Settings, overrides: dict[str, Any], clock: ClockPort):
     if "operator" in overrides:
         return overrides["operator"]
+    from botmoduleproject1.app.sequence_gate import OPERATOR_PLANE_FROZEN
+
+    if OPERATOR_PLANE_FROZEN:
+        return NullOperator()
     if getattr(settings.feature_flags, "pm8_operator", False):
         from botmoduleproject1.modules.pm8_operator.module import PM8OperatorModule
 
@@ -149,7 +163,7 @@ def build_container(
         _risk_module(settings, overrides, clock),
         _execution_module(settings, overrides, clock),
         _ledger_module(settings, overrides, clock),
-        overrides.get("storage") or NullStorage(),
+        _storage_module(settings, overrides, clock),
         overrides.get("notifications") or NullNotifications(),
         _monitoring_module(settings, overrides, clock),
         _operator_module(settings, overrides, clock),
@@ -165,6 +179,15 @@ def build_container(
             continue
         registry.register(meta_fn(), module)
         health.add(module)
+
+    try:
+        op = registry.get("pm8_operator").instance
+        storage = registry.get("pm8_persistence").instance
+        bind = getattr(op, "bind_persistence", None)
+        if bind is not None:
+            bind(storage)
+    except Exception:
+        pass
 
     registry.validate_dependencies()
     return Container(

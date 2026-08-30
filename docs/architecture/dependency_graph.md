@@ -1,6 +1,8 @@
+> **RECLASSIFIED 2026-08-30.** Operator plane is canonical Sequence 13, not Sequence 10. See `docs/SEQUENCE_CORRECTION.md`.
+
 # Dependency Graph — BotModuleProject1
 
-Status: Accepted for Sequence 00; PM8 Operator live in Sequence 10 (flag off, NullOperator default, simulated transport)  
+Status: Accepted for Sequence 00; PM8 Operator reused in Sequence 13 (flag off, NullOperator default, simulated transport)  
 Date (UTC): 2026-08-28
 
 ## 1. Canonical data flow

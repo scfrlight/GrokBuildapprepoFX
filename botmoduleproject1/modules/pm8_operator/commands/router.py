@@ -79,10 +79,15 @@ def dispatch(module: "PM8OperatorModule", command: OperatorCommand) -> CommandRe
 
     if command.verb is OperatorVerb.STATUS:
         bundle = module.publish()
+        extra = ""
+        api = getattr(module, "persistence_api", None)
+        if api is not None and hasattr(api, "health"):
+            h = api.health()
+            extra = f" persistence={h.get('api_version')} events={h.get('event_count')} integrity={h.get('integrity')}"
         return _receipt(
             command,
             disposition=CommandDisposition.ACCEPTED,
-            message=f"halt={bundle.halt_state.value} transport={bundle.transport_mode.value} hitl={bundle.hitl_pending} live=false",
+            message=f"halt={bundle.halt_state.value} transport={bundle.transport_mode.value} hitl={bundle.hitl_pending} live=false{extra}",
             reason_code="status",
             now=now,
             details=bundle.model_dump(mode="json"),

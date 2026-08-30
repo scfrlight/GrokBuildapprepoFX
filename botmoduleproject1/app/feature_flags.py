@@ -9,6 +9,7 @@ from pydantic import BaseModel, ConfigDict, Field
 
 from botmoduleproject1.app.exceptions import FeatureFlagError, LiveTradingDisabledError
 from botmoduleproject1.app.profiles import ProfileName
+from botmoduleproject1.app.sequence_gate import assert_operator_not_frozen
 
 
 class SafetyClassification(str, Enum):
@@ -62,6 +63,12 @@ _ALIAS_ENV = {
     "pm8_operator": "BOTMODULEPROJECT1_FEATURE__ENABLE_PM8_OPERATOR",
     "pm8_hitl": "BOTMODULEPROJECT1_FEATURE__ENABLE_PM8_HITL",
     "pm8_command_audit": "BOTMODULEPROJECT1_FEATURE__ENABLE_PM8_COMMAND_AUDIT",
+    "pm8_persistence": "BOTMODULEPROJECT1_FEATURE__ENABLE_PM8_PERSISTENCE",
+    "pm8_outbox": "BOTMODULEPROJECT1_FEATURE__ENABLE_PM8_OUTBOX",
+    "pm8_projections": "BOTMODULEPROJECT1_FEATURE__ENABLE_PM8_PROJECTIONS",
+    "mt5_demo_adapter": "BOTMODULEPROJECT1_FEATURE__ENABLE_MT5_DEMO_ADAPTER",
+    "exit_engine": "BOTMODULEPROJECT1_FEATURE__ENABLE_EXIT_ENGINE",
+    "unified_runtime": "BOTMODULEPROJECT1_FEATURE__ENABLE_UNIFIED_RUNTIME",
 }
 
 _ALL_PROFILES = tuple(ProfileName)
@@ -151,7 +158,7 @@ FEATURE_FLAG_CATALOG: tuple[FeatureFlagSpec, ...] = (
     FeatureFlagSpec(
         name="enable_telegram_control",
         field="telegram",
-        description="Real Telegram Bot API. Refused in Sequence 10. Use enable_pm8_operator (simulated transport).",
+        description="Real Telegram Bot API. Refused. Canonical operator plane is Sequence 13 (frozen until 09–12).",
         allowed_profiles=(),
         safety=SafetyClassification.DANGEROUS,
         env_key=_ALIAS_ENV["telegram"],
@@ -263,7 +270,7 @@ FEATURE_FLAG_CATALOG: tuple[FeatureFlagSpec, ...] = (
     FeatureFlagSpec(
         name="enable_pm8_operator",
         field="pm8_operator",
-        description="PM8 operator control plane. Env opt-in; test and research only. Simulated transport. Commands are not orders.",
+        description="PM8 operator control plane. FROZEN until Sequence 13. Canonical Sequence 13 preview. Commands are not orders.",
         allowed_profiles=(ProfileName.TEST, ProfileName.RESEARCH),
         safety=SafetyClassification.REQUIRES_REVIEW,
         env_key=_ALIAS_ENV["pm8_operator"],
@@ -279,10 +286,58 @@ FEATURE_FLAG_CATALOG: tuple[FeatureFlagSpec, ...] = (
     FeatureFlagSpec(
         name="enable_pm8_command_audit",
         field="pm8_command_audit",
-        description="PM8 command audit trail. Test/research. Not a durable ledger.",
+        description="PM8 command audit trail. Sequence 13. Test/research. Not a durable ledger.",
         allowed_profiles=(ProfileName.TEST, ProfileName.RESEARCH),
         safety=SafetyClassification.REQUIRES_REVIEW,
         env_key=_ALIAS_ENV["pm8_command_audit"],
+    ),
+    FeatureFlagSpec(
+        name="enable_pm8_persistence",
+        field="pm8_persistence",
+        description="Canonical Sequence 09 PM8 persistence API. Test/research. Never orders. Not production_durable.",
+        allowed_profiles=(ProfileName.TEST, ProfileName.RESEARCH),
+        safety=SafetyClassification.REQUIRES_REVIEW,
+        env_key=_ALIAS_ENV["pm8_persistence"],
+    ),
+    FeatureFlagSpec(
+        name="enable_pm8_outbox",
+        field="pm8_outbox",
+        description="Sequence 09 outbox dispatcher. Test/research.",
+        allowed_profiles=(ProfileName.TEST, ProfileName.RESEARCH),
+        safety=SafetyClassification.REQUIRES_REVIEW,
+        env_key=_ALIAS_ENV["pm8_outbox"],
+    ),
+    FeatureFlagSpec(
+        name="enable_pm8_projections",
+        field="pm8_projections",
+        description="Sequence 09 projection rebuild. Test/research.",
+        allowed_profiles=(ProfileName.TEST, ProfileName.RESEARCH),
+        safety=SafetyClassification.REQUIRES_REVIEW,
+        env_key=_ALIAS_ENV["pm8_projections"],
+    ),
+    FeatureFlagSpec(
+        name="enable_mt5_demo_adapter",
+        field="mt5_demo_adapter",
+        description="Sequence 11 Demo-only MT5 adapter. Test/research. Live account refused. No silent recon.",
+        allowed_profiles=(ProfileName.TEST, ProfileName.RESEARCH),
+        safety=SafetyClassification.REQUIRES_REVIEW,
+        env_key=_ALIAS_ENV["mt5_demo_adapter"],
+    ),
+    FeatureFlagSpec(
+        name="enable_exit_engine",
+        field="exit_engine",
+        description="Sequence 11 structural SL/TP, breakeven, time stops. Test/research. Never bypasses PM4.",
+        allowed_profiles=(ProfileName.TEST, ProfileName.RESEARCH),
+        safety=SafetyClassification.REQUIRES_REVIEW,
+        env_key=_ALIAS_ENV["exit_engine"],
+    ),
+    FeatureFlagSpec(
+        name="enable_unified_runtime",
+        field="unified_runtime",
+        description="Sequence 12 unified orchestrator. Test/research. Recovery-before-trading. No live path.",
+        allowed_profiles=(ProfileName.TEST, ProfileName.RESEARCH),
+        safety=SafetyClassification.REQUIRES_REVIEW,
+        env_key=_ALIAS_ENV["unified_runtime"],
     ),
 )
 
@@ -330,6 +385,12 @@ class FeatureFlags(BaseModel):
     pm8_operator: bool = False
     pm8_hitl: bool = False
     pm8_command_audit: bool = False
+    pm8_persistence: bool = False
+    pm8_outbox: bool = False
+    pm8_projections: bool = False
+    mt5_demo_adapter: bool = False
+    exit_engine: bool = False
+    unified_runtime: bool = False
     env_opt_in: tuple[str, ...] = Field(default=())
 
     def enabled_map(self) -> dict[str, bool]:
@@ -394,6 +455,7 @@ def validate_feature_flags(flags: FeatureFlags, profile: ProfileName) -> None:
         enabled = bool(getattr(flags, spec.field))
         if not enabled:
             continue
+        assert_operator_not_frozen(spec.field, spec.name)
         if spec.safety is SafetyClassification.DANGEROUS and spec.field not in opted:
             raise FeatureFlagError(
                 f"dangerous feature flag {spec.name} is default-disabled and "
@@ -408,8 +470,9 @@ def validate_feature_flags(flags: FeatureFlags, profile: ProfileName) -> None:
             )
         if spec.field == "telegram":
             raise FeatureFlagError(
-                f"feature flag {spec.name} is refused in Sequence 10; "
-                "no Telegram Bot API. Use enable_pm8_operator with SimulatedTransport"
+                f"feature flag {spec.name} is refused; "
+                "Telegram Bot API is never bound. Canonical operator plane is Sequence 13 "
+                "and stays frozen until Sequences 09–12 complete. Use SimulatedTransport later."
             )
         if profile not in spec.allowed_profiles:
             raise FeatureFlagError(

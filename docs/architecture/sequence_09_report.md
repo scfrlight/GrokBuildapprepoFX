@@ -1,3 +1,5 @@
+> **NUMBERING NOTE 2026-08-30.** This report is the **historical Sequence 09 = PM7 journal**. Canonical Sequence 09 is now **PM8 Database Consolidation** (`docs/architecture/sequence_09_pm8_consolidation_report.md`). PM7 is kept. See `docs/SEQUENCE_CORRECTION.md`.
+
 # Sequence 09 Report — PM7 Persistence, Event Ledger, Reconciliation Store & Durable Audit Layer
 
 Date (UTC): 2026-08-28  
@@ -126,4 +128,5 @@ The system is NOT ready for live trading, demo trading, paper trading, or produc
 
 ## 14. Exact next step
 
-Sequence 10 — PM8 Operator Control Plane, Telegram Control Engine & Human-in-the-Loop Operations.
+Sequence 10 — historically named PM8 Operator (mislabeled). Canonical next after
+this PM7 report was Sequence 09 (PM8 consolidation). See `docs/SEQUENCE_CORRECTION.md`.

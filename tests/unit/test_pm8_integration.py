@@ -52,7 +52,7 @@ def test_telegram_flag_refused():
         )
         raise AssertionError("telegram flag must be refused")
     except FeatureFlagError as exc:
-        assert "Sequence 10" in str(exc)
+        assert "refused" in str(exc).lower()
 
 
 def test_yaml_cannot_enable_operator_in_demo():

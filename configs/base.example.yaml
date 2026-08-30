@@ -50,6 +50,12 @@ feature_flags:
   pm8_operator: false
   pm8_hitl: false
   pm8_command_audit: false
+  pm8_persistence: false
+  pm8_outbox: false
+  pm8_projections: false
+  mt5_demo_adapter: false
+  exit_engine: false
+  unified_runtime: false
 
 logging:
   level: INFO

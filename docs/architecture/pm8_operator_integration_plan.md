@@ -1,8 +1,10 @@
+> **RECLASSIFIED 2026-08-30.** This plan was written as Sequence 10. Canonical home is **Sequence 13** (PM9 Operator UX). See `docs/SEQUENCE_CORRECTION.md`.
+
 # PM8 Operator Control Plane — Integration Plan
 
-Status: Accepted before Sequence 10 implementation  
+Status: Accepted before the operator early build; reclassified Sequence 13  
 Date (UTC): 2026-08-29  
-Sequence: 10 — PM8 Operator Control Plane, Telegram Control Engine & Human-in-the-Loop Operations
+Sequence: 13 preview / early build (historically labeled Sequence 10)
 
 This plan is written **before** module implementation. It is the Sequence 10
 source-of-truth together with `docs/prompts/PM8_Operator_Sequence10_Prompt.md`

@@ -1,10 +1,7 @@
 # Runbooks
 
-Sequence 00: no operational procedures yet. When PM1 lands, add:
+- `pm8a_backup_restore.md` — Sequence 10 backup, restore verification, restart drill, rollback (test/research only)
+- `doctor.md` — not yet; `/doctor` on the operator plane is observe-only
+- `live-disabled.md` — `python -m botmoduleproject1 live` must fail closed (proven Sequence 11)
 
-- `doctor.md` — config and import diagnostics
-- `safe-halt.md` — how observe-only / halt is entered and cleared
-- `recovery.md` — incomplete recovery is a stop, not a skip (PM8)
-- `live-disabled.md` — what happens if someone passes `--mode live`
-
-Until then, the only valid operator action is reading the architecture baseline.
+Until Sequence 14 is authorized, the only valid operator action is reading the architecture baseline and SEQUENCE_CORRECTION.

@@ -1,8 +1,10 @@
+> **RECLASSIFIED 2026-08-30.** This ADR was written as Sequence 10. Canonical sequence for the operator plane is **13**. See `docs/SEQUENCE_CORRECTION.md`.
+
 # ADR-015 — PM8 operator control plane and HITL boundary
 
-Status: Accepted  
+Status: Accepted (sequence number corrected to 13)  
 Date (UTC): 2026-08-29  
-Sequence: 10
+Sequence: 13 (historically labeled 10)
 
 ## Context
 

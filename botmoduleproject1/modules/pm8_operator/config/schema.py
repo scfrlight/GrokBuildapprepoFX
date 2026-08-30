@@ -27,7 +27,7 @@ class Pm8OperatorConfig(BaseModel):
     @classmethod
     def _mode(cls, value: str) -> str:
         if value == "telegram_api":
-            raise ValueError("telegram_api transport is refused in Sequence 10")
+            raise ValueError("telegram_api transport is refused in Sequence 13")
         if value not in {"disabled", "simulated"}:
             raise ValueError("operating_mode must be disabled|simulated")
         return value
@@ -41,7 +41,7 @@ class Pm8OperatorConfig(BaseModel):
         if self.broker_commands:
             raise ValueError("PM8 cannot issue broker commands")
         if self.telegram_api:
-            raise ValueError("Telegram Bot API is refused in Sequence 10")
+            raise ValueError("Telegram Bot API is refused in Sequence 13")
         if self.auto_promote_to_live:
             raise ValueError("studio cannot auto-promote to live")
         if self.allow_purge:

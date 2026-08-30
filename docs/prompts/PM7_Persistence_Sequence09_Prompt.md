@@ -116,5 +116,6 @@ silent corruption repair.
 
 The system is NOT ready for live trading, demo trading, paper trading, or production.
 
-Exact next step: Sequence 10 — PM8 Operator Control Plane, Telegram Control Engine
-& Human-in-the-Loop Operations.
+Exact next step (historical): Sequence 10 — PM8 Operator Control Plane.
+Canonical correction 2026-08-30: next after this PM7 work is Sequence 09
+PM8 Database Consolidation. Operator is Sequence 13. See `docs/SEQUENCE_CORRECTION.md`.
