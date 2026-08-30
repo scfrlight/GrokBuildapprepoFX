@@ -38,9 +38,7 @@ def test_production_durable_refused():
 def test_pm7_does_not_submit_orders():
     mod = pm7_module()
     assert not hasattr(mod, "submit")
-    src = Path(mod.__class__.__module__.replace(".", "/") + ".py")
-    # imported module path
-    text = Path("/workspace/botmoduleproject1/modules/pm7_persistence/module.py").read_text()
+    text = (ROOT / "botmoduleproject1" / "modules" / "pm7_persistence" / "module.py").read_text()
     assert "MetaTrader" not in text
     assert "submit(" not in text
 

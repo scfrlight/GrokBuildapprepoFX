@@ -26,7 +26,9 @@ jobs:
           python -m pip install -r requirements-dev.txt
       - name: Pytest
         run: |
-          PYTHONPATH=. python -m pytest tests --tb=short -q | tee pytest.log
+          set -o pipefail
+          PYTHONPATH=. python -m pytest tests --tb=short | tee pytest.log
+          grep -E '[0-9]+ passed' pytest.log
       - name: Evidence (restart drill + backup)
         run: PYTHONPATH=. python scripts/bot/emit_evidence.py --out-dir docs/evidence
       - name: Doctor on supported interpreter
