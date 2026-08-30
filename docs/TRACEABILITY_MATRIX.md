@@ -1,4 +1,4 @@
-# Traceability matrix — Sequence 14 + reconciliation 2026-08-30
+# Traceability matrix — Sequence 14 + reconciliation + PM4 capital 2026-08-30
 
 Statuses: COMPLETE | PARTIAL | BLOCKED | NEEDS-HARDENING | NOT-IN-SCOPE | SOURCE-MISSING | ABSENT.
 
@@ -90,4 +90,19 @@ This is **not** Sequence 15.
 | PG-11 | Restart durability | PG §13 | reopen `PostgresStore` | `test_restart_durability` | COMPLETE | sandbox/CI cluster | — |
 | PG-12 | UoW fault injection | PG §20 | `inject_fault` | `test_uow_fault_injection_no_partial_commit` | COMPLETE | — | — |
 | PG-13 | Sequence 11+ still blocked | stop | flags / CLI | `test_reconciliation_boundaries.py` | COMPLETE (refused) | — | — |
+| PC-01 | Historical Seq 07/PM5 risk maps to canonical Seq 06 PM4 | architect capital prompt | `pm4_risk_gate/capital/` not `pm5_risk_capital_gate` | `test_pm4_capital_gate.py` `MODULE_NUMBERING_MAP.md` | COMPLETE | Seq 07 remains OMS/EMS | — |
+| PC-02 | 40 independent checks always executed | capital §checks | `capital/catalog.py` `checks.py` | `test_catalog_has_exactly_forty_named_checks` `test_all_checks_run_on_fail_closed` | COMPLETE | — | — |
+| PC-03 | Decimal sizing ROUND_DOWN, never through a limit | capital §sizing | `capital/sizing.py` | `test_sizing_never_rounds_up_through_budget` | COMPLETE | — | — |
+| PC-04 | Heat / concentration / exposure | capital §portfolio | `capital/portfolio.py` `checks.py` | `test_heat_blocks_when_projected_exceeds_cap` | COMPLETE | — | — |
+| PC-05 | Restart-safe drawdown ledger | capital §drawdown | `capital/drawdown_ledger.py` | `test_drawdown_survives_restart` `test_postgres_drawdown_restart` | COMPLETE sqlite + PG | requires injected PersistenceApiV1 | — |
+| PC-06 | Model / spread / slippage / market freshness | capital §gates | `checks.py` | `test_model_quality_unknown_blocks_when_required` `test_spread_gate` `test_stale_market_blocks` | COMPLETE | — | — |
+| PC-07 | Persist via PersistenceApiV1 only | capital §persist | `capital/persistence.py` | `test_persist_round_trip_sqlite` `test_postgres_numeric_capital_decision` | COMPLETE | no second database | — |
+| PC-08 | Idempotency same hash / conflict | capital §idempotency | `evaluation.py` | `test_idempotency_same_key_same_hash_returns_stored` `test_idempotency_same_key_different_hash_conflicts` | COMPLETE | — | — |
+| PC-09 | Replay match; divergence does not overwrite | capital §replay | `evaluation.py` | `test_replay_matches_and_does_not_overwrite` | COMPLETE | — | — |
+| PC-10 | Fail-closed on faults / missing data | capital §fail-closed | `evaluation.py` | `test_injected_faults_fail_closed` `test_unknown_exposure_fail_closed` | COMPLETE | — | — |
+| PC-11 | Safe-halt no auto-rearm | capital §halt | `safe_halt.py` | `test_safe_halt_latch_no_auto_rearm` `test_drawdown_freeze_blocks_and_trips_halt` | COMPLETE | — | — |
+| PC-12 | Approved intent is not an order | capital §boundary | `pm4_capital.py` validators | `test_approved_intent_cannot_set_execution_allowed` `test_happy_path_emits_all_forty_checks_and_no_execution` | COMPLETE (refused) | — | — |
+| PC-13 | Existing evaluate() path unbroken | ADR-007 | `module.py` | `test_existing_evaluate_path_unchanged` `test_pm4_safety.py` | COMPLETE | — | — |
+| PC-14 | Sequence 15 / trading enablement still blocked | stop | no artifacts | `test_no_sequence_15_artifacts` | COMPLETE (refused) | — | — |
+
 

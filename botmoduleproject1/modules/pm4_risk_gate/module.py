@@ -29,8 +29,10 @@ from botmoduleproject1.contracts.v1.risk import (
 )
 from botmoduleproject1.contracts.v1.strategy import TradeIntent
 from botmoduleproject1.contracts.v1.time import ensure_aware_utc
+from botmoduleproject1.contracts.v1.pm4_capital import CapitalEvaluationResult, RiskEvaluationRequest
 from botmoduleproject1.modules.pm4_risk_gate.budgeting.hierarchical_allocator import HierarchicalRiskAllocator
 from botmoduleproject1.modules.pm4_risk_gate.capabilities import PM4_RISK_GATE_METADATA
+from botmoduleproject1.modules.pm4_risk_gate.capital.evaluation import CapitalEvaluationService
 from botmoduleproject1.modules.pm4_risk_gate.config.schema import Pm4RiskGateConfig, config_from_settings
 from botmoduleproject1.modules.pm4_risk_gate.concentration.correlation_engine import CorrelationEngine
 from botmoduleproject1.modules.pm4_risk_gate.controls.pretrade_controls import PreTradeControlEngine
@@ -90,10 +92,12 @@ class PM4RiskGateModule:
         clock: Any,
         *,
         feature_enabled: bool = True,
+        persistence_api: Any | None = None,
     ) -> None:
         self.config = config
         self.clock = clock
         self.feature_enabled = feature_enabled
+        self.persistence_api = persistence_api
         self.gateway = RiskIntakeGateway()
         self.admission = RiskAdmissionController(config)
         self.allocator = HierarchicalRiskAllocator(config)
@@ -110,6 +114,12 @@ class PM4RiskGateModule:
         self.publisher = RiskPublisher()
         self._forced_mode: RiskMode | None = None
         self._last_mode: RiskMode = RiskMode.NORMAL
+        self.capital = CapitalEvaluationService(
+            config,
+            clock=clock,
+            persistence=persistence_api,
+            require_persistence=persistence_api is not None,
+        )
 
     @classmethod
     def from_settings(cls, settings: object, clock: Any) -> PM4RiskGateModule:
@@ -175,6 +185,10 @@ class PM4RiskGateModule:
         """RiskGate protocol. Missing PM2/PM3 artifacts deny-by-default."""
         bundle = self.evaluate_intent(intent, exposure)
         return bundle.verdict
+
+    def evaluate_capital(self, request: RiskEvaluationRequest) -> CapitalEvaluationResult:
+        """Capital-management pipeline. Never an order. execution_allowed stays false."""
+        return self.capital.evaluate(request)
 
     def evaluate_intent(
         self,

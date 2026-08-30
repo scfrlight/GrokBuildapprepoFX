@@ -18,7 +18,7 @@ Bare **`pm6` is reserved for post-trade**. Sequence 11 is **`mt5_execution_engin
 | 03 | PM2 Market Context | `PM1_Sequence03_PM2_MarketContext_Prompt.md` | `modules/pm2_market_context` | Done |
 | 04 | PM3 Strategy Engine | `PM3_Strategy_Engine_Sequence04_Prompt.md` | `modules/pm3_strategy_engine` | Done |
 | 05 | PM3 Forecasting / QRF | `PM3_Forecasting_Sequence05_Prompt.md` | `modules/pm3_forecasting` | Done |
-| 06 | PM4 Risk Gate | `PM4_Risk_Gate_Sequence06_Prompt.md` | `modules/pm4_risk_gate` | Done |
+| 06 | PM4 Risk Gate | `PM4_Risk_Gate_Sequence06_Prompt.md` | `modules/pm4_risk_gate` | Done (capital-management pipeline 2026-08-30; exclusive risk gate) |
 | 07 | PM5 OMS/EMS simulation | `PM5_Execution_Sequence07_Prompt.md` | `modules/pm5_execution` | Done |
 | 08 | **PM6 Post-Trade Controls** | `PM6_Post_Trade_Sequence08_Prompt.md` | **`modules/pm6_post_trade`** | Done (in-memory; not Seq 14) |
 | 09 | **PM8 Database Consolidation** | reconstructed `PM8a_Build_Spec.md` | **`modules/pm8_persistence`** | Done sequence; SQLite local + PostgreSQL fail-closed backend 2026-08-30 (`production_durable` refused) |
@@ -29,6 +29,8 @@ Bare **`pm6` is reserved for post-trade**. Sequence 11 is **`mt5_execution_engin
 | 14 | **Observability, Operations & Documentation** | architect Sequence 14 authorization 2026-08-30 | **`modules/observability`** (not PM6) | Done observe-only; `trading_readiness` false |
 
 No row uses a second package whose last path segment is bare `pm6`. There is no `modules/pm6_execution`. Sequence 15+ is not in this map.
+
+**Numbering footnote (2026-08-30).** A later architect prompt titled “SEQUENCE 07 — PM5 Risk & Capital Management Gate” is **historical Master Orchestration numbering**. Canonical Sequence 07 is already `pm5_execution` (OMS/EMS, `SIM-*`). That capital work was implemented as hardening of **Sequence 06 / `pm4_risk_gate/capital/`**. There is no `pm5_risk_capital_gate` package. Report: `docs/architecture/pm4_capital_gate_report.md`.
 
 ## 2. Sequence 11 naming (the PM6 collision)
 

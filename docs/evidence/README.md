@@ -1,7 +1,7 @@
 # Evidence
 
-Independent verification artifacts for Sequences 09–14. Numbers in audits
-must cite a file here, a file under `ci/`, or the full inline body in the
+Independent verification artifacts for Sequences 09–14 plus PM4 capital hardening.
+Numbers in audits must cite a file here, a file under `ci/`, or the full inline body in the
 audit report. GitHub Actions **artifact ZIPs require login** even on a
 public repo; that is why CI transcripts are also committed under `ci/`
 and duplicated inline in the architect report.

@@ -28,3 +28,12 @@ Suite: 235 collected / 235 passed (46 added in Sequence 06)
 | YAML flag remains false | `tests/unit/test_pm4_integration.py` | `test_yaml_does_not_enable_pm4` | PASS |
 | demo cannot opt-in | `tests/unit/test_pm4_integration.py` | `test_flag_on_in_demo_rejected` | PASS |
 | public contracts | `tests/contract/test_pm4_risk_contracts.py` | `test_required_enums_exist` | PASS |
+| capital 40-check catalog | `tests/unit/test_pm4_capital_gate.py` | `test_catalog_has_exactly_forty_named_checks` | PASS |
+| capital no execution | `tests/unit/test_pm4_capital_gate.py` | `test_happy_path_emits_all_forty_checks_and_no_execution` | PASS |
+| capital ROUND_DOWN sizing | `tests/unit/test_pm4_capital_gate.py` | `test_sizing_never_rounds_up_through_budget` | PASS |
+| capital restart drawdown | `tests/unit/test_pm4_capital_gate.py` | `test_drawdown_survives_restart` | PASS |
+| capital idempotency conflict | `tests/unit/test_pm4_capital_gate.py` | `test_idempotency_same_key_different_hash_conflicts` | PASS |
+| capital replay | `tests/unit/test_pm4_capital_gate.py` | `test_replay_matches_and_does_not_overwrite` | PASS |
+| capital fail-inject | `tests/unit/test_pm4_capital_gate.py` | `test_injected_faults_fail_closed` | PASS |
+| capital PG NUMERIC | `tests/unit/test_pm4_capital_persistence.py` | `test_postgres_numeric_capital_decision` | PASS |
+| existing evaluate() unbroken | `tests/unit/test_pm4_capital_gate.py` | `test_existing_evaluate_path_unchanged` | PASS |

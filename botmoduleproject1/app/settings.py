@@ -289,6 +289,29 @@ class Pm4RiskGateSection(BaseModel):
     telemetry_verbose: bool = True
     cancel_on_disconnect: bool = True
     route_name: str = "pm5_pending"
+    policy_id: str = "pm4-capital"
+    policy_version: str = "1.0.0"
+    include_transaction_costs: bool = True
+    require_model: bool = True
+    max_spread: str = "0.00040"
+    max_slippage: str = "0.00020"
+    max_commission: str = "10"
+    max_cost_to_edge: str = "0.50"
+    min_reward_risk: str = "0.80"
+    max_uncertainty_span: str = "0.020"
+    market_stale_seconds: int = Field(default=30, ge=1)
+    account_stale_seconds: int = Field(default=30, ge=1)
+    model_stale_seconds: int = Field(default=300, ge=1)
+    max_simultaneous_positions: int = Field(default=8, ge=1)
+    max_symbol_exposure_pct: str = "0.03"
+    max_currency_exposure_pct: str = "0.05"
+    max_correlation_pct: str = "0.04"
+    max_strategy_pct: str = "0.50"
+    max_profile_pct: str = "0.50"
+    consecutive_loss_limit: int = Field(default=5, ge=1)
+    equity_floor: str = "1000"
+    free_margin_floor: str = "500"
+    allowed_symbols: tuple[str, ...] = ("EURUSD", "GBPUSD", "USDJPY", "AUDUSD")
 
     @field_validator("auto_rearm")
     @classmethod

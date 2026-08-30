@@ -76,6 +76,30 @@ class Pm4RiskGateConfig(BaseModel):
     cancel_on_disconnect: bool = True
     route_name: str = "pm5_pending"
 
+    policy_id: str = "pm4-capital"
+    policy_version: str = "1.0.0"
+    include_transaction_costs: bool = True
+    require_model: bool = True
+    max_spread: Decimal = Field(default=Decimal("0.00040"), ge=0)
+    max_slippage: Decimal = Field(default=Decimal("0.00020"), ge=0)
+    max_commission: Decimal = Field(default=Decimal("10"), ge=0)
+    max_cost_to_edge: Decimal = Field(default=Decimal("0.50"))
+    min_reward_risk: Decimal = Field(default=Decimal("0.80"), ge=0)
+    max_uncertainty_span: Decimal = Field(default=Decimal("0.020"), gt=0)
+    market_stale_seconds: int = Field(default=30, ge=1)
+    account_stale_seconds: int = Field(default=30, ge=1)
+    model_stale_seconds: int = Field(default=300, ge=1)
+    max_simultaneous_positions: int = Field(default=8, ge=1)
+    max_symbol_exposure_pct: Decimal = Field(default=Decimal("0.03"))
+    max_currency_exposure_pct: Decimal = Field(default=Decimal("0.05"))
+    max_correlation_pct: Decimal = Field(default=Decimal("0.04"))
+    max_strategy_pct: Decimal = Field(default=Decimal("0.50"))
+    max_profile_pct: Decimal = Field(default=Decimal("0.50"))
+    consecutive_loss_limit: int = Field(default=5, ge=1)
+    equity_floor: Decimal = Field(default=Decimal("1000"), ge=0)
+    free_margin_floor: Decimal = Field(default=Decimal("500"), ge=0)
+    allowed_symbols: tuple[str, ...] = ("EURUSD", "GBPUSD", "USDJPY", "AUDUSD")
+
     @field_validator("operating_mode")
     @classmethod
     def _mode(cls, value: str) -> str:
@@ -109,6 +133,12 @@ class Pm4RiskGateConfig(BaseModel):
         "european_basket_cap",
         "crowding_block",
         "wide_interval_pct",
+        "max_cost_to_edge",
+        "max_symbol_exposure_pct",
+        "max_currency_exposure_pct",
+        "max_correlation_pct",
+        "max_strategy_pct",
+        "max_profile_pct",
     )
     @classmethod
     def _bounded(cls, value: Decimal, info) -> Decimal:  # type: ignore[no-untyped-def]
@@ -120,8 +150,6 @@ class Pm4RiskGateConfig(BaseModel):
             raise ValueError("auto_rearm must stay false; kill-switch has no hidden rearm")
         if self.min_lots > self.max_lots:
             raise ValueError("min_lots must be <= max_lots")
-        if self.dd_mild > self.dd_reduced > self.dd_restricted > self.dd_freeze > self.dd_kill:
-            raise ValueError("drawdown ladder must be non-decreasing")
         if self.dd_mild > self.dd_reduced > self.dd_restricted > self.dd_freeze > self.dd_kill:
             raise ValueError("drawdown ladder must be non-decreasing")
         if not (

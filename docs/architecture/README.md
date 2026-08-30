@@ -19,6 +19,7 @@
 - [Sequence 04 report](./sequence_04_report.md)
 - [Sequence 05 report](./sequence_05_report.md)
 - [Sequence 06 report](./sequence_06_report.md)
+- [PM4 capital-management gate report (historical Seq 07 / PM5 risk title)](./pm4_capital_gate_report.md)
 - [Sequence 07 report](./sequence_07_report.md)
 - [Sequence 08 report](./sequence_08_report.md)
 - [Sequence 09 report (historical PM7 journal — misnumbered)](./sequence_09_report.md)

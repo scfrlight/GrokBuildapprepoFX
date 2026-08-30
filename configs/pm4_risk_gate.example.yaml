@@ -74,3 +74,32 @@ pm4_risk_gate:
   telemetry_verbose: true
   cancel_on_disconnect: true
   route_name: pm5_pending
+
+  # Capital-management hardening (canonical Seq 06; historical title Seq 07 / PM5 risk)
+  policy_id: pm4-capital
+  policy_version: "1.0.0"
+  include_transaction_costs: true
+  require_model: true
+  max_spread: "0.00040"
+  max_slippage: "0.00020"
+  max_commission: "10"
+  max_cost_to_edge: "0.50"
+  min_reward_risk: "0.80"
+  max_uncertainty_span: "0.020"
+  market_stale_seconds: 30
+  account_stale_seconds: 30
+  model_stale_seconds: 300
+  max_simultaneous_positions: 8
+  max_symbol_exposure_pct: "0.03"
+  max_currency_exposure_pct: "0.05"
+  max_correlation_pct: "0.04"
+  max_strategy_pct: "0.50"
+  max_profile_pct: "0.50"
+  consecutive_loss_limit: 5
+  equity_floor: "1000"
+  free_margin_floor: "500"
+  allowed_symbols:
+    - EURUSD
+    - GBPUSD
+    - USDJPY
+    - AUDUSD

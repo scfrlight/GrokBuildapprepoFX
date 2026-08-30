@@ -44,7 +44,7 @@ Sources of truth (priority): (1) live safety constraints in this repo; (2) persi
 | 03 | PM2 market context | `modules/pm2_market_context` | COMPLETE | COMPLETE for Seq 03 scope; HMM/GMM stubs off | no | no | `NullMarketData` | `enable_pm2_market_data` |
 | 04 | PM3 strategy engine | `modules/pm3_strategy_engine` | COMPLETE | COMPLETE for TradeIntent-only Seq 04 | no (intents ≠ orders) | no | `NullSignals` | `enable_pm3_strategy_engine` |
 | 05 | PM3 forecasting | `modules/pm3_forecasting` | COMPLETE | PARTIAL vs fitted QRF (**NOT-IN-SCOPE** / blocked) | no | no | `NullModel` | `enable_forecasting` |
-| 06 | PM4 risk gate | `modules/pm4_risk_gate` | COMPLETE | COMPLETE as exclusive deny-by-default gate (flag off) | no | no | `NullRiskGate` DENY | `enable_pm4_risk_gate` |
+| 06 | PM4 risk gate | `modules/pm4_risk_gate` | COMPLETE | COMPLETE exclusive deny-by-default gate + capital pipeline (flag off); approved intent ≠ order | no | persist via PM8 API when injected | `NullRiskGate` DENY | `enable_pm4_risk_gate` |
 | 07 | PM5 OMS/EMS sim | `modules/pm5_execution` | COMPLETE | COMPLETE for simulation; broker adapter **BLOCKED** | no (SIM-* not broker) | no | `DisabledExecution` | `enable_pm5_simulation` |
 | 08 | PM6 post-trade | `modules/pm6_post_trade` | COMPLETE | COMPLETE for in-memory Seq 08; not Seq 14 | no | no | `NullMonitoring` | `enable_pm6_post_trade` |
 | 09 | PM8 DB consolidation | `modules/pm8_persistence` | COMPLETE | **PARTIAL vs PG**; SQLite named projections / isolated restore-apply present | no | **yes** (canonical downstream API when flag on) | `NullStorage` | `enable_pm8_persistence` |

@@ -1,0 +1,21 @@
+[2m2026-08-30T14:57:29.772025Z[0m [[32m[1minfo     [0m] [1mBotModuleProject1 platform kernel[0m
+[2m2026-08-30T14:57:29.772099Z[0m [[32m[1minfo     [0m] [1menvironment=test cli_mode=doctor profile=test trading_mode=test[0m
+[2m2026-08-30T14:57:29.772126Z[0m [[32m[1minfo     [0m] [1mlive_trading_enabled=False    [0m
+[2m2026-08-30T14:57:29.772147Z[0m [[32m[1minfo     [0m] [1mallowed_capabilities=platform, diagnostics, telemetry[0m
+[2m2026-08-30T14:57:29.772167Z[0m [[32m[1minfo     [0m] [1mconfig_fingerprint=554c983bafacd17265ca1298a7f273902a581efe5aae3212fdc062c892474aac[0m
+[2m2026-08-30T14:57:29.772183Z[0m [[32m[1minfo     [0m] [1mlifecycle=degraded            [0m
+[2m2026-08-30T14:57:29.772197Z[0m [[32m[1minfo     [0m] [1mmodules=pm1_platform, pm2_market_context, pm3_strategy_engine, pm3_forecasting, pm4_risk, pm5_execution, pm7_ledger, pm8_persistence, notifications, pm6_monitoring, pm8_operator, observability[0m
+[2m2026-08-30T14:57:29.772220Z[0m [[32m[1minfo     [0m] [1mcaptured_at=2026-08-30T14:57:29.771957+00:00[0m
+[2m2026-08-30T14:57:29.772278Z[0m [[32m[1minfo     [0m] [1mNOT TRADE READY. Live trading is disabled. No orders will be sent.[0m
+BotModuleProject1 platform kernel
+environment=test cli_mode=doctor profile=test trading_mode=test
+live_trading_enabled=False
+allowed_capabilities=platform, diagnostics, telemetry
+config_fingerprint=554c983bafacd17265ca1298a7f273902a581efe5aae3212fdc062c892474aac
+lifecycle=degraded
+modules=pm1_platform, pm2_market_context, pm3_strategy_engine, pm3_forecasting, pm4_risk, pm5_execution, pm7_ledger, pm8_persistence, notifications, pm6_monitoring, pm8_operator, observability
+captured_at=2026-08-30T14:57:29.771957+00:00
+NOT TRADE READY. Live trading is disabled. No orders will be sent.
+fingerprint=554c983bafacd17265ca1298a7f273902a581efe5aae3212fdc062c892474aac
+profile=test
+allowed_capabilities=platform, diagnostics, telemetry

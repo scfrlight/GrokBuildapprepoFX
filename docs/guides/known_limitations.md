@@ -12,6 +12,7 @@
 - PM8 named projections exist as read models; restore-apply is isolated SQLite or isolated PostgreSQL DSN (live target refused).
 - PostgreSQL is implemented as a fail-closed PM8 backend. `production_durable` remains refused. Not a hosted production cluster claim.
 - Sequence 15+ is blocked.
+- Historical “Sequence 07 / PM5 Risk Gate” is implemented as PM4 capital hardening (`pm4_risk_gate/capital`). Canonical Sequence 07 remains `pm5_execution`. Approved intents are not orders.
 
 See also `docs/known_limitations.md` and `docs/ARCHITECTURE_INVENTORY.md`.
 

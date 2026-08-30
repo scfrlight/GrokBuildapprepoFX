@@ -66,6 +66,18 @@ from botmoduleproject1.contracts.v1.pm2 import (
     SuppressionRecord,
     quality_tier_for,
 )
+from botmoduleproject1.contracts.v1.pm4_capital import (
+    CapitalDecisionState,
+    CapitalEvaluationResult,
+    CheckOutcome,
+    CheckStatus,
+    QuantileBand,
+    RiskApprovedExecutableIntent,
+    RiskDecision,
+    RiskEvaluationRequest,
+    RiskRejection,
+    SizingTrace,
+)
 from botmoduleproject1.contracts.v1.risk import (
     ConcentrationExposureCard,
     ConcentrationState,
@@ -271,4 +283,14 @@ __all__ = [
     "REFUSED_VERBS",
     "TransportMode",
     "EntryType",
+    "CapitalDecisionState",
+    "CapitalEvaluationResult",
+    "CheckOutcome",
+    "CheckStatus",
+    "QuantileBand",
+    "RiskApprovedExecutableIntent",
+    "RiskDecision",
+    "RiskEvaluationRequest",
+    "RiskRejection",
+    "SizingTrace",
 ]
