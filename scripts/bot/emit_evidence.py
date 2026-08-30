@@ -1,16 +1,33 @@
 """Write raw Sequence 10 backup/restore and restart-drill logs.
 
 Not a trading path. Safe to run in CI.
+
+Backup checksum is sha256 of dump_events_json() for THIS run. It is not a
+golden hash across environments: event_id, correlation_id, occurred_at and
+row_hash are generated per ingest. Restore proves the file matches the
+checksum of that dump, not that two machines produced identical bytes.
+
+payload_canonical_sha256 hashes only payload_json fields and IS comparable
+across runs (same business payload → same value).
 """
 
 from __future__ import annotations
 
 import argparse
+import json
+import shutil
 import sys
 from datetime import datetime, timezone
+from hashlib import sha256
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
+
+
+def payload_canonical_sha256(blob: str) -> str:
+    events = json.loads(blob)
+    payloads = [row.get("payload_json") for row in events]
+    return sha256(json.dumps(payloads, sort_keys=True).encode("utf-8")).hexdigest()
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -40,6 +57,8 @@ def main(argv: list[str] | None = None) -> int:
     )
 
     work = out / "_scratch"
+    if work.exists():
+        shutil.rmtree(work)
     work.mkdir(exist_ok=True)
     result = RestartDrill().run(work / "drill.sqlite")
     drill_body = [
@@ -60,12 +79,18 @@ def main(argv: list[str] | None = None) -> int:
     report = api.backup(work / "backups")
     RestoreService(store).verify_file(Path(report.path), report.checksum)
     after = store.last_sequence()
+    blob = Path(report.path).read_text(encoding="utf-8")
+    payload_hash = payload_canonical_sha256(blob)
     backup_body = [
         f"# backup / restore verification  utc={now}",
         f"# command: PYTHONPATH=. python scripts/bot/emit_evidence.py --out-dir {out}",
         f"schema_version={getattr(report, 'schema_version', 'v1')}",
         f"backup_id={report.backup_id}",
         f"checksum={report.checksum}",
+        "# checksum = sha256(dump_events_json()); dump includes event_id, correlation_id,",
+        "# occurred_at, row_hash. It is run-specific, not a golden cross-run hash.",
+        f"payload_canonical_sha256={payload_hash}",
+        "# payload_canonical_sha256 hashes only payload_json fields and IS comparable.",
         f"path={report.path}",
         f"verified={report.verified}",
         f"event_count={report.event_count}",

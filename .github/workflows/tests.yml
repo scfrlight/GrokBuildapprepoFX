@@ -32,7 +32,9 @@ jobs:
       - name: Evidence (restart drill + backup)
         run: PYTHONPATH=. python scripts/bot/emit_evidence.py --out-dir docs/evidence
       - name: Doctor on supported interpreter
-        run: PYTHONPATH=. python -m botmoduleproject1 doctor --profile test --config configs/test.example.yaml
+        run: |
+          PYTHONPATH=. python -m botmoduleproject1 doctor --profile test --config configs/test.example.yaml > doctor.out 2> doctor.err
+          grep -q "NOT TRADE READY" doctor.out
       - name: Upload logs
         if: always()
         uses: actions/upload-artifact@v4
@@ -40,6 +42,8 @@ jobs:
           name: evidence-py${{ matrix.python-version }}
           path: |
             pytest.log
+            doctor.out
+            doctor.err
             docs/evidence/
 
   doctor-py310-fail-fast:
@@ -55,6 +59,7 @@ jobs:
           set +e
           PYTHONPATH=. python -m botmoduleproject1 doctor --profile test --config configs/test.example.yaml > doctor.out 2> doctor.err
           code=$?
+          set -e
           echo "exit=$code"
           echo "----- stderr -----"
           cat doctor.err

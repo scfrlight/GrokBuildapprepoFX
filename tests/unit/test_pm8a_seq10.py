@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 from pathlib import Path
 
 from botmoduleproject1.contracts.v1.pm8_persistence import TableFamily
@@ -44,6 +45,27 @@ def test_backup_restore_verification_does_not_touch_runtime(tmp_path: Path):
     assert report.verified is True
     RestoreService(store).verify_file(Path(report.path), report.checksum)
     assert store.last_sequence() == before
+
+
+def test_backup_checksum_is_dump_specific_not_golden(tmp_path: Path):
+    """Dump checksum binds UUIDs + occurred_at. Same payload, different dumps."""
+    checksums: list[str] = []
+    payloads: list[str] = []
+    for i in range(2):
+        store = SqliteStore(tmp_path / f"live-{i}.sqlite")
+        MigrationService(store).upgrade_to(2)
+        api = PersistenceApiV1(store)
+        api.ingest_event(event_type="t", producer="evidence", family=TableFamily.EVENT, payload={"n": 7})
+        report = api.backup(tmp_path / f"backups-{i}")
+        blob = Path(report.path).read_text(encoding="utf-8")
+        events = json.loads(blob)
+        checksums.append(report.checksum)
+        payloads.append(events[0]["payload_json"])
+        RestoreService(store).verify_file(Path(report.path), report.checksum)
+        assert report.verified is True
+        assert store.last_sequence() == 1
+    assert checksums[0] != checksums[1]
+    assert payloads[0] == payloads[1] == '{"n": 7}'
 
 
 def test_restart_drill(tmp_path: Path):

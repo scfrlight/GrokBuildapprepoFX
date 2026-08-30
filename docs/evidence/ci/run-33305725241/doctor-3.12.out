@@ -1,0 +1,12 @@
+BotModuleProject1 platform kernel
+environment=test cli_mode=doctor profile=test trading_mode=test
+live_trading_enabled=False
+allowed_capabilities=platform, diagnostics, telemetry
+config_fingerprint=55d6ca0dfe1a2fff768e5e7b95085b6cb52e7a1d6c2183e7d7a6f875eab2d326
+lifecycle=degraded
+modules=pm1_platform, pm2_market_context, pm3_strategy_engine, pm3_forecasting, pm4_risk, pm5_execution, pm7_ledger, pm8_persistence, notifications, pm6_monitoring, pm8_operator
+captured_at=2026-08-30T10:08:17.510140+00:00
+NOT TRADE READY. Live trading is disabled. No orders will be sent.
+fingerprint=55d6ca0dfe1a2fff768e5e7b95085b6cb52e7a1d6c2183e7d7a6f875eab2d326
+profile=test
+allowed_capabilities=platform, diagnostics, telemetry

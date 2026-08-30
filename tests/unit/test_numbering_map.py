@@ -19,6 +19,12 @@ def test_numbering_map_file_exists_and_states_rules():
     assert "not mixed" in MAP.lower() or "not mixed into PM8" in MAP
 
 
+def test_numbering_map_covers_seq_00_to_13():
+    for n in range(14):
+        needle = f"| {n:02d} |"
+        assert needle in MAP, f"MODULE_NUMBERING_MAP.md missing row for Sequence {n:02d}"
+
+
 def test_canonical_sequence_11_is_not_pm6():
     assert CANONICAL_SEQUENCES[8] == "pm6_post_trade_controls"
     assert CANONICAL_SEQUENCES[11] == "mt5_execution_engine"

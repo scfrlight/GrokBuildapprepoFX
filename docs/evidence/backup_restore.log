@@ -1,9 +1,13 @@
-# backup / restore verification  utc=2026-08-30T10:03:43.228018+00:00
+# backup / restore verification  utc=2026-08-30T10:22:45.080398+00:00
 # command: PYTHONPATH=. python scripts/bot/emit_evidence.py --out-dir docs/evidence
 schema_version=v1
-backup_id=88e37a17-18ab-4085-bc26-065d17f36ba6
-checksum=b6fbdca7477fceb31cfe2777e4839be14184f6742e7af551dee8383ac6e6802d
-path=docs/evidence/_scratch/backups/88e37a17-18ab-4085-bc26-065d17f36ba6.json
+backup_id=bdf0aa29-a7af-4ea7-bcd0-ebe23e920bc3
+checksum=6eda8cc17704b617d40345dabe20f11ae34dc367fe1fde8db9e117da4c697ae3
+# checksum = sha256(dump_events_json()); dump includes event_id, correlation_id,
+# occurred_at, row_hash. It is run-specific, not a golden cross-run hash.
+payload_canonical_sha256=50383ca70c905131a84eb141e18fa6d524c0900cdaa8125754256b09dde406db
+# payload_canonical_sha256 hashes only payload_json fields and IS comparable.
+path=docs/evidence/_scratch/backups/bdf0aa29-a7af-4ea7-bcd0-ebe23e920bc3.json
 verified=True
 event_count=1
 sequence_before=1

@@ -37,6 +37,11 @@ logs/
 *.log
 !docs/evidence/*.log
 !docs/evidence/*.txt
+!docs/evidence/**/*.log
+!docs/evidence/**/*.txt
+!docs/evidence/**/*.out
+!docs/evidence/**/*.err
+!docs/evidence/**/*.md
 docs/evidence/_scratch/
 data/local/
 data/cache/
