@@ -18,7 +18,7 @@ Git home: [scfrlight/GrokBuildapprepoFX](https://github.com/scfrlight/GrokBuilda
 | Python | 3.11+ (fail-fast; ADR-008) |
 | Trading readiness | **false** (Sequence 14 cannot set it true) |
 
-**PM4** is the authoritative risk gate. **PM5** is the OMS/EMS fabric (simulation/shadow; `SIM-*` is not a venue ticket). **Sequence 11** is `mt5_execution_engine` (tickets `DEMO-*`, not broker truth; not PM6). **PM6** is only `pm6_post_trade`. **PM7** is the append-only evidence journal. **PM8 persistence** (canonical Sequences 09–10) is the only downstream data API. **Operator** is Sequence 13; Telegram Bot API refused. **Sequence 14** is `modules/observability`.
+**PM4** is the authoritative risk gate. **PM5** is the OMS/EMS fabric (simulation/shadow; `SIM-*` is not a venue ticket). **Sequence 11** is `mt5_execution_engine` (tickets `DEMO-*`, not broker truth; not PM6). **PM6** is only `pm6_post_trade` (post-trade governance; not Seq 14). **PM7** is a **PARTIAL** append-only evidence-journal subset (not production durable, not the downstream API). **PM8 persistence** (canonical Sequences 09–10, **PARTIAL** vs reconstructed PM8a) is the only downstream data API. **PM8a** is the build-spec/hardening identity of that same package. **Operator** is Sequence 13; Telegram Bot API refused. **Sequence 14** is `modules/observability` (not PM6). Inventory: [docs/ARCHITECTURE_INVENTORY.md](docs/ARCHITECTURE_INVENTORY.md). PM8 gaps: [docs/PM8_PM8A_GAP_MATRIX.md](docs/PM8_PM8A_GAP_MATRIX.md).
 
 Unprefixed ambient env (`DATABASE_URL`, `TRADING_MODE`, …) is ignored.
 
@@ -36,15 +36,16 @@ Unprefixed ambient env (`DATABASE_URL`, `TRADING_MODE`, …) is ignored.
 
 ## Distinctions
 
-- PM6 = `pm6_post_trade` (post-trade monitoring/governance)
+- PM6 = `pm6_post_trade` (post-trade monitoring/governance). Sequence 14 observability is **not** PM6.
 - Sequence 11 = `mt5_execution_engine` (Demo execution/exit **simulation**)
-- PM7 = append-only evidence journal
-- PM8 = persistence/consolidation data API
-- PM8a = implementation/hardening specification for PM8
+- PM7 = PARTIAL evidence-journal subset (in-memory / local sqlite write-append; not production durable)
+- PM8 = persistence/consolidation data API (`PersistenceApiV1`); named projections ABSENT
+- PM8a = implementation/hardening specification for PM8 (same package)
 - Sequence 09 = PM8 consolidation
 - Sequence 10 = PM8a hardening
 - Sequence 13 = operator UX reuse
 - Sequence 14 = observability/operations/documentation
+- Sequence 15+ = **BLOCKED**
 
 ## What does not exist yet
 

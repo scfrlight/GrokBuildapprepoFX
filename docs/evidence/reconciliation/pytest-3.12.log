@@ -1,0 +1,8 @@
+git_sha=3c36a9cf4d75e520abe56482282eb3a770a54952
+utc=2026-08-30T11:34:19Z
+command: python3.12 -m pytest tests
+python3.12: ABSENT in this App Builder sandbox (which python3.12 empty)
+status: SOURCE-MISSING / NOT-RUN-HERE
+CI matrix remains: .github/workflows/tests.yml python-version 3.11 and 3.12
+prior CI transcript: docs/evidence/ci/run-33307496179/pytest-3.12.log
+exit_code: not-run

@@ -1,0 +1,36 @@
+git_sha=3c36a9cf4d75e520abe56482282eb3a770a54952
+parent_sha=cfce27ad7979a62d9702ad82ff04ac75b10c1883
+utc=2026-08-30T11:34:19Z
+python=3.11.2
+sequence_15=NOT STARTED
+
+sources:
+  docs/prompts/PM1_Master_Prompt.md PRESENT
+  docs/prompts/PM6_Post_Trade_Sequence08_Prompt.md PRESENT (PM6_Master_Prompt.md SOURCE-MISSING)
+  docs/prompts/PM7_Persistence_Sequence09_Prompt.md PRESENT (PM7_Master_Prompt.md SOURCE-MISSING)
+  docs/prompts/PM8a_Build_Spec.md PRESENT reconstructed (original Drive SOURCE-MISSING)
+  docs/SEQUENCE_CORRECTION.md PRESENT
+  docs/MODULE_NUMBERING_MAP.md PRESENT
+  docs/TRACEABILITY_MATRIX.md PRESENT
+  docs/ARCHITECTURE_INVENTORY.md PRESENT
+  docs/PM8_PM8A_GAP_MATRIX.md PRESENT
+  Grok_Build_Master_Orchestration_Prompt.md SOURCE-MISSING
+  PM9a_Strategy_Fine_Tune_Studio_Master_Prompt.md SOURCE-MISSING
+
+packages:
+  botmoduleproject1.app PM1 kernel
+  modules/pm2_market_context Seq03
+  modules/pm3_strategy_engine Seq04
+  modules/pm3_forecasting Seq05
+  modules/pm4_risk_gate Seq06
+  modules/pm5_execution Seq07
+  modules/pm6_post_trade Seq08 PM6
+  modules/pm7_persistence PM7 PARTIAL evidence-journal
+  modules/pm8_persistence Seq09/10 PM8/PM8a
+  modules/mt5_execution_engine Seq11
+  botmoduleproject1/runtime Seq12
+  modules/pm8_operator Seq13
+  modules/observability Seq14 NOT PM6
+
+flags: all YAML default false; no Sequence 15 flag
+default binds: NullRiskGate NullMonitoring NullLedger NullStorage NullOperator DisabledExecution

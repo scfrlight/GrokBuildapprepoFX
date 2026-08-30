@@ -1,4 +1,7 @@
+> **RECONCILIATION 2026-08-30.** Sequence 10 **delivery** (migrations, backup **verification**, restart drill) remains. Restore **apply** into a live store is **ABSENT**. Original Drive `PM8a_Build_Spec.md` is **SOURCE-MISSING** (reconstructed copy in `docs/prompts/`). Named projections ABSENT. See `docs/PM8_PM8A_GAP_MATRIX.md`. Do not read historical COMPLETE tables as full PM8a Master.
+
 # Sequence 10 Report — PM8a Migration, Backup & Recovery Hardening
+
 
 Date (UTC): 2026-08-30  
 Git home: `scfrlight/GrokBuildapprepoFX`  

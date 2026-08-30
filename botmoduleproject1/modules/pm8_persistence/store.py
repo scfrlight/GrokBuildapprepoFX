@@ -200,13 +200,23 @@ class SqliteStore:
         return cur.fetchone() is not None
 
     def save_checkpoint(self, row: dict[str, Any]) -> None:
+        cursor = int(row["cursor_seq"])
+        cur = self._exec("SELECT COALESCE(MAX(cursor_seq), -1) FROM recovery_checkpoints")
+        max_seq = int(cur.fetchone()[0])
+        if cursor < max_seq:
+            raise ValueError(
+                f"checkpoint cursor_seq must be monotonic non-decreasing "
+                f"(got {cursor} < max {max_seq})"
+            )
         self._exec(
             "INSERT INTO recovery_checkpoints (checkpoint_id, cursor_seq, payload_json, created_at) VALUES (?,?,?,?)",
             (row["checkpoint_id"], row["cursor_seq"], row["payload_json"], row["created_at"]),
         )
 
     def latest_checkpoint(self) -> dict[str, Any] | None:
-        cur = self._exec("SELECT * FROM recovery_checkpoints ORDER BY created_at DESC LIMIT 1")
+        cur = self._exec(
+            "SELECT * FROM recovery_checkpoints ORDER BY cursor_seq DESC, created_at DESC LIMIT 1"
+        )
         row = cur.fetchone()
         return dict(row) if row else None
 

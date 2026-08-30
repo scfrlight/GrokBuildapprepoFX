@@ -1,0 +1,1 @@
+STARTUP FAILED: Python 3.10.21 is not supported. BotModuleProject1 requires Python 3.11+. See docs/adr/ADR-008-python-version-constraint.md.

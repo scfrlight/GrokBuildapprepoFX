@@ -1,0 +1,12 @@
+{
+  "kind": "runtime_state_hash_source",
+  "trading_readiness": false,
+  "accept_trade": false,
+  "liveness": "pass",
+  "broker_venue": "unavailable",
+  "venue_present": false,
+  "telegram_bound": false,
+  "live_trading_enabled": false,
+  "flags_any_on": false,
+  "kernel_note": "NOT TRADE READY. Sequence 14 is observe-only."
+}

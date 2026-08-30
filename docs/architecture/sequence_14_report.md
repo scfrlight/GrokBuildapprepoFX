@@ -26,8 +26,8 @@ Trading, risk, and broker execution modules were not behavior-changed.
 | Seq | Content | Status | Implementation | Test / evidence |
 |---|---|---|---|---|
 | 00–08 | Platform through PM6 post-trade | COMPLETE (historical, flags off) | `docs/architecture/sequence_0*_report.md` | existing unit suites |
-| 09 | PM8 consolidation | COMPLETE | `modules/pm8_persistence` | `test_pm8_persistence_seq09.py` |
-| 10 | PM8a hardening | COMPLETE | `modules/pm8_persistence` + runbooks | `test_pm8a_seq10.py` / `docs/evidence/restart_drill.log` |
+| 09 | PM8 consolidation | COMPLETE sequence; **PARTIAL** vs PM8a | `modules/pm8_persistence` | `test_pm8_persistence_seq09.py` / `docs/PM8_PM8A_GAP_MATRIX.md` |
+| 10 | PM8a hardening | COMPLETE sequence; restore-apply **ABSENT** | `modules/pm8_persistence` + runbooks | `test_pm8a_seq10.py` / `docs/evidence/restart_drill.log` |
 | 11 | `mt5_execution_engine` | COMPLETE (sim/test-safe) | `modules/mt5_execution_engine` | `test_seq11_mt5_exit.py` |
 | 12 | Unified runtime | COMPLETE | `botmoduleproject1/runtime` | `test_seq12_orchestrator.py` |
 | 13 | Operator UX reuse | COMPLETE (Telegram unbound) | `modules/pm8_operator` | `test_sequence_correction.py` |
@@ -44,9 +44,10 @@ Trading, risk, and broker execution modules were not behavior-changed.
 | PM3-FX | `pm3_forecasting` | COMPLETE, flag off (not fitted QRF) |
 | PM4 | `pm4_risk_gate` | COMPLETE, exclusive risk gate, flag off |
 | PM5 | `pm5_execution` | COMPLETE, `SIM-*` not broker truth |
-| PM6 | **`pm6_post_trade` only** | COMPLETE, flag off |
-| PM7 | `pm7_persistence` journal | COMPLETE, flag off |
-| PM8 persistence | `pm8_persistence` | COMPLETE Seq 09–10 |
+| PM6 | **`pm6_post_trade` only** | COMPLETE Seq 08 in-memory; not Seq 14 |
+| PM7 | `pm7_persistence` | **PARTIAL / evidence-journal subset**, flag off |
+| PM8 persistence | `pm8_persistence` | **PARTIAL** vs reconstructed PM8a (named projections ABSENT) |
+| PM8a | same package, Seq 10 identity | verify COMPLETE; restore-apply ABSENT; spec SOURCE-MISSING |
 | PM8 operator / PM9 UX | `pm8_operator` | COMPLETE Seq 13, Telegram refused |
 | Seq 11 | `mt5_execution_engine` | COMPLETE, `DEMO-*` not broker truth |
 | Seq 14 | `modules/observability` | COMPLETE, not a trading module |

@@ -1,3 +1,5 @@
+> **RECONCILIATION 2026-08-30.** Sequence 09 **delivery** remains. Capability vs reconstructed PM8a is **PARTIAL**: named projections ABSENT, restore-apply ABSENT, Decimal domain records ABSENT, outbox relay ABSENT, family-row UoW PARTIAL. Original Drive spec SOURCE-MISSING. See `docs/PM8_PM8A_GAP_MATRIX.md`. Do not read the §4 COMPLETE table as a full PM8a Master.
+
 # Sequence 09 Report — PM8 Database Consolidation & Data Integrity
 
 Date (UTC): 2026-08-30  

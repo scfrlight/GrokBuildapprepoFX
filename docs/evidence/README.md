@@ -23,8 +23,12 @@ and duplicated inline in the architect report.
 python3.11 -m venv .venv311
 .venv311/bin/python -m pip install -r requirements-dev.txt
 PYTHONPATH=. .venv311/bin/python --version
-set -o pipefail
-PYTHONPATH=. .venv311/bin/python -m pytest tests --tb=short | tee docs/evidence/pytest-3.11.log
+set +e
+PYTHONPATH=. .venv311/bin/python -m pytest tests --tb=short > docs/evidence/pytest-3.11.log 2>&1
+code=$?
+set -e
+test "$code" -eq 0
+# Do not use `pytest | tee` or `command | grep` as a success gate.
 
 # Restart drill + backup checksum (raw logs)
 PYTHONPATH=. .venv311/bin/python scripts/bot/emit_evidence.py --out-dir docs/evidence
@@ -35,6 +39,9 @@ PYTHONPATH=. .venv311/bin/python scripts/bot/emit_seq14_evidence.py --out-dir do
 # Fail-fast on the sandbox 3.10 interpreter (must exit 1, no pydantic required)
 PYTHONPATH=. python3.10 -m botmoduleproject1 doctor --profile test --config configs/test.example.yaml
 ```
+
+Reconciliation 2026-08-30 evidence: `docs/evidence/reconciliation/`.
+
 
 CI: `.github/workflows/tests.yml` (matrix 3.11 / 3.12 + 3.10 fail-fast + seq14-hygiene).
 

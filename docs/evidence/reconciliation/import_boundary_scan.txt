@@ -1,0 +1,7 @@
+import_boundary_scan
+status=PASS
+violations 0
+pm6_post_trade: no MT5 / sizing / execution imports
+observability: no MT5 / OMS imports
+pm7_persistence: no MT5 / submit
+pm8_persistence: no MT5 / submit

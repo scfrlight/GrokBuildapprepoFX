@@ -1,8 +1,10 @@
 # Module numbering map
 
-Status: **Accepted** — architect follow-up 2026-08-30 (problems 2.1–2.4)  
-Source of sequence **order**: Master Orchestration Prompt (file missing; order taken from the 2026-08-30 correction prompt)  
+Status: **Accepted** — architect follow-up 2026-08-30 (problems 2.1–2.4); reconciliation 2026-08-30 added capability footnotes.  
+Source of sequence **order**: Master Orchestration Prompt (file **SOURCE-MISSING**; order taken from the 2026-08-30 correction prompt)  
 Source of package **names**: this file. Do not infer a package from a sequence title.
+
+Sequence-delivery **Done** means the sequence shipped. It is **not** a claim of full PM Master capability or trading readiness. Capability statuses live in `docs/ARCHITECTURE_INVENTORY.md` and `docs/PM8_PM8A_GAP_MATRIX.md`.
 
 Bare **`pm6` is reserved for post-trade**. Sequence 11 is **`mt5_execution_engine`**.
 
@@ -18,13 +20,13 @@ Bare **`pm6` is reserved for post-trade**. Sequence 11 is **`mt5_execution_engin
 | 05 | PM3 Forecasting / QRF | `PM3_Forecasting_Sequence05_Prompt.md` | `modules/pm3_forecasting` | Done |
 | 06 | PM4 Risk Gate | `PM4_Risk_Gate_Sequence06_Prompt.md` | `modules/pm4_risk_gate` | Done |
 | 07 | PM5 OMS/EMS simulation | `PM5_Execution_Sequence07_Prompt.md` | `modules/pm5_execution` | Done |
-| 08 | **PM6 Post-Trade Controls** | `PM6_Post_Trade_Sequence08_Prompt.md` | **`modules/pm6_post_trade`** | Done |
-| 09 | **PM8 Database Consolidation** | reconstructed `PM8a_Build_Spec.md` | **`modules/pm8_persistence`** | Done |
-| 10 | **PM8a Migration, Backup & Recovery** | reconstructed `PM8a_Build_Spec.md` | **`modules/pm8_persistence`** (v2 + runbooks) | Done |
-| 11 | MT5 Execution & Exit Engine (Demo-only). *Master Orchestration title:* “PM6 MT5 Execution & Exit Engine” | original spec missing | **`modules/mt5_execution_engine`** + adapter `adapters/mt5` | Done |
+| 08 | **PM6 Post-Trade Controls** | `PM6_Post_Trade_Sequence08_Prompt.md` | **`modules/pm6_post_trade`** | Done (in-memory; not Seq 14) |
+| 09 | **PM8 Database Consolidation** | reconstructed `PM8a_Build_Spec.md` | **`modules/pm8_persistence`** | Done sequence; **PARTIAL** vs PM8a named projections / restore-apply |
+| 10 | **PM8a Migration, Backup & Recovery** | reconstructed `PM8a_Build_Spec.md` | **`modules/pm8_persistence`** (v2 + runbooks) | Done sequence; verify COMPLETE, restore-apply **ABSENT** |
+| 11 | MT5 Execution & Exit Engine (Demo-only). *Master Orchestration title:* “PM6 MT5 Execution & Exit Engine” | original spec missing | **`modules/mt5_execution_engine`** + adapter `adapters/mt5` | Done (sim/test-safe; real terminal BLOCKED) |
 | 12 | Unified Runtime Orchestrator | correction prompt | `botmoduleproject1/runtime` | Done |
-| 13 | PM9 Operator UX & Telegram Control | `PM8_Operator_Sequence10_Prompt.md` (historical filename) | `modules/pm8_operator` (re-export `pm9_operator_ux`) | Done |
-| 14 | **Observability, Operations & Documentation** | architect Sequence 14 authorization 2026-08-30 | **`modules/observability`** | Done |
+| 13 | PM9 Operator UX & Telegram Control | `PM8_Operator_Sequence10_Prompt.md` (historical filename) | `modules/pm8_operator` (re-export `pm9_operator_ux`) | Done (Telegram API BLOCKED) |
+| 14 | **Observability, Operations & Documentation** | architect Sequence 14 authorization 2026-08-30 | **`modules/observability`** (not PM6) | Done observe-only; `trading_readiness` false |
 
 No row uses a second package whose last path segment is bare `pm6`. There is no `modules/pm6_execution`. Sequence 15+ is not in this map.
 
@@ -52,9 +54,9 @@ Routing (`DemoRouter`) and exits (`ExitEngine`) **moved** from `pm5_execution` i
 | Historical report | `docs/architecture/sequence_09_report.md` (banner: misnumbered) | kept for archaeology |
 | Canonical report | — | `docs/architecture/sequence_09_pm8_consolidation_report.md` |
 
-PM7 is not mixed into PM8. PM8 `PersistenceApiV1` is the only downstream data path after canonical Sequence 09. PM7 remains the evidence journal behind `enable_pm7_persistence` (default off, `NullLedger`).
+PM7 is not mixed into PM8. PM8 `PersistenceApiV1` is the only downstream data path after canonical Sequence 09. PM7 remains a **PARTIAL evidence-journal subset** behind `enable_pm7_persistence` (default off, `NullLedger`) — not a production-durable warehouse.
 
-Operator built as “Sequence 10” was the same class of error; that code is Sequence 13 / `pm8_operator`. Canonical Sequence 10 is PM8a hardening. Canonical Sequence 14 is observability/operations/documentation — not a trading sequence.
+Operator built as “Sequence 10” was the same class of error; that code is Sequence 13 / `pm8_operator`. Canonical Sequence 10 is PM8a hardening. Canonical Sequence 14 is observability/operations/documentation — **not PM6** and not a trading sequence.
 
 ## 4. Compatibility re-exports (not second identities)
 

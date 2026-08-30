@@ -2,7 +2,8 @@
 
 Workflow: `.github/workflows/tests.yml`
 
-- pytest matrix CPython 3.11 / 3.12 with `set -o pipefail` on `pytest | tee`
+- pytest matrix CPython 3.11 / 3.12; pytest exit captured (`set +e` / `code=$?` / `test "$code" -eq 0`). `pytest | tee` and `command | grep` are forbidden as success gates.
+
 - doctor on the supported interpreter
 - evidence emission (failure fails the job)
 - doctor fail-fast on 3.10 without deps (`set +e` then `set -e` and `test "$code" -eq 1`)

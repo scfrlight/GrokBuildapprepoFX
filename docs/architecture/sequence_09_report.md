@@ -1,4 +1,6 @@
 > **NUMBERING NOTE 2026-08-30.** This report is the **historical Sequence 09 = PM7 journal**. Canonical Sequence 09 is now **PM8 Database Consolidation** (`docs/architecture/sequence_09_pm8_consolidation_report.md`). PM7 is kept. See `docs/SEQUENCE_CORRECTION.md`.
+>
+> **RECONCILIATION 2026-08-30.** Sequence-scoped COMPLETE in §4 describes the in-memory evidence journal. Relative to PM7 Master it is **PARTIAL / evidence-journal subset**: not production durable, file/sqlite backends do not reload on restart, backup is metadata-only, canonical downstream API is PM8 `PersistenceApiV1`. See `docs/ARCHITECTURE_INVENTORY.md`.
 
 # Sequence 09 Report — PM7 Persistence, Event Ledger, Reconciliation Store & Durable Audit Layer
 

@@ -1,0 +1,7 @@
+git_sha=3c36a9cf4d75e520abe56482282eb3a770a54952
+utc=2026-08-30T11:34:19Z
+command: PYTHONPATH=. python3.10 -m botmoduleproject1 doctor --profile test --config configs/test.example.yaml
+exit_code=1
+---stdout---
+---stderr---
+STARTUP FAILED: Python 3.10.21 is not supported. BotModuleProject1 requires Python 3.11+. See docs/adr/ADR-008-python-version-constraint.md.

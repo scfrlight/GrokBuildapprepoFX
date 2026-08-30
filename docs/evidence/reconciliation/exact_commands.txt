@@ -1,0 +1,25 @@
+# Reconciliation evidence commands.
+# SHA at generation (pre-commit HEAD): 3c36a9cf4d75e520abe56482282eb3a770a54952
+# UTC: 2026-08-30T11:34:19Z
+
+cd GrokBuildapprepoFX
+export PYTHONPATH=.
+
+python3.11 -m pytest tests --tb=short
+# -> 551 passed, exit 0
+
+python3.11 -m botmoduleproject1 doctor --profile test --config configs/test.example.yaml
+# -> exit 0, NOT TRADE READY
+
+python3.11 -m botmoduleproject1 live --config configs/test.example.yaml
+# -> exit 2, LIVE TRADING IS DISABLED
+
+python3.11 -m botmoduleproject1 observe --profile test --config configs/test.example.yaml --json
+# -> trading_readiness=false accept_trade=false
+
+python3.10 -m botmoduleproject1 doctor --profile test --config configs/test.example.yaml
+# -> exit 1, STARTUP FAILED requires 3.11+
+
+python3.12 -m pytest tests
+# -> interpreter ABSENT in this sandbox; CI job pytest (CPython 3.12) remains in .github/workflows/tests.yml
+# prior transcript: docs/evidence/ci/run-33307496179/pytest-3.12.log

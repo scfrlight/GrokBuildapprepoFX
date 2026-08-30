@@ -1,0 +1,31 @@
+# Run-specific evidence file hashes. NOT a canonical payload hash.
+# Distinguish:
+#   backup_file_checksum = this list (changes every run)
+#   payload_canonical_sha256 = PM8 dump comparable hash (not this dir)
+#   test_result_hash = sha256(pytest-3.11.junit.xml) = 12d5de7df10240d4ee39f43cc74563d1c29157dbba7f2d8685e340b5f9a84e28
+#   runtime_state_hash = sha256(health_readiness.json) = 62fa17409b77a2f1f0bc5bfc077e87d60a68cf97d1900aef5d74f9b22c98dcca
+# python3.12 pytest NOT-RUN-HERE.
+
+c80a90fb1379f60ac259e5c86d4cc5f19396cafbef1f8de562c231f9ce99a18e       141  backup_file_checksum  doctor-3.10.err
+e7a7f1402552d25a43cc07bf566bfeff75381700b9fde0907f4cc3f84dcfc7e4       364  backup_file_checksum  doctor-3.10.log
+e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855         0  backup_file_checksum  doctor-3.10.out
+e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855         0  backup_file_checksum  doctor-3.11.err
+2ccb51df9c83fc31d86334cc6583416d5d24db406f420666f234e47519bf378e      1955  backup_file_checksum  doctor-3.11.out
+bf034b57e19f4ef1e8987bb65d5952e15b952c9200b5f3dffbd9fcacc5384d41       965  backup_file_checksum  exact_commands.txt
+8f84d8d85449a9bb7b681bf0b4dfb316a170973a0c30291f06664062e54d47a2      2437  backup_file_checksum  flags_snapshot.json
+62fa17409b77a2f1f0bc5bfc077e87d60a68cf97d1900aef5d74f9b22c98dcca       329  backup_file_checksum  health_readiness.json
+993da3a6e7dfc0a1e5d743793e6b207a3e2a970723d3e17ce3b08501dcef7c70       200  backup_file_checksum  import_boundary_scan.txt
+f864a4eafc2050c003733951ee82b397de0b786e59eb129b32fd121109378682       221  backup_file_checksum  interpreter.txt
+ddc31d644676cfcb006f41db63be5e62be6fe7ecfcde63b6dcd956b281af73c0      1449  backup_file_checksum  inventory.txt
+d09d859a36daf70fe50b9bd92b7d9096a741b3ae1fd4e7cf4908f2e51af0e21c       145  backup_file_checksum  live.err
+e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855         0  backup_file_checksum  live.out
+e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855         0  backup_file_checksum  observe.err
+1bc96c3f4b8b98f1eee0d9831fb81d052491859bb114d05fbe419974d9677a84     10758  backup_file_checksum  observe.json
+9a6217ab332eb63b232d51f72a5d86fd200f73e0f23cda37a7e5575382e5cb99       737  backup_file_checksum  pm6_boundary_report.md
+306b6e3afd6c950eb8451b808d91704bb5e497b7610982136195c940f0fafa6c      1164  backup_file_checksum  pm7_capability_report.md
+244151d2d62aa0b59f29e686e2f1a68ddd53e5f71767dd8af27eb8ac92e7413c      8545  backup_file_checksum  pm8_capability_report.md
+12d5de7df10240d4ee39f43cc74563d1c29157dbba7f2d8685e340b5f9a84e28     60487  backup_file_checksum  pytest-3.11.junit.xml
+37238fd0927adc0424edd0d5b1ec2e667b4c1c6920040ecc1e4d772f975266fd       934  backup_file_checksum  pytest-3.11.log
+2d74cf0078c477b3ed72cf24e043cac15f33ec1071630162f3a27a4a7bd2bf85       385  backup_file_checksum  pytest-3.12.log
+f7c8c71c09ef5683170312249177552f8b6d57591aa6dcc71073d457605e1ee3       729  backup_file_checksum  safety_invariants.log
+794c02cd2be8a2638d58ee26d5451ffea0a7b94c6613cb875e7c36f17b22610c      3031  backup_file_checksum  checksum_manifest.txt

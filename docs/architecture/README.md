@@ -1,6 +1,10 @@
 # Architecture
 
-- [**Module numbering map**](../MODULE_NUMBERING_MAP.md) — sequence number ↔ PM name ↔ package (SoT)
+- [**Architecture inventory (reconciliation)**](../ARCHITECTURE_INVENTORY.md)
+- [**PM8 / PM8a gap matrix**](../PM8_PM8A_GAP_MATRIX.md)
+- [**Reconciliation report 2026-08-30**](./reconciliation_report.md)
+
+- [Known limitations](../known_limitations.md)
 - [Baseline](./architecture_baseline.md)
 - [Dependency graph](./dependency_graph.md)
 - [Runtime modes](./runtime_modes.md)
