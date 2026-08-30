@@ -22,31 +22,58 @@ jobs:
         run: python --version
       - name: Install
         run: |
+          set -euo pipefail
           python -m pip install --upgrade pip
           python -m pip install -r requirements-dev.txt
       - name: Pytest
+        id: pytest
         run: |
-          set -o pipefail
-          PYTHONPATH=. python -m pytest tests --tb=short | tee pytest.log
-          grep -E '[0-9]+ passed' pytest.log
+          set -euo pipefail
+          set +e
+          PYTHONPATH=. python -m pytest tests --tb=short --junitxml=pytest-junit.xml > pytest.log 2>&1
+          code=$?
+          set -e
+          echo "pytest_exit=$code" >> pytest.log
+          tail -n 80 pytest.log
+          test "$code" -eq 0
       - name: Evidence (restart drill + backup)
-        run: PYTHONPATH=. python scripts/bot/emit_evidence.py --out-dir docs/evidence
+        run: |
+          set -euo pipefail
+          PYTHONPATH=. python scripts/bot/emit_evidence.py --out-dir docs/evidence
       - name: Sequence 14 evidence
-        run: PYTHONPATH=. python scripts/bot/emit_seq14_evidence.py --out-dir docs/evidence/seq14
+        run: |
+          set -euo pipefail
+          PYTHONPATH=. python scripts/bot/emit_seq14_evidence.py --out-dir docs/evidence/seq14
       - name: Doctor on supported interpreter
         run: |
+          set -euo pipefail
+          set +e
           PYTHONPATH=. python -m botmoduleproject1 doctor --profile test --config configs/test.example.yaml > doctor.out 2> doctor.err
+          code=$?
+          set -e
+          test "$code" -eq 0
           grep -q "NOT TRADE READY" doctor.out
-      - name: Upload logs
-        if: always()
+      - name: Upload evidence (after validation)
+        if: success()
         uses: actions/upload-artifact@v4
         with:
           name: evidence-py${{ matrix.python-version }}
           path: |
             pytest.log
+            pytest-junit.xml
             doctor.out
             doctor.err
             docs/evidence/
+      - name: Upload failure logs
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: failure-logs-py${{ matrix.python-version }}
+          path: |
+            pytest.log
+            pytest-junit.xml
+            doctor.out
+            doctor.err
 
   seq14-hygiene:
     name: Sequence 14 safety hygiene
@@ -58,15 +85,21 @@ jobs:
           python-version: "3.11"
       - name: Install
         run: |
+          set -euo pipefail
           python -m pip install --upgrade pip
           python -m pip install -r requirements-dev.txt
       - name: Hygiene tests
         run: |
-          set -o pipefail
-          PYTHONPATH=. python -m pytest tests/unit/test_seq14_ci_hygiene.py tests/unit/test_seq14_docs.py tests/unit/test_numbering_map.py --tb=short | tee hygiene.log
-          grep -E '[0-9]+ passed' hygiene.log
+          set -euo pipefail
+          set +e
+          PYTHONPATH=. python -m pytest tests/unit/test_seq14_ci_hygiene.py tests/unit/test_seq14_docs.py tests/unit/test_numbering_map.py --tb=short > hygiene.log 2>&1
+          code=$?
+          set -e
+          tail -n 40 hygiene.log
+          test "$code" -eq 0
       - name: Live fail-closed
         run: |
+          set -euo pipefail
           set +e
           PYTHONPATH=. python -m botmoduleproject1 live --profile test --config configs/test.example.yaml > live.out 2> live.err
           code=$?
@@ -77,6 +110,7 @@ jobs:
           grep -q "LIVE TRADING IS DISABLED" live.err
       - name: Docs paths
         run: |
+          set -euo pipefail
           test -f docs/MODULE_NUMBERING_MAP.md
           test -f docs/TRACEABILITY_MATRIX.md
           test -f docs/observability/guide.md
@@ -85,7 +119,7 @@ jobs:
           grep -F 'mt5_execution_engine' docs/MODULE_NUMBERING_MAP.md
           grep -F 'pm6_post_trade' docs/MODULE_NUMBERING_MAP.md
       - uses: actions/upload-artifact@v4
-        if: always()
+        if: success()
         with:
           name: evidence-seq14-hygiene
           path: |
@@ -103,6 +137,7 @@ jobs:
           python-version: "3.10"
       - name: Doctor must exit 1 before pydantic
         run: |
+          set -euo pipefail
           set +e
           PYTHONPATH=. python -m botmoduleproject1 doctor --profile test --config configs/test.example.yaml > doctor.out 2> doctor.err
           code=$?
@@ -117,7 +152,7 @@ jobs:
           grep -q "3.11" doctor.err
           grep -q "Python 3.10" doctor.err
       - uses: actions/upload-artifact@v4
-        if: always()
+        if: success()
         with:
           name: evidence-doctor-py310
           path: |

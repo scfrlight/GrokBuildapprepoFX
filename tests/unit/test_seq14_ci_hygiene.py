@@ -47,21 +47,30 @@ def _run_blocks(text: str) -> list[str]:
     return blocks
 
 
-def test_workflows_pipefail_on_pipelines():
+def test_workflows_forbid_false_green_pipes():
+    """Sequence 14 forbids pytest|tee, command|grep, command|tee|grep as success gates."""
     files = list(WORKFLOWS.glob("*.yml")) + list(WORKFLOWS.glob("*.yaml"))
     assert files, "no workflow files"
     offenders: list[str] = []
+    pytest_tee = re.compile(r"pytest[^\n]*\|\s*tee\b")
+    pytest_grep = re.compile(r"pytest[^\n]*\|\s*grep\b")
+    tee_grep = re.compile(r"\|\s*tee\b[^\n]*\|\s*grep\b")
+    pipe_grep = re.compile(r"[^\n]*\|\s*grep\b")
     for path in files:
         text = path.read_text(encoding="utf-8")
+        if pytest_tee.search(text):
+            offenders.append(f"{path.name}:pytest|tee")
+        if pytest_grep.search(text):
+            offenders.append(f"{path.name}:pytest|grep")
+        if tee_grep.search(text):
+            offenders.append(f"{path.name}:tee|grep")
         for i, line in enumerate(text.splitlines(), 1):
             stripped = line.strip()
-            if stripped.endswith("|") or stripped.endswith("|-") or stripped.endswith("|+"):
+            if not stripped or stripped.startswith("#"):
                 continue
-            if "| tee" in line or "| grep" in line:
-                window = "\n".join(text.splitlines()[max(0, i - 8) : i])
-                if "pipefail" not in window:
-                    offenders.append(f"{path.name}:{i}:{stripped}")
-    assert offenders == [], f"piped commands without pipefail: {offenders}"
+            if pipe_grep.search(stripped):
+                offenders.append(f"{path.name}:{i}:{stripped}")
+    assert offenders == [], f"false-green pipeline patterns: {offenders}"
 
 
 def test_set_plus_e_restores_errexit():
