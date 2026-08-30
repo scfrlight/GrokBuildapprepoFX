@@ -11,7 +11,7 @@ PM5 capital package was created. Sequence 15+ was not started.
 
 ## 1. Main SHA
 
-Recorded at commit time on `main` (this report lands in the same commit). Parent
+Recorded at commit time on `main`: **`14434da2b40dba2033077dad62d402d2d3c7dd02`**. Parent
 at start of this wave: `78928a4674dcc46e1c7c9864c33931a4d818d27e` (PM8 PostgreSQL
 durability).
 
