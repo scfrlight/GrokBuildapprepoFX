@@ -96,6 +96,15 @@ from botmoduleproject1.contracts.v1.risk import (
     RiskVerdict,
     RiskVerdictStatus,
 )
+from botmoduleproject1.contracts.v1.observability import (
+    ErrorCode,
+    HealthReport as ObservabilityHealthReport,
+    MetricSpec,
+    ObservabilitySnapshot,
+    ProbeState,
+    ReadinessReport,
+    StructuredLogEvent,
+)
 from botmoduleproject1.contracts.v1.operator import (
     CommandDisposition,
     CommandReceipt,
@@ -187,6 +196,13 @@ __all__ = [
     "ModelVersionInfo",
     "NoTradeDecision",
     "OhlcvBar",
+    "ObservabilityHealthReport",
+    "ObservabilitySnapshot",
+    "ProbeState",
+    "ReadinessReport",
+    "StructuredLogEvent",
+    "ErrorCode",
+    "MetricSpec",
     "OperatorRole",
     "OrderRequest",
     "OrderStatus",

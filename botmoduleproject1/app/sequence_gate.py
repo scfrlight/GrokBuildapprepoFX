@@ -25,6 +25,7 @@ CANONICAL_SEQUENCES: dict[int, str] = {
     11: "mt5_execution_engine",
     12: "unified_runtime_orchestrator",
     13: "pm9_operator_ux_telegram_control",
+    14: "observability_operations_documentation",
 }
 
 MISLABELED_OPERATOR_SEQUENCE = 10

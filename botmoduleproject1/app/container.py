@@ -123,6 +123,14 @@ def _operator_module(settings: Settings, overrides: dict[str, Any], clock: Clock
     return NullOperator()
 
 
+def _observability_module(settings: Settings, overrides: dict[str, Any], clock: ClockPort):
+    if "observability" in overrides:
+        return overrides["observability"]
+    from botmoduleproject1.modules.observability.module import ObservabilityModule
+
+    return ObservabilityModule.from_settings(settings, clock)
+
+
 @dataclass
 class Container:
     settings: Settings
@@ -167,6 +175,7 @@ def build_container(
         overrides.get("notifications") or NullNotifications(),
         _monitoring_module(settings, overrides, clock),
         _operator_module(settings, overrides, clock),
+        _observability_module(settings, overrides, clock),
     ]
 
     # Always ensure platform metadata is known even if caller replaced instance.

@@ -24,8 +24,9 @@ Bare **`pm6` is reserved for post-trade**. Sequence 11 is **`mt5_execution_engin
 | 11 | MT5 Execution & Exit Engine (Demo-only). *Master Orchestration title:* “PM6 MT5 Execution & Exit Engine” | original spec missing | **`modules/mt5_execution_engine`** + adapter `adapters/mt5` | Done |
 | 12 | Unified Runtime Orchestrator | correction prompt | `botmoduleproject1/runtime` | Done |
 | 13 | PM9 Operator UX & Telegram Control | `PM8_Operator_Sequence10_Prompt.md` (historical filename) | `modules/pm8_operator` (re-export `pm9_operator_ux`) | Done |
+| 14 | **Observability, Operations & Documentation** | architect Sequence 14 authorization 2026-08-30 | **`modules/observability`** | Done |
 
-No row uses a second package whose last path segment is bare `pm6`. There is no `modules/pm6_execution`.
+No row uses a second package whose last path segment is bare `pm6`. There is no `modules/pm6_execution`. Sequence 15+ is not in this map.
 
 ## 2. Sequence 11 naming (the PM6 collision)
 
@@ -53,7 +54,7 @@ Routing (`DemoRouter`) and exits (`ExitEngine`) **moved** from `pm5_execution` i
 
 PM7 is not mixed into PM8. PM8 `PersistenceApiV1` is the only downstream data path after canonical Sequence 09. PM7 remains the evidence journal behind `enable_pm7_persistence` (default off, `NullLedger`).
 
-Operator built as “Sequence 10” was the same class of error; that code is Sequence 13 / `pm8_operator`. Canonical Sequence 10 is PM8a hardening.
+Operator built as “Sequence 10” was the same class of error; that code is Sequence 13 / `pm8_operator`. Canonical Sequence 10 is PM8a hardening. Canonical Sequence 14 is observability/operations/documentation — not a trading sequence.
 
 ## 4. Compatibility re-exports (not second identities)
 

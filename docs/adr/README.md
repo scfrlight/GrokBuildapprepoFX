@@ -17,3 +17,4 @@
 | [ADR-013](./ADR-013-pm6-post-trade-governance.md) | PM6 Post-trade governance | Accepted |
 | [ADR-014](./ADR-014-pm7-persistence-and-evidence.md) | PM7 persistence and evidence | Accepted |
 | [ADR-015](./ADR-015-pm8-operator-control-plane.md) | PM8 operator control plane and HITL boundary | Accepted |
+| [ADR-016](./ADR-016-observability.md) | Sequence 14 observability / operations | Accepted |

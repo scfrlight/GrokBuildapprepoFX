@@ -1,0 +1,211 @@
+[
+  {
+    "audit_required": true,
+    "code": "configuration_error",
+    "operator_action": "Inspect YAML/env against configuration guide. Do not force-start.",
+    "public_safe_message": "Configuration is invalid. Process will not start.",
+    "retryable": false,
+    "schema_version": "v1",
+    "severity": "error",
+    "system_action": "Fail closed. Do not enter ready.",
+    "trading_must_halt": true
+  },
+  {
+    "audit_required": true,
+    "code": "unsupported_python_version",
+    "operator_action": "Restart on Python 3.11+.",
+    "public_safe_message": "Python version is not supported. Python 3.11+ is required.",
+    "retryable": false,
+    "schema_version": "v1",
+    "severity": "critical",
+    "system_action": "Exit 1 before importing settings.",
+    "trading_must_halt": true
+  },
+  {
+    "audit_required": true,
+    "code": "validation_error",
+    "operator_action": "Correct the payload against the v1 contract.",
+    "public_safe_message": "Payload failed contract validation.",
+    "retryable": false,
+    "schema_version": "v1",
+    "severity": "error",
+    "system_action": "Reject the message. Do not mutate state.",
+    "trading_must_halt": false
+  },
+  {
+    "audit_required": true,
+    "code": "contract_error",
+    "operator_action": "Stop the producer and file an incident.",
+    "public_safe_message": "Contract mismatch between modules.",
+    "retryable": false,
+    "schema_version": "v1",
+    "severity": "error",
+    "system_action": "Drop the event. Do not coerce types.",
+    "trading_must_halt": true
+  },
+  {
+    "audit_required": true,
+    "code": "stale_data_error",
+    "operator_action": "Observe only. Do not force a tick.",
+    "public_safe_message": "Market data is stale. Observe-only.",
+    "retryable": true,
+    "schema_version": "v1",
+    "severity": "warning",
+    "system_action": "Safe-stop routing. Mark operational health degraded.",
+    "trading_must_halt": true
+  },
+  {
+    "audit_required": true,
+    "code": "persistence_error",
+    "operator_action": "Follow persistence-unavailable runbook. Do not rewrite history.",
+    "public_safe_message": "Persistence is unavailable.",
+    "retryable": true,
+    "schema_version": "v1",
+    "severity": "critical",
+    "system_action": "Mark persistence not-ready. Refuse writes that cannot be journaled.",
+    "trading_must_halt": true
+  },
+  {
+    "audit_required": true,
+    "code": "integrity_error",
+    "operator_action": "Preserve the ledger. Escalate. Do not repair by rewrite.",
+    "public_safe_message": "Ledger integrity check failed.",
+    "retryable": false,
+    "schema_version": "v1",
+    "severity": "critical",
+    "system_action": "Halt writes. Record a correction event only.",
+    "trading_must_halt": true
+  },
+  {
+    "audit_required": true,
+    "code": "idempotency_conflict",
+    "operator_action": "Inspect the original record. Do not retry with a new identity.",
+    "public_safe_message": "Idempotent request already committed.",
+    "retryable": false,
+    "schema_version": "v1",
+    "severity": "warning",
+    "system_action": "Ignore the duplicate. Keep the first commit.",
+    "trading_must_halt": false
+  },
+  {
+    "audit_required": true,
+    "code": "duplicate_event",
+    "operator_action": "Confirm the original event id. No action if identical.",
+    "public_safe_message": "Duplicate event ignored.",
+    "retryable": false,
+    "schema_version": "v1",
+    "severity": "info",
+    "system_action": "Return duplicate-ignored.",
+    "trading_must_halt": false
+  },
+  {
+    "audit_required": true,
+    "code": "duplicate_execution",
+    "operator_action": "Do not resubmit. Inspect SIM/DEMO ticket, never treat as broker truth.",
+    "public_safe_message": "Duplicate execution attempt refused.",
+    "retryable": false,
+    "schema_version": "v1",
+    "severity": "warning",
+    "system_action": "Refuse the second submit.",
+    "trading_must_halt": false
+  },
+  {
+    "audit_required": true,
+    "code": "broker_unavailable",
+    "operator_action": "Do not send orders. Venue absence is degraded, not pass.",
+    "public_safe_message": "Broker venue is unavailable.",
+    "retryable": true,
+    "schema_version": "v1",
+    "severity": "error",
+    "system_action": "Set broker venue unavailable. Reconciliation cannot pass.",
+    "trading_must_halt": true
+  },
+  {
+    "audit_required": true,
+    "code": "broker_rejected",
+    "operator_action": "Read the simulated rejection. Do not coerce to fill.",
+    "public_safe_message": "Simulated execution was rejected.",
+    "retryable": false,
+    "schema_version": "v1",
+    "severity": "warning",
+    "system_action": "Record DEMO/SIM rejection. Do not invent a fill.",
+    "trading_must_halt": false
+  },
+  {
+    "audit_required": true,
+    "code": "reconciliation_mismatch",
+    "operator_action": "Do not force pass. Follow reconciliation-degraded runbook.",
+    "public_safe_message": "Reconciliation mismatch. Status is degraded.",
+    "retryable": false,
+    "schema_version": "v1",
+    "severity": "error",
+    "system_action": "Status=degraded. Never auto-pass without a venue.",
+    "trading_must_halt": true
+  },
+  {
+    "audit_required": true,
+    "code": "projection_error",
+    "operator_action": "Do not rebuild against a live write path.",
+    "public_safe_message": "Projection rebuild failed.",
+    "retryable": true,
+    "schema_version": "v1",
+    "severity": "error",
+    "system_action": "Keep the projection stale. Schedule an isolated rebuild.",
+    "trading_must_halt": true
+  },
+  {
+    "audit_required": true,
+    "code": "recovery_error",
+    "operator_action": "Do not promote. Recovery must finish before any routing.",
+    "public_safe_message": "Recovery did not complete.",
+    "retryable": true,
+    "schema_version": "v1",
+    "severity": "critical",
+    "system_action": "trading_readiness=false. Stay degraded.",
+    "trading_must_halt": true
+  },
+  {
+    "audit_required": true,
+    "code": "permission_denied",
+    "operator_action": "Do not escalate privileges ad hoc.",
+    "public_safe_message": "Operator permission denied.",
+    "retryable": false,
+    "schema_version": "v1",
+    "severity": "warning",
+    "system_action": "Deny the command. Audit the attempt.",
+    "trading_must_halt": false
+  },
+  {
+    "audit_required": true,
+    "code": "unsafe_operation",
+    "operator_action": "Stop. Do not retry live, paper, or Telegram bind.",
+    "public_safe_message": "Unsafe operation refused.",
+    "retryable": false,
+    "schema_version": "v1",
+    "severity": "critical",
+    "system_action": "Fail closed.",
+    "trading_must_halt": true
+  },
+  {
+    "audit_required": true,
+    "code": "secret_handling_error",
+    "operator_action": "Rotate the exposed credential. Follow secret-exposure runbook.",
+    "public_safe_message": "Secret handling failed. Values are never logged.",
+    "retryable": false,
+    "schema_version": "v1",
+    "severity": "critical",
+    "system_action": "Redact, halt export, mark evidence compromised if needed.",
+    "trading_must_halt": true
+  },
+  {
+    "audit_required": true,
+    "code": "unexpected_internal_error",
+    "operator_action": "Preserve logs. Do not paste traces into chat with secrets.",
+    "public_safe_message": "Internal error. Trading remains halted.",
+    "retryable": false,
+    "schema_version": "v1",
+    "severity": "critical",
+    "system_action": "Fail the operation. Do not leak traceback to operator-facing text.",
+    "trading_must_halt": true
+  }
+]

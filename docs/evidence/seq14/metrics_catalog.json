@@ -1,0 +1,360 @@
+[
+  {
+    "cardinality": "bounded: allowlisted label keys only; no IDs, payloads, or secrets",
+    "description": "Persistence write latency",
+    "labels": [
+      "module"
+    ],
+    "metric_type": "histogram",
+    "name": "botmodule.persistence.latency_ms",
+    "safe_default": 0.0,
+    "schema_version": "v1",
+    "source_module": "pm8_persistence",
+    "unit": "milliseconds",
+    "update_point": "PersistenceApiV1.ingest_event"
+  },
+  {
+    "cardinality": "bounded: allowlisted label keys only; no IDs, payloads, or secrets",
+    "description": "Persistence errors",
+    "labels": [
+      "module",
+      "error_code"
+    ],
+    "metric_type": "counter",
+    "name": "botmodule.persistence.errors",
+    "safe_default": 0.0,
+    "schema_version": "v1",
+    "source_module": "pm8_persistence",
+    "unit": "count",
+    "update_point": "PersistenceApiV1 error path"
+  },
+  {
+    "cardinality": "bounded: allowlisted label keys only; no IDs, payloads, or secrets",
+    "description": "Outbox backlog size",
+    "labels": [
+      "module"
+    ],
+    "metric_type": "gauge",
+    "name": "botmodule.outbox.backlog",
+    "safe_default": 0.0,
+    "schema_version": "v1",
+    "source_module": "pm8_persistence",
+    "unit": "count",
+    "update_point": "outbox poll"
+  },
+  {
+    "cardinality": "bounded: allowlisted label keys only; no IDs, payloads, or secrets",
+    "description": "Outbox relay lag",
+    "labels": [
+      "module"
+    ],
+    "metric_type": "gauge",
+    "name": "botmodule.outbox.relay_lag_ms",
+    "safe_default": 0.0,
+    "schema_version": "v1",
+    "source_module": "pm8_persistence",
+    "unit": "milliseconds",
+    "update_point": "outbox dispatch"
+  },
+  {
+    "cardinality": "bounded: allowlisted label keys only; no IDs, payloads, or secrets",
+    "description": "Inbox dedupe hits",
+    "labels": [
+      "module"
+    ],
+    "metric_type": "counter",
+    "name": "botmodule.inbox.dedupe_hits",
+    "safe_default": 0.0,
+    "schema_version": "v1",
+    "source_module": "pm8_persistence",
+    "unit": "count",
+    "update_point": "inbox consume"
+  },
+  {
+    "cardinality": "bounded: allowlisted label keys only; no IDs, payloads, or secrets",
+    "description": "Dead-letter count",
+    "labels": [
+      "module"
+    ],
+    "metric_type": "gauge",
+    "name": "botmodule.dead_letter.count",
+    "safe_default": 0.0,
+    "schema_version": "v1",
+    "source_module": "pm8_persistence",
+    "unit": "count",
+    "update_point": "outbox dead-letter"
+  },
+  {
+    "cardinality": "bounded: allowlisted label keys only; no IDs, payloads, or secrets",
+    "description": "Projection lag in events",
+    "labels": [
+      "module"
+    ],
+    "metric_type": "gauge",
+    "name": "botmodule.projection.lag",
+    "safe_default": 0.0,
+    "schema_version": "v1",
+    "source_module": "pm8_persistence",
+    "unit": "count",
+    "update_point": "projection cursor"
+  },
+  {
+    "cardinality": "bounded: allowlisted label keys only; no IDs, payloads, or secrets",
+    "description": "Projection rebuild duration",
+    "labels": [
+      "module"
+    ],
+    "metric_type": "histogram",
+    "name": "botmodule.projection.rebuild_duration_ms",
+    "safe_default": 0.0,
+    "schema_version": "v1",
+    "source_module": "pm8_persistence",
+    "unit": "milliseconds",
+    "update_point": "projection rebuild"
+  },
+  {
+    "cardinality": "bounded: allowlisted label keys only; no IDs, payloads, or secrets",
+    "description": "Replay duration",
+    "labels": [
+      "module"
+    ],
+    "metric_type": "histogram",
+    "name": "botmodule.replay.duration_ms",
+    "safe_default": 0.0,
+    "schema_version": "v1",
+    "source_module": "pm7_persistence",
+    "unit": "milliseconds",
+    "update_point": "journal replay"
+  },
+  {
+    "cardinality": "bounded: allowlisted label keys only; no IDs, payloads, or secrets",
+    "description": "Snapshot age",
+    "labels": [
+      "module"
+    ],
+    "metric_type": "gauge",
+    "name": "botmodule.snapshot.age_seconds",
+    "safe_default": 0.0,
+    "schema_version": "v1",
+    "source_module": "pm8_persistence",
+    "unit": "seconds",
+    "update_point": "snapshot capture"
+  },
+  {
+    "cardinality": "bounded: allowlisted label keys only; no IDs, payloads, or secrets",
+    "description": "Checkpoint age",
+    "labels": [
+      "module"
+    ],
+    "metric_type": "gauge",
+    "name": "botmodule.checkpoint.age_seconds",
+    "safe_default": 0.0,
+    "schema_version": "v1",
+    "source_module": "pm8_persistence",
+    "unit": "seconds",
+    "update_point": "checkpoint"
+  },
+  {
+    "cardinality": "bounded: allowlisted label keys only; no IDs, payloads, or secrets",
+    "description": "Reconciliation mismatches",
+    "labels": [
+      "module"
+    ],
+    "metric_type": "gauge",
+    "name": "botmodule.reconciliation.mismatch_count",
+    "safe_default": 0.0,
+    "schema_version": "v1",
+    "source_module": "pm6_post_trade",
+    "unit": "count",
+    "update_point": "reconciliation"
+  },
+  {
+    "cardinality": "bounded: allowlisted label keys only; no IDs, payloads, or secrets",
+    "description": "Reconciliation degraded transitions",
+    "labels": [
+      "module"
+    ],
+    "metric_type": "counter",
+    "name": "botmodule.reconciliation.degraded_count",
+    "safe_default": 0.0,
+    "schema_version": "v1",
+    "source_module": "pm6_post_trade",
+    "unit": "count",
+    "update_point": "reconciliation degraded"
+  },
+  {
+    "cardinality": "bounded: allowlisted label keys only; no IDs, payloads, or secrets",
+    "description": "Risk denials",
+    "labels": [
+      "module",
+      "outcome"
+    ],
+    "metric_type": "counter",
+    "name": "botmodule.risk.denials",
+    "safe_default": 0.0,
+    "schema_version": "v1",
+    "source_module": "pm4_risk_gate",
+    "unit": "count",
+    "update_point": "risk verdict"
+  },
+  {
+    "cardinality": "bounded: allowlisted label keys only; no IDs, payloads, or secrets",
+    "description": "Execution simulation attempts",
+    "labels": [
+      "module",
+      "outcome"
+    ],
+    "metric_type": "counter",
+    "name": "botmodule.execution.simulation_attempts",
+    "safe_default": 0.0,
+    "schema_version": "v1",
+    "source_module": "pm5_execution",
+    "unit": "count",
+    "update_point": "SIM ticket"
+  },
+  {
+    "cardinality": "bounded: allowlisted label keys only; no IDs, payloads, or secrets",
+    "description": "Duplicate execution attempts",
+    "labels": [
+      "module"
+    ],
+    "metric_type": "counter",
+    "name": "botmodule.execution.duplicate_attempts",
+    "safe_default": 0.0,
+    "schema_version": "v1",
+    "source_module": "pm5_execution",
+    "unit": "count",
+    "update_point": "idempotent submit"
+  },
+  {
+    "cardinality": "bounded: allowlisted label keys only; no IDs, payloads, or secrets",
+    "description": "Retry count",
+    "labels": [
+      "module",
+      "family"
+    ],
+    "metric_type": "counter",
+    "name": "botmodule.retry.count",
+    "safe_default": 0.0,
+    "schema_version": "v1",
+    "source_module": "pm8_persistence",
+    "unit": "count",
+    "update_point": "outbox retry"
+  },
+  {
+    "cardinality": "bounded: allowlisted label keys only; no IDs, payloads, or secrets",
+    "description": "Stale market-data events",
+    "labels": [
+      "module"
+    ],
+    "metric_type": "counter",
+    "name": "botmodule.market.stale_events",
+    "safe_default": 0.0,
+    "schema_version": "v1",
+    "source_module": "pm2_market_context",
+    "unit": "count",
+    "update_point": "stale detector"
+  },
+  {
+    "cardinality": "bounded: allowlisted label keys only; no IDs, payloads, or secrets",
+    "description": "Active incidents",
+    "labels": [
+      "module"
+    ],
+    "metric_type": "gauge",
+    "name": "botmodule.incidents.active",
+    "safe_default": 0.0,
+    "schema_version": "v1",
+    "source_module": "pm6_post_trade",
+    "unit": "count",
+    "update_point": "incident registry"
+  },
+  {
+    "cardinality": "bounded: allowlisted label keys only; no IDs, payloads, or secrets",
+    "description": "Unresolved incidents",
+    "labels": [
+      "module"
+    ],
+    "metric_type": "gauge",
+    "name": "botmodule.incidents.unresolved",
+    "safe_default": 0.0,
+    "schema_version": "v1",
+    "source_module": "pm6_post_trade",
+    "unit": "count",
+    "update_point": "incident registry"
+  },
+  {
+    "cardinality": "bounded: allowlisted label keys only; no IDs, payloads, or secrets",
+    "description": "Operator actions",
+    "labels": [
+      "module",
+      "outcome"
+    ],
+    "metric_type": "counter",
+    "name": "botmodule.operator.actions",
+    "safe_default": 0.0,
+    "schema_version": "v1",
+    "source_module": "pm8_operator",
+    "unit": "count",
+    "update_point": "command dispatch"
+  },
+  {
+    "cardinality": "bounded: allowlisted label keys only; no IDs, payloads, or secrets",
+    "description": "Denied operator actions",
+    "labels": [
+      "module",
+      "outcome"
+    ],
+    "metric_type": "counter",
+    "name": "botmodule.operator.denied_actions",
+    "safe_default": 0.0,
+    "schema_version": "v1",
+    "source_module": "pm8_operator",
+    "unit": "count",
+    "update_point": "permission check"
+  },
+  {
+    "cardinality": "bounded: allowlisted label keys only; no IDs, payloads, or secrets",
+    "description": "Health transitions",
+    "labels": [
+      "module",
+      "dimension",
+      "outcome"
+    ],
+    "metric_type": "counter",
+    "name": "botmodule.health.transitions",
+    "safe_default": 0.0,
+    "schema_version": "v1",
+    "source_module": "observability",
+    "unit": "count",
+    "update_point": "health evaluate"
+  },
+  {
+    "cardinality": "bounded: allowlisted label keys only; no IDs, payloads, or secrets",
+    "description": "Shutdown duration",
+    "labels": [
+      "module"
+    ],
+    "metric_type": "histogram",
+    "name": "botmodule.shutdown.duration_ms",
+    "safe_default": 0.0,
+    "schema_version": "v1",
+    "source_module": "pm1_platform",
+    "unit": "milliseconds",
+    "update_point": "runtime.stop"
+  },
+  {
+    "cardinality": "bounded: allowlisted label keys only; no IDs, payloads, or secrets",
+    "description": "Recovery duration",
+    "labels": [
+      "module"
+    ],
+    "metric_type": "histogram",
+    "name": "botmodule.recovery.duration_ms",
+    "safe_default": 0.0,
+    "schema_version": "v1",
+    "source_module": "runtime",
+    "unit": "milliseconds",
+    "update_point": "orchestrator recovery"
+  }
+]

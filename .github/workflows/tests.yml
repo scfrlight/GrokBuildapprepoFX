@@ -31,6 +31,8 @@ jobs:
           grep -E '[0-9]+ passed' pytest.log
       - name: Evidence (restart drill + backup)
         run: PYTHONPATH=. python scripts/bot/emit_evidence.py --out-dir docs/evidence
+      - name: Sequence 14 evidence
+        run: PYTHONPATH=. python scripts/bot/emit_seq14_evidence.py --out-dir docs/evidence/seq14
       - name: Doctor on supported interpreter
         run: |
           PYTHONPATH=. python -m botmoduleproject1 doctor --profile test --config configs/test.example.yaml > doctor.out 2> doctor.err
@@ -45,6 +47,51 @@ jobs:
             doctor.out
             doctor.err
             docs/evidence/
+
+  seq14-hygiene:
+    name: Sequence 14 safety hygiene
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements-dev.txt
+      - name: Hygiene tests
+        run: |
+          set -o pipefail
+          PYTHONPATH=. python -m pytest tests/unit/test_seq14_ci_hygiene.py tests/unit/test_seq14_docs.py tests/unit/test_numbering_map.py --tb=short | tee hygiene.log
+          grep -E '[0-9]+ passed' hygiene.log
+      - name: Live fail-closed
+        run: |
+          set +e
+          PYTHONPATH=. python -m botmoduleproject1 live --profile test --config configs/test.example.yaml > live.out 2> live.err
+          code=$?
+          set -e
+          echo "exit=$code"
+          cat live.err
+          test "$code" -eq 2
+          grep -q "LIVE TRADING IS DISABLED" live.err
+      - name: Docs paths
+        run: |
+          test -f docs/MODULE_NUMBERING_MAP.md
+          test -f docs/TRACEABILITY_MATRIX.md
+          test -f docs/observability/guide.md
+          grep -F '| 00 |' docs/MODULE_NUMBERING_MAP.md
+          grep -F '| 14 |' docs/MODULE_NUMBERING_MAP.md
+          grep -F 'mt5_execution_engine' docs/MODULE_NUMBERING_MAP.md
+          grep -F 'pm6_post_trade' docs/MODULE_NUMBERING_MAP.md
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: evidence-seq14-hygiene
+          path: |
+            hygiene.log
+            live.out
+            live.err
 
   doctor-py310-fail-fast:
     name: doctor fail-fast on CPython 3.10 (no deps)

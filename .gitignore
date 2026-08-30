@@ -42,6 +42,7 @@ logs/
 !docs/evidence/**/*.out
 !docs/evidence/**/*.err
 !docs/evidence/**/*.md
+!docs/evidence/**/*.json
 docs/evidence/_scratch/
 data/local/
 data/cache/

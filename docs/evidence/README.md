@@ -1,6 +1,6 @@
 # Evidence
 
-Independent verification artifacts for Sequences 09–13. Numbers in audits
+Independent verification artifacts for Sequences 09–14. Numbers in audits
 must cite a file here, a file under `ci/`, or the full inline body in the
 audit report. GitHub Actions **artifact ZIPs require login** even on a
 public repo; that is why CI transcripts are also committed under `ci/`
@@ -28,11 +28,14 @@ PYTHONPATH=. .venv311/bin/python -m pytest tests --tb=short -q | tee docs/eviden
 # Restart drill + backup checksum (raw logs)
 PYTHONPATH=. .venv311/bin/python scripts/bot/emit_evidence.py --out-dir docs/evidence
 
+# Sequence 14 observability snapshot
+PYTHONPATH=. .venv311/bin/python scripts/bot/emit_seq14_evidence.py --out-dir docs/evidence/seq14
+
 # Fail-fast on the sandbox 3.10 interpreter (must exit 1, no pydantic required)
 PYTHONPATH=. python3.10 -m botmoduleproject1 doctor --profile test --config configs/test.example.yaml
 ```
 
-CI: `.github/workflows/tests.yml` (matrix 3.11 / 3.12 + a 3.10 fail-fast job).
+CI: `.github/workflows/tests.yml` (matrix 3.11 / 3.12 + 3.10 fail-fast + seq14-hygiene).
 
 ## Backup checksum is NOT a golden cross-run hash
 
@@ -48,15 +51,6 @@ and `row_hash`. Therefore **two evidence runs with the same business payload
 `{"n": 7}` MUST produce different dump checksums.** That is expected. It is
 not a restore bug.
 
-| Run | backup_id | dump checksum (sha256 of events JSON) |
-|---|---|---|
-| local 3.11.2 `/workspace/.venv311` 2026-08-30T10:03:43Z | `88e37a17-18ab-4085-bc26-065d17f36ba6` | `b6fbdca7477fceb31cfe2777e4839be14184f6742e7af551dee8383ac6e6802d` |
-| CI 3.11.16 run 33305725241 | `fa387454-31bb-420f-bf8a-aa953a8aba41` | `bd5bb00c1243c7f3e951d019791b22ae9336272770174bfa2a0abb4775d28949` |
-| CI 3.12.14 run 33305725241 | `76ba714b-30ef-4770-9d5f-0f64c43871dc` | `ec4bcff2eff9fe8e928a53e63dfe2e1b0a7a2afc5d5723693e3c44cafd31a225` |
-
-All three dumps carry `payload_json = {"n": 7}`. All three reported
-`verified=True` and `sequence_before=1` / `sequence_after_verify=1`.
-
 **Invariant that restore actually proves (per run):**
 
 1. `sha256(backup_file_bytes) == report.checksum`
@@ -65,14 +59,13 @@ All three dumps carry `payload_json = {"n": 7}`. All three reported
 
 **Not an invariant:** `checksum(local) == checksum(CI)`.
 
-Seeds are **not** frozen: a frozen dump hash would hide the fact that
-production backups bind identity + time. The comparable field is
-`payload_canonical_sha256` (hash of `payload_json` only), emitted by
-`scripts/bot/emit_evidence.py` from this commit onward.
+The comparable field is `payload_canonical_sha256` (hash of `payload_json` only).
 
-`tests/unit/test_pm8a_seq10.py::test_backup_checksum_is_dump_specific_not_golden`
-asserts two independent `{"n": 7}` backups have different dump checksums,
-identical payload JSON, and each restores against its own checksum.
+## Sequence 14 snapshot checksum
+
+`docs/evidence/seq14/checksums.txt` records `dump_sha256` (run-specific; the
+snapshot contains `captured_at` and generated IDs) and
+`payload_canonical_sha256` of `{trading_readiness: false, accept_trade: false}`.
 
 ## Files
 
@@ -80,8 +73,9 @@ identical payload JSON, and each restores against its own checksum.
 |---|---|
 | `interpreter.txt` | `sys.version` of the evidence run |
 | `restart_drill.log` | raw RestartDrill output |
-| `backup_restore.log` | dump checksum + payload_canonical_sha256 + verified + sequence unchanged |
+| `backup_restore.log` | checksum + verified + sequence unchanged |
 | `pytest-3.11.log` | local official suite transcript |
 | `doctor_py310_fail_fast.log` | local 3.10 doctor stderr |
 | `doctor_py311.log` | local 3.11 doctor stdout |
-| `ci/run-33305725241/` | committed copies of CI artifacts so they are fetchable without Actions login |
+| `seq14/` | observability snapshot, catalogs, redaction sample |
+| `ci/run-33305725241/` | committed copies of CI artifacts from ce0aa74 |

@@ -50,6 +50,8 @@ _CLI_MODES = (
     "backfill",
     "demo",
     "observe-only",
+    "observe",
+    "health",
     "research",
     "backtest",
     "live-disabled",

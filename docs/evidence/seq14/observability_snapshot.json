@@ -1,0 +1,333 @@
+{
+  "captured_at": "2026-08-30T10:50:48.038805Z",
+  "error_catalog_count": 19,
+  "flags": {
+    "enable_exit_engine": false,
+    "enable_fine_tune_studio": false,
+    "enable_forecasting": false,
+    "enable_live_execution": false,
+    "enable_live_trading": false,
+    "enable_mt5_demo_adapter": false,
+    "enable_mt5_demo_execution": false,
+    "enable_pm2_market_data": false,
+    "enable_pm3_strategy_engine": false,
+    "enable_pm4_risk_gate": false,
+    "enable_pm5_broker_adapter": false,
+    "enable_pm5_execution": false,
+    "enable_pm5_simulation": false,
+    "enable_pm6_governance_intelligence": false,
+    "enable_pm6_incident_response": false,
+    "enable_pm6_post_trade": false,
+    "enable_pm6_surveillance": false,
+    "enable_pm6_withdrawal_planner": false,
+    "enable_pm7_integrity": false,
+    "enable_pm7_journal": false,
+    "enable_pm7_persistence": false,
+    "enable_pm7_replay": false,
+    "enable_pm7_reporting": false,
+    "enable_pm7_retention": false,
+    "enable_pm8_command_audit": false,
+    "enable_pm8_hitl": false,
+    "enable_pm8_operator": false,
+    "enable_pm8_outbox": false,
+    "enable_pm8_persistence": false,
+    "enable_pm8_projections": false,
+    "enable_telegram_control": false,
+    "enable_unified_runtime": false
+  },
+  "health": {
+    "captured_at": "2026-08-30T10:50:48.038595Z",
+    "dimensions": [
+      {
+        "dimension": "liveness",
+        "reason": "process assembled",
+        "schema_version": "v1",
+        "source": "pm1_platform",
+        "state": "pass",
+        "trading_halt": false
+      },
+      {
+        "dimension": "readiness",
+        "reason": "observe/doctor path",
+        "schema_version": "v1",
+        "source": "pm1_platform",
+        "state": "pass",
+        "trading_halt": false
+      },
+      {
+        "dimension": "operational_health",
+        "reason": "flags off; kernel diagnostic only",
+        "schema_version": "v1",
+        "source": "observability",
+        "state": "degraded",
+        "trading_halt": false
+      },
+      {
+        "dimension": "trading_readiness",
+        "reason": "sequence_14_forbids_trading_readiness_true; all_feature_flags_default_false; broker_venue_unavailable",
+        "schema_version": "v1",
+        "source": "observability",
+        "state": "fail",
+        "trading_halt": true
+      },
+      {
+        "dimension": "recovery_readiness",
+        "reason": "lifecycle=degraded",
+        "schema_version": "v1",
+        "source": "runtime",
+        "state": "pass",
+        "trading_halt": false
+      },
+      {
+        "dimension": "persistence_readiness",
+        "reason": "pm8 flag off binds NullStorage",
+        "schema_version": "v1",
+        "source": "pm8_persistence",
+        "state": "degraded",
+        "trading_halt": false
+      },
+      {
+        "dimension": "broker_venue_availability",
+        "reason": "MT5 venue absent; reconciliation cannot pass",
+        "schema_version": "v1",
+        "source": "mt5_execution_engine",
+        "state": "unavailable",
+        "trading_halt": true
+      },
+      {
+        "dimension": "operator_readiness",
+        "reason": "Telegram Bot API refused; NullOperator",
+        "schema_version": "v1",
+        "source": "pm8_operator",
+        "state": "degraded",
+        "trading_halt": false
+      }
+    ],
+    "flags_any_on": false,
+    "liveness": "pass",
+    "operational_health": "degraded",
+    "reasons": [
+      "flags off; kernel diagnostic only",
+      "sequence_14_forbids_trading_readiness_true; all_feature_flags_default_false; broker_venue_unavailable",
+      "pm8 flag off binds NullStorage",
+      "MT5 venue absent; reconciliation cannot pass",
+      "Telegram Bot API refused; NullOperator"
+    ],
+    "recovery_complete": true,
+    "schema_version": "v1",
+    "stale_data": false,
+    "trading_halted": true,
+    "trading_readiness": false,
+    "venue_present": false
+  },
+  "kernel_note": "NOT TRADE READY. Sequence 14 is observe-only.",
+  "live_trading_enabled": false,
+  "metric_catalog_count": 25,
+  "metrics": [
+    {
+      "captured_at": "2026-08-30T10:50:48.038712Z",
+      "labels": {
+        "dimension": "liveness",
+        "module": "observability",
+        "outcome": "pass"
+      },
+      "name": "botmodule.health.transitions",
+      "schema_version": "v1",
+      "value": 1.0
+    },
+    {
+      "captured_at": "2026-08-30T10:50:48.038712Z",
+      "labels": {},
+      "name": "botmodule.persistence.latency_ms",
+      "schema_version": "v1",
+      "value": 0.0
+    },
+    {
+      "captured_at": "2026-08-30T10:50:48.038712Z",
+      "labels": {},
+      "name": "botmodule.persistence.errors",
+      "schema_version": "v1",
+      "value": 0.0
+    },
+    {
+      "captured_at": "2026-08-30T10:50:48.038712Z",
+      "labels": {},
+      "name": "botmodule.outbox.backlog",
+      "schema_version": "v1",
+      "value": 0.0
+    },
+    {
+      "captured_at": "2026-08-30T10:50:48.038712Z",
+      "labels": {},
+      "name": "botmodule.outbox.relay_lag_ms",
+      "schema_version": "v1",
+      "value": 0.0
+    },
+    {
+      "captured_at": "2026-08-30T10:50:48.038712Z",
+      "labels": {},
+      "name": "botmodule.inbox.dedupe_hits",
+      "schema_version": "v1",
+      "value": 0.0
+    },
+    {
+      "captured_at": "2026-08-30T10:50:48.038712Z",
+      "labels": {},
+      "name": "botmodule.dead_letter.count",
+      "schema_version": "v1",
+      "value": 0.0
+    },
+    {
+      "captured_at": "2026-08-30T10:50:48.038712Z",
+      "labels": {},
+      "name": "botmodule.projection.lag",
+      "schema_version": "v1",
+      "value": 0.0
+    },
+    {
+      "captured_at": "2026-08-30T10:50:48.038712Z",
+      "labels": {},
+      "name": "botmodule.projection.rebuild_duration_ms",
+      "schema_version": "v1",
+      "value": 0.0
+    },
+    {
+      "captured_at": "2026-08-30T10:50:48.038712Z",
+      "labels": {},
+      "name": "botmodule.replay.duration_ms",
+      "schema_version": "v1",
+      "value": 0.0
+    },
+    {
+      "captured_at": "2026-08-30T10:50:48.038712Z",
+      "labels": {},
+      "name": "botmodule.snapshot.age_seconds",
+      "schema_version": "v1",
+      "value": 0.0
+    },
+    {
+      "captured_at": "2026-08-30T10:50:48.038712Z",
+      "labels": {},
+      "name": "botmodule.checkpoint.age_seconds",
+      "schema_version": "v1",
+      "value": 0.0
+    },
+    {
+      "captured_at": "2026-08-30T10:50:48.038712Z",
+      "labels": {},
+      "name": "botmodule.reconciliation.mismatch_count",
+      "schema_version": "v1",
+      "value": 0.0
+    },
+    {
+      "captured_at": "2026-08-30T10:50:48.038712Z",
+      "labels": {},
+      "name": "botmodule.reconciliation.degraded_count",
+      "schema_version": "v1",
+      "value": 0.0
+    },
+    {
+      "captured_at": "2026-08-30T10:50:48.038712Z",
+      "labels": {},
+      "name": "botmodule.risk.denials",
+      "schema_version": "v1",
+      "value": 0.0
+    },
+    {
+      "captured_at": "2026-08-30T10:50:48.038712Z",
+      "labels": {},
+      "name": "botmodule.execution.simulation_attempts",
+      "schema_version": "v1",
+      "value": 0.0
+    },
+    {
+      "captured_at": "2026-08-30T10:50:48.038712Z",
+      "labels": {},
+      "name": "botmodule.execution.duplicate_attempts",
+      "schema_version": "v1",
+      "value": 0.0
+    },
+    {
+      "captured_at": "2026-08-30T10:50:48.038712Z",
+      "labels": {},
+      "name": "botmodule.retry.count",
+      "schema_version": "v1",
+      "value": 0.0
+    },
+    {
+      "captured_at": "2026-08-30T10:50:48.038712Z",
+      "labels": {},
+      "name": "botmodule.market.stale_events",
+      "schema_version": "v1",
+      "value": 0.0
+    },
+    {
+      "captured_at": "2026-08-30T10:50:48.038712Z",
+      "labels": {},
+      "name": "botmodule.incidents.active",
+      "schema_version": "v1",
+      "value": 0.0
+    },
+    {
+      "captured_at": "2026-08-30T10:50:48.038712Z",
+      "labels": {},
+      "name": "botmodule.incidents.unresolved",
+      "schema_version": "v1",
+      "value": 0.0
+    },
+    {
+      "captured_at": "2026-08-30T10:50:48.038712Z",
+      "labels": {},
+      "name": "botmodule.operator.actions",
+      "schema_version": "v1",
+      "value": 0.0
+    },
+    {
+      "captured_at": "2026-08-30T10:50:48.038712Z",
+      "labels": {},
+      "name": "botmodule.operator.denied_actions",
+      "schema_version": "v1",
+      "value": 0.0
+    },
+    {
+      "captured_at": "2026-08-30T10:50:48.038712Z",
+      "labels": {},
+      "name": "botmodule.shutdown.duration_ms",
+      "schema_version": "v1",
+      "value": 0.0
+    },
+    {
+      "captured_at": "2026-08-30T10:50:48.038712Z",
+      "labels": {},
+      "name": "botmodule.recovery.duration_ms",
+      "schema_version": "v1",
+      "value": 0.0
+    }
+  ],
+  "python": "3.11.2",
+  "readiness": {
+    "accept_observe": true,
+    "accept_trade": false,
+    "broker_venue": "unavailable",
+    "captured_at": "2026-08-30T10:50:48.038595Z",
+    "liveness": "pass",
+    "operator_readiness": "degraded",
+    "persistence_readiness": "degraded",
+    "process_alive": true,
+    "readiness": "pass",
+    "reasons": [
+      "flags off; kernel diagnostic only",
+      "sequence_14_forbids_trading_readiness_true; all_feature_flags_default_false; broker_venue_unavailable",
+      "pm8 flag off binds NullStorage",
+      "MT5 venue absent; reconciliation cannot pass",
+      "Telegram Bot API refused; NullOperator"
+    ],
+    "recovery_readiness": "pass",
+    "schema_version": "v1",
+    "trading_readiness": "fail"
+  },
+  "runbook_count": 20,
+  "schema_version": "v1",
+  "sequence": 14,
+  "telegram_bound": false
+}

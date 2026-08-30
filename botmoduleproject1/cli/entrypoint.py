@@ -31,7 +31,7 @@ def build_parser() -> argparse.ArgumentParser:
         "mode",
         nargs="?",
         default="doctor",
-        help="test | doctor | paper | live | backfill | demo | observe-only",
+        help="test | doctor | paper | live | backfill | demo | observe-only | observe | health",
     )
     parser.add_argument("--config", dest="config", default=None, help="YAML config path")
     parser.add_argument(
@@ -64,6 +64,8 @@ _ALLOWED_MODES = {
     "backfill",
     "demo",
     "observe-only",
+    "observe",
+    "health",
     "research",
     "backtest",
     "live-disabled",
@@ -100,6 +102,32 @@ def main(argv: Sequence[str] | None = None) -> int:
         )
         snapshot = runtime.last_snapshot
         assert snapshot is not None
+        if mode in {"observe", "health"}:
+            from botmoduleproject1.modules.observability.module import ObservabilityModule
+
+            try:
+                obs = _container.registry.get("observability").instance
+            except Exception:
+                obs = ObservabilityModule.from_settings(settings, None)
+            flags = settings.feature_flags
+            report = obs.snapshot(
+                settings,
+                lifecycle=runtime.container.lifecycle.state,
+                persistence_enabled=bool(getattr(flags, "pm8_persistence", False)),
+                telegram_bound=False,
+            )
+            if args.json:
+                print(json.dumps(report.model_dump(mode="json"), indent=2, sort_keys=True))
+            else:
+                print("\n".join(snapshot.banner_lines()))
+                print(f"liveness={report.readiness.liveness.value}")
+                print(f"trading_readiness={report.health.trading_readiness}")
+                print(f"accept_trade={report.readiness.accept_trade}")
+                print(f"broker_venue={report.readiness.broker_venue.value}")
+                print(f"runbooks={report.runbook_count} metrics={report.metric_catalog_count}")
+                print(report.kernel_note)
+            runtime.stop()
+            return 0
         if args.json:
             print(json.dumps(snapshot.model_dump(mode="json"), indent=2, sort_keys=True))
         else:
