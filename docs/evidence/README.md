@@ -23,7 +23,8 @@ and duplicated inline in the architect report.
 python3.11 -m venv .venv311
 .venv311/bin/python -m pip install -r requirements-dev.txt
 PYTHONPATH=. .venv311/bin/python --version
-PYTHONPATH=. .venv311/bin/python -m pytest tests --tb=short -q | tee docs/evidence/pytest-3.11.log
+set -o pipefail
+PYTHONPATH=. .venv311/bin/python -m pytest tests --tb=short | tee docs/evidence/pytest-3.11.log
 
 # Restart drill + backup checksum (raw logs)
 PYTHONPATH=. .venv311/bin/python scripts/bot/emit_evidence.py --out-dir docs/evidence
@@ -79,3 +80,4 @@ snapshot contains `captured_at` and generated IDs) and
 | `doctor_py311.log` | local 3.11 doctor stdout |
 | `seq14/` | observability snapshot, catalogs, redaction sample |
 | `ci/run-33305725241/` | committed copies of CI artifacts from ce0aa74 |
+| `ci/run-33307496179/` | Sequence 14 CI: 3.11/3.12 526 passed, hygiene, live fail-closed, 3.10 fail-fast |

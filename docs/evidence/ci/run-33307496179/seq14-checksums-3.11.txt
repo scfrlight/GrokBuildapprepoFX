@@ -1,0 +1,9 @@
+# Sequence 14 evidence  utc=2026-08-30T10:52:05.701223+00:00
+# dump checksum is run-specific (timestamps/UUIDs in snapshot).
+dump_sha256=e200d15605457eed92e4d2a9f9928fbe4ad5e6f7bc9c1e83c1546ca348c6050c
+payload_canonical_sha256=8c6737b844e22b710214f59468264041b2a00901c80cc8611811f25984c566a2
+trading_readiness=false
+accept_trade=false
+metric_catalog_count=25
+runbook_count=20
+error_catalog_count=19

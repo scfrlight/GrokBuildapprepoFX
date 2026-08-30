@@ -1,0 +1,3 @@
+LIVE TRADING IS DISABLED.
+Refusing to start because CLI mode=live.
+This build is demo-first. See docs/architecture/runtime_modes.md and ADR-002.

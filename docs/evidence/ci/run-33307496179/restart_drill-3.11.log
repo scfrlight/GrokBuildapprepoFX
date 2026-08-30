@@ -1,0 +1,8 @@
+# restart drill  utc=2026-08-30T10:52:05.234948+00:00
+# command: PYTHONPATH=. python scripts/bot/emit_evidence.py --out-dir docs/evidence
+passed=True
+sequence=1
+log:
+  seed disposition=committed seq=1
+  closed
+  reopen seq=1 integrity=valid passed=True
