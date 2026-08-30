@@ -8,13 +8,13 @@ Git home: `scfrlight/GrokBuildapprepoFX`
 
 ## 1. HEAD SHA
 
-Parent of this reconciliation: **`3c36a9cf4d75e520abe56482282eb3a770a54952`** (`Sequence 14 CI: ban pytest|tee false greens; artifacts after validation.`).
+**`9402421bce53fa1c81a8dd4e2dfc770acdb5d988`** — `Reconciliation audit: PM identity, PM7 PARTIAL, PM8a gaps, monotonic checkpoints.`
 
-HEAD of this commit is recorded in `docs/evidence/reconciliation/interpreter.txt` after land. Until then parent SHA above is the known origin/main tip.
 
 ## 2. Parent SHA
 
-**`cfce27ad7979a62d9702ad82ff04ac75b10c1883`** is parent of 3c36a9c. The reconciliation commit’s parent is **3c36a9c**.
+**`3c36a9cf4d75e520abe56482282eb3a770a54952`** (`Sequence 14 CI: ban pytest|tee false greens; artifacts after validation.`).
+
 
 ## 3. Changed files
 

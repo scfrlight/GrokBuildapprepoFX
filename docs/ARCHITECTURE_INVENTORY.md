@@ -1,7 +1,8 @@
 # Architecture inventory — reconciliation 2026-08-30
 
 Status: **reconciliation**, not Sequence 15.  
-HEAD at generation: see `docs/evidence/reconciliation/`.  
+HEAD at generation: `9402421bce53fa1c81a8dd4e2dfc770acdb5d988` (see `docs/evidence/reconciliation/`).
+  
 Sequence 15+ remains **BLOCKED**.
 
 Sources of truth (priority): (1) live safety constraints in this repo; (2) persisted PM sequence prompts; (3) reconstructed `PM8a_Build_Spec.md`; (4) `SEQUENCE_CORRECTION.md`; (5) `MODULE_NUMBERING_MAP.md`; (6) README/docs; (7) tests as behaviour evidence, not as a substitute for spec.
