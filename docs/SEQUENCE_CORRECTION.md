@@ -3,7 +3,8 @@
 Date (UTC): 2026-08-30  
 Author: implementation-orchestrator  
 Status: **Accepted** — architect correction prompt 2026-08-30  
-Git home: `scfrlight/GrokBuildapprepoFX`
+Git home: `scfrlight/GrokBuildapprepoFX`  
+Kernel SHA: **`8fd45f624bc088ec7ebe47151333605397c06b15`** (main, 2026-08-30; parent `a2a1890`)
 
 ## 1. Missing original specs (escalation record)
 
