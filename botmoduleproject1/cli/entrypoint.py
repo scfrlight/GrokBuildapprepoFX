@@ -1,4 +1,9 @@
-"""CLI entry point. Modes: test, doctor, paper, live, backfill."""
+"""CLI entry point. Modes: test, doctor, paper, live, backfill.
+
+ADR-008: assert_python_version() runs before any pydantic/settings import.
+`app/__init__.py` is lazy so `python -m botmoduleproject1` on Python <3.11
+fails with PythonVersionError, not ImportError.
+"""
 
 from __future__ import annotations
 
@@ -15,7 +20,6 @@ from botmoduleproject1.app.exceptions import (
     SettingsError,
 )
 from botmoduleproject1.app.python_version import assert_python_version
-from botmoduleproject1.app.settings import CliMode
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -67,7 +71,7 @@ _ALLOWED_MODES = {
 }
 
 
-def _normalize_mode(raw: str) -> CliMode:
+def _normalize_mode(raw: str) -> str:
     alias = {
         "dry-run": "paper",
         "observe_only": "observe-only",
@@ -76,7 +80,7 @@ def _normalize_mode(raw: str) -> CliMode:
     mode = alias.get(raw, raw)
     if mode not in _ALLOWED_MODES and mode not in alias.values():
         raise SystemExit(f"unknown mode {raw!r}")
-    return mode  # type: ignore[return-value]
+    return mode
 
 
 def main(argv: Sequence[str] | None = None) -> int:

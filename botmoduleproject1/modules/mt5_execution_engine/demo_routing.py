@@ -1,6 +1,7 @@
 """Sequence 11 — the only path from an ALLOW verdict to the demo gateway.
 
 Strategy / entry code must not import DemoMt5Gateway.
+Package: mt5_execution_engine (not pm5, not pm6).
 """
 
 from __future__ import annotations
@@ -29,7 +30,9 @@ class DemoRouter:
             intent_id=str(verdict.intent_id),
         )
         if self.api is not None and result.get("accepted"):
-            self.api.persist_order(client_order_id, {"state": result["state"], "ticket": result.get("venue_ticket")})
+            self.api.persist_order(
+                client_order_id, {"state": result["state"], "ticket": result.get("venue_ticket")}
+            )
             self.api.persist_execution(
                 order_id=client_order_id,
                 venue_kind=result.get("venue_kind", "mt5_demo_sim"),

@@ -318,7 +318,7 @@ FEATURE_FLAG_CATALOG: tuple[FeatureFlagSpec, ...] = (
     FeatureFlagSpec(
         name="enable_mt5_demo_adapter",
         field="mt5_demo_adapter",
-        description="Sequence 11 Demo-only MT5 adapter. Test/research. Live account refused. No silent recon.",
+        description="Sequence 11 Demo-only MT5 adapter (`mt5_execution_engine`, not pm6). Test/research. Live account refused. No silent recon.",
         allowed_profiles=(ProfileName.TEST, ProfileName.RESEARCH),
         safety=SafetyClassification.REQUIRES_REVIEW,
         env_key=_ALIAS_ENV["mt5_demo_adapter"],
@@ -326,7 +326,7 @@ FEATURE_FLAG_CATALOG: tuple[FeatureFlagSpec, ...] = (
     FeatureFlagSpec(
         name="enable_exit_engine",
         field="exit_engine",
-        description="Sequence 11 structural SL/TP, breakeven, time stops. Test/research. Never bypasses PM4.",
+        description="Sequence 11 structural SL/TP, breakeven, time stops in `mt5_execution_engine`. Test/research. Never bypasses PM4.",
         allowed_profiles=(ProfileName.TEST, ProfileName.RESEARCH),
         safety=SafetyClassification.REQUIRES_REVIEW,
         env_key=_ALIAS_ENV["exit_engine"],

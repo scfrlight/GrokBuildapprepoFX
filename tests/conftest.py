@@ -1,12 +1,15 @@
 """Shared fixtures.
 
-ADR-008: this App Builder sandbox runs pytest on CPython 3.10.21 because
-CPython 3.11 is present but has no pip/ensurepip. Production and CLI still
-require 3.11+. Tests patch interpreter_version() so the guard is exercised
-without blocking the suite. See tests/unit/test_python_version.py.
+ADR-008 production floor is Python 3.11+. Official suite runs on 3.11+
+(venv / CI). If a collector is still 3.10 (App Builder system python),
+unit tests patch interpreter_version() so the rest of the kernel can be
+exercised; CLI and unpatched preflight still see the real interpreter.
+The patch is not a production escape hatch.
 """
 
 from __future__ import annotations
+
+import sys
 
 import pytest
 
@@ -14,6 +17,9 @@ import pytest
 @pytest.fixture(autouse=True)
 def _sandbox_python_floor(monkeypatch: pytest.MonkeyPatch, request: pytest.FixtureRequest):
     if request.node.get_closest_marker("real_interpreter"):
+        yield
+        return
+    if sys.version_info[:2] >= (3, 11):
         yield
         return
     monkeypatch.setattr(

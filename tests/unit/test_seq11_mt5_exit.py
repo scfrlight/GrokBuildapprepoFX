@@ -13,8 +13,7 @@ from botmoduleproject1.app.bootstrap import bootstrap
 from botmoduleproject1.app.exceptions import ExecutionDisabledError, LiveTradingDisabledError
 from botmoduleproject1.contracts.v1.risk import RiskVerdict, RiskVerdictStatus
 from botmoduleproject1.contracts.v1.time import utc_now
-from botmoduleproject1.modules.pm5_execution.demo_routing import DemoRouter
-from botmoduleproject1.modules.pm5_execution.exit_engine import ExitEngine, ExitState
+from botmoduleproject1.modules.mt5_execution_engine import DemoRouter, ExitEngine, ExitState
 from botmoduleproject1.modules.pm5_execution.ems.mt5_adapter import Mt5BrokerAdapter
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -92,3 +91,17 @@ def test_exit_engine_sl_tp_be_time():
 def test_live_cli_still_fail_closed():
     with pytest.raises(LiveTradingDisabledError):
         bootstrap(config_path=TEST_YAML, cli_mode="live", profile="test")
+
+
+def test_seq11_package_is_not_bare_pm6():
+    import importlib
+
+    with pytest.raises(ModuleNotFoundError):
+        importlib.import_module("botmoduleproject1.modules.pm6_execution")
+    with pytest.raises(ModuleNotFoundError):
+        importlib.import_module("botmoduleproject1.modules.pm5_execution.demo_routing")
+    with pytest.raises(ModuleNotFoundError):
+        importlib.import_module("botmoduleproject1.modules.pm5_execution.exit_engine")
+    from botmoduleproject1.modules import mt5_execution_engine
+
+    assert mt5_execution_engine.DemoRouter is DemoRouter

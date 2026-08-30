@@ -27,6 +27,7 @@ suite ran on 3.11 would be a lie.
    rest of the suite can exercise the kernel. The patch is **not** a production
    escape hatch. CLI and unpatched preflight still see the real interpreter.
 6. Operators and CI on a real machine MUST use Python 3.11+.
+7. GitHub Actions (`.github/workflows/tests.yml`) runs the suite on CPython 3.11 and 3.12, plus a 3.10 job that proves `doctor --profile test` fail-fast without installing pydantic.
 
 ## Consequences
 

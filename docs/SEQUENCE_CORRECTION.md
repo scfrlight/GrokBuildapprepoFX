@@ -63,19 +63,19 @@ Do not enable `enable_pm8_operator` / `enable_pm8_hitl` / `enable_pm8_command_au
 | 08 | PM6 post-trade controls | `pm6_post_trade` | Done (flag off) |
 | **09** | **PM8 database consolidation** | `pm8_persistence` | **Done this wave — 12/12 gate tests** |
 | **10** | **PM8a migration / backup / recovery** | `pm8_persistence` + runbooks | **Done this wave — 5/5 gate tests; restart drill logged** |
-| **11** | **MT5 Demo execution & exit** (Master Orchestration name: PM6) | `adapters/mt5` + `pm5_execution` exit/routing | **Done this wave — 6/6 gate tests; live fail-closed** |
+| **11** | **MT5 Demo execution & exit** (Master Orchestration *title* only) | **`mt5_execution_engine`** + `adapters/mt5` | **Done — package is not pm6; `pm6_post_trade` untouched** |
 | **12** | **Unified runtime orchestrator** | `botmoduleproject1/runtime/` | **Done this wave — 2/2 gate tests** |
 | **13** | **Operator UX / Telegram control** | `pm8_operator` (reuse, unfreeze) | **Done this wave — reuse + bind; 4/4 correction tests** |
 
-Full suite after the wave: **480 passed** (CPython 3.10.21; ADR-008 floor remains 3.11+).
+Full suite after the wave: see `docs/evidence/pytest-3.11.log` and GitHub Actions (Python 3.11+). ADR-008 floor is 3.11+.
 
-### Dual PM6 naming (do not rename)
+### Dual PM6 naming — resolved
 
-Master Orchestration Sequence 11 is titled **PM6 MT5 Execution & Exit Engine**. This repo already used **PM6** for post-trade (Sequence 08) and **PM5** for OMS/EMS. Packages stay. Sequence 11 content lands in the MT5 adapter + PM5 routing/exit engine. Documentation uses both names.
+Master Orchestration **titles** Sequence 11 “PM6 MT5 Execution & Exit Engine”. That title is not a package name. The package is **`mt5_execution_engine`**. **`pm6_post_trade` is the only PM6 package.** Map: `docs/MODULE_NUMBERING_MAP.md`.
 
-### Dual Sequence 09 naming (do not delete)
+### Dual Sequence 09 naming — previous-session error
 
-Historical Sequence 09 = PM7 append-only journal (`pm7_persistence`). Canonical Sequence 09 = PM8 consolidated persistence API (`pm8_persistence`). PM7 remains the evidence journal. PM8 is the **only** downstream data path after Sequence 09.
+Calling Sequence 09 “PM7 journal” was an error of a previous session. PM7 journal **content stays** in `pm7_persistence` (PM1–PM7 range). Canonical Sequence 09 is PM8 consolidation (`pm8_persistence`). Details: `docs/MODULE_NUMBERING_MAP.md` §3.
 
 ## 5. Return plan (strict order)
 

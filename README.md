@@ -17,7 +17,7 @@ Git home: [scfrlight/GrokBuildapprepoFX](https://github.com/scfrlight/GrokBuilda
 | Secrets in git | never |
 | Python | 3.11+ (fail-fast; ADR-008) |
 
-**PM4** is the authoritative risk gate. **PM5** is the OMS/EMS fabric (simulation/shadow; `SIM-*` is not a venue ticket). **Sequence 11** Demo tickets are `DEMO-*` and are not broker truth. **PM7** is the append-only evidence journal. **PM8 persistence** (canonical Sequences 09–10) is the only downstream data API. **Operator** is Sequence 13; Telegram Bot API refused.
+**PM4** is the authoritative risk gate. **PM5** is the OMS/EMS fabric (simulation/shadow; `SIM-*` is not a venue ticket). **Sequence 11** is `mt5_execution_engine` (tickets `DEMO-*`, not broker truth; not PM6). **PM6** is only `pm6_post_trade`. **PM7** is the append-only evidence journal. **PM8 persistence** (canonical Sequences 09–10) is the only downstream data API. **Operator** is Sequence 13; Telegram Bot API refused. Name map: [docs/MODULE_NUMBERING_MAP.md](docs/MODULE_NUMBERING_MAP.md).
 
 Unprefixed ambient env (`DATABASE_URL`, `TRADING_MODE`, …) is ignored.
 
@@ -28,7 +28,7 @@ Unprefixed ambient env (`DATABASE_URL`, `TRADING_MODE`, …) is ignored.
 | 00–08 | Platform through PM6 post-trade (historical, kept) | flags off |
 | **09** | PM8 database consolidation | `NullStorage` |
 | **10** | PM8a migrations / backup / restore / restart drills | off |
-| **11** | Demo MT5 adapter + exit engine | fail-closed / simulated tests |
+| **11** | `mt5_execution_engine` (not PM6) | fail-closed / simulated tests |
 | **12** | Unified runtime orchestrator | off |
 | **13** | Operator UX (reused `pm8_operator`) | `NullOperator` |
 

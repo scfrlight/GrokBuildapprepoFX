@@ -1,6 +1,7 @@
 """Sequence 11 exit lifecycle. Structural SL/TP, breakeven lock, time stops.
 
 Does not send orders by itself. Emits exit intents for DemoRouter after PM4 ALLOW.
+Package: mt5_execution_engine (not pm5, not pm6).
 """
 
 from __future__ import annotations
@@ -9,7 +10,6 @@ from dataclasses import dataclass, field
 from datetime import datetime, timedelta
 from decimal import Decimal
 from enum import Enum
-from typing import Any
 
 from botmoduleproject1.contracts.v1.time import utc_now
 
@@ -38,7 +38,16 @@ class ExitPlanLive:
 
 
 class ExitEngine:
-    def arm(self, *, symbol: str, side: str, entry: Decimal, sl: Decimal, tp: Decimal, now: datetime | None = None) -> ExitPlanLive:
+    def arm(
+        self,
+        *,
+        symbol: str,
+        side: str,
+        entry: Decimal,
+        sl: Decimal,
+        tp: Decimal,
+        now: datetime | None = None,
+    ) -> ExitPlanLive:
         if sl == entry or tp == entry:
             raise ValueError("structural SL/TP must be away from entry")
         if side == "buy" and not (sl < entry < tp):

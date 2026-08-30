@@ -12,6 +12,8 @@ secrets*.yml
 # python
 .venv/
 venv/
+.venv311/
+.venv312/
 __pycache__/
 *.py[cod]
 *.egg-info/
@@ -33,6 +35,9 @@ node_modules/
 # logs, local data, artifacts
 logs/
 *.log
+!docs/evidence/*.log
+!docs/evidence/*.txt
+docs/evidence/_scratch/
 data/local/
 data/cache/
 artifacts/

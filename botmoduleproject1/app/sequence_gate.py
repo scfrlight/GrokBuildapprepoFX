@@ -1,13 +1,13 @@
 """Canonical sequence map and freeze gates.
 
 Master Orchestration Prompt is the source of truth for sequence *order*.
-The original Drive/GitHub file was not recovered; the architect's 2026-08-30
-correction prompt is the authorized mapping. See docs/SEQUENCE_CORRECTION.md.
+Package names are in docs/MODULE_NUMBERING_MAP.md. Sequence 11 is
+`mt5_execution_engine`, not `pm6`. Sequence 08 keeps `pm6_post_trade`.
 """
 
 from __future__ import annotations
 
-# Lifted after Sequences 09–12 build gates in this correction wave.
+# Lifted after Sequences 09–12 build gates in the 2026-08-30 correction wave.
 OPERATOR_PLANE_FROZEN: bool = False
 
 CANONICAL_SEQUENCES: dict[int, str] = {
@@ -22,7 +22,7 @@ CANONICAL_SEQUENCES: dict[int, str] = {
     8: "pm6_post_trade_controls",
     9: "pm8_database_consolidation",
     10: "pm8a_migration_backup_recovery",
-    11: "pm6_mt5_execution_exit_engine",
+    11: "mt5_execution_engine",
     12: "unified_runtime_orchestrator",
     13: "pm9_operator_ux_telegram_control",
 }
@@ -39,7 +39,7 @@ def operator_freeze_message(flag_name: str) -> str:
         f"early build mislabeled as Sequence {MISLABELED_OPERATOR_SEQUENCE}; "
         f"canonical home is Sequence {CANONICAL_OPERATOR_SEQUENCE}. "
         "No further operator work and no flag bind until Sequences 09–12 complete. "
-        "See docs/SEQUENCE_CORRECTION.md."
+        "See docs/SEQUENCE_CORRECTION.md and docs/MODULE_NUMBERING_MAP.md."
     )
 
 

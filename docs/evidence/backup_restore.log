@@ -1,0 +1,11 @@
+# backup / restore verification  utc=2026-08-30T10:03:43.228018+00:00
+# command: PYTHONPATH=. python scripts/bot/emit_evidence.py --out-dir docs/evidence
+schema_version=v1
+backup_id=88e37a17-18ab-4085-bc26-065d17f36ba6
+checksum=b6fbdca7477fceb31cfe2777e4839be14184f6742e7af551dee8383ac6e6802d
+path=docs/evidence/_scratch/backups/88e37a17-18ab-4085-bc26-065d17f36ba6.json
+verified=True
+event_count=1
+sequence_before=1
+sequence_after_verify=1
+runtime_untouched=True

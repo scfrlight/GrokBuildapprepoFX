@@ -75,4 +75,4 @@ The system is NOT ready for live trading, demo trading, paper trading, or produc
 
 ## 9. Exact next step
 
-Sequence 11 — PM6 MT5 Execution & Exit Engine (Demo-only; existing `pm6_post_trade` is not renamed).
+Sequence 11 — `mt5_execution_engine` (Master Orchestration title “PM6 MT5…”; `pm6_post_trade` is not this module).

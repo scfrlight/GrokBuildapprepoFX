@@ -24,12 +24,14 @@ TEST_YAML = ROOT / "configs" / "test.example.yaml"
 
 
 def test_canonical_map_has_09_to_13():
+    assert CANONICAL_SEQUENCES[8] == "pm6_post_trade_controls"
     assert CANONICAL_SEQUENCES[9] == "pm8_database_consolidation"
     assert CANONICAL_SEQUENCES[10] == "pm8a_migration_backup_recovery"
-    assert CANONICAL_SEQUENCES[11] == "pm6_mt5_execution_exit_engine"
+    assert CANONICAL_SEQUENCES[11] == "mt5_execution_engine"
     assert CANONICAL_SEQUENCES[12] == "unified_runtime_orchestrator"
     assert CANONICAL_SEQUENCES[13] == "pm9_operator_ux_telegram_control"
     assert CANONICAL_OPERATOR_SEQUENCE == 13
+    assert "pm6_mt5" not in CANONICAL_SEQUENCES[11]
 
 
 def test_freeze_blocks_when_set(monkeypatch: pytest.MonkeyPatch):
