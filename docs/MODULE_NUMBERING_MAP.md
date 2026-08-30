@@ -21,7 +21,7 @@ Bare **`pm6` is reserved for post-trade**. Sequence 11 is **`mt5_execution_engin
 | 06 | PM4 Risk Gate | `PM4_Risk_Gate_Sequence06_Prompt.md` | `modules/pm4_risk_gate` | Done |
 | 07 | PM5 OMS/EMS simulation | `PM5_Execution_Sequence07_Prompt.md` | `modules/pm5_execution` | Done |
 | 08 | **PM6 Post-Trade Controls** | `PM6_Post_Trade_Sequence08_Prompt.md` | **`modules/pm6_post_trade`** | Done (in-memory; not Seq 14) |
-| 09 | **PM8 Database Consolidation** | reconstructed `PM8a_Build_Spec.md` | **`modules/pm8_persistence`** | Done sequence; SQLite local remediation 2026-08-30 (PG BLOCKED) |
+| 09 | **PM8 Database Consolidation** | reconstructed `PM8a_Build_Spec.md` | **`modules/pm8_persistence`** | Done sequence; SQLite local + PostgreSQL fail-closed backend 2026-08-30 (`production_durable` refused) |
 | 10 | **PM8a Migration, Backup & Recovery** | reconstructed `PM8a_Build_Spec.md` | **`modules/pm8_persistence`** (v2 + runbooks) | Done sequence; verify COMPLETE, restore-apply **ABSENT** |
 | 11 | MT5 Execution & Exit Engine (Demo-only). *Master Orchestration title:* “PM6 MT5 Execution & Exit Engine” | original spec missing | **`modules/mt5_execution_engine`** + adapter `adapters/mt5` | Done (sim/test-safe; real terminal BLOCKED) |
 | 12 | Unified Runtime Orchestrator | correction prompt | `botmoduleproject1/runtime` | Done |

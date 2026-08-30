@@ -45,12 +45,15 @@ Unprefixed ambient env (`DATABASE_URL`, `TRADING_MODE`, …) is ignored.
 - Sequence 10 = PM8a hardening
 - Sequence 13 = operator UX reuse
 - Sequence 14 = observability/operations/documentation
-- Durability remediation 2026-08-30 = SQLite local/test (PostgreSQL BLOCKED)
+- Durability remediation 2026-08-30 = SQLite local/test
+- PostgreSQL durability 2026-08-30 = `PostgresStore` fail-closed backend (`production_durable` still refused)
 - Sequence 15+ = **BLOCKED**
 
 ## What does not exist yet
 
-Fitted QRF/ML, real MT5 terminal send on this Linux host, live Telegram bot, production distributed database, Sequence 15+.
+Fitted QRF/ML, real MT5 terminal send on this Linux host, live Telegram bot, Sequence 15+.
+
+PostgreSQL is an implemented PM8 backend, not a production-readiness claim. `production_durable` stays refused.
 
 `python -m botmoduleproject1 live` must fail closed.
 

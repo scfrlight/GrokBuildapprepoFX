@@ -1,6 +1,6 @@
 """Isolated restore-apply. Never mutates an active trading runtime.
 
-SQLite local/test scope only. PostgreSQL restore-apply = BLOCKED.
+SQLite: isolated file path. PostgreSQL: isolated DSN/database.
 Trading readiness remains false. No MT5 send.
 """
 
@@ -164,3 +164,65 @@ class RestoreApplyService:
             )
         except Exception:
             pass
+
+    def apply_restore_postgres(
+        self,
+        backup_path: Path,
+        expected_checksum: str,
+        target_dsn: str,
+    ) -> dict[str, Any]:
+        """Apply backup into an isolated PostgreSQL database. Never the live DSN."""
+        from botmoduleproject1.modules.pm8_persistence.postgres.store import PostgresStore
+
+        source_dsn = getattr(self.source, "dsn", None)
+        if source_dsn and str(source_dsn) == str(target_dsn):
+            raise RestoreApplyError("refusing to apply backup onto the active store")
+        if getattr(self.source, "backend_identity", "") == "postgresql" and not target_dsn:
+            raise RestoreApplyError("restore target must be an isolated postgresql DSN")
+        verified = self.verify_backup(backup_path, expected_checksum)
+        events = json.loads(backup_path.read_text(encoding="utf-8"))
+        isolated = PostgresStore(target_dsn)
+        from botmoduleproject1.modules.pm8_persistence.api.v1 import PersistenceApiV1
+        from botmoduleproject1.modules.pm8_persistence.migrations import MigrationService
+
+        MigrationService(isolated).upgrade_to(2)
+        isolated.truncate_all()
+        api = PersistenceApiV1(isolated)
+        last_cursor = -1
+        for ev in events:
+            cursor = int(ev.get("sequence_no") or 0)
+            if cursor < last_cursor:
+                isolated.close()
+                raise RestoreApplyError("backward checkpoint / sequence rejected")
+            last_cursor = cursor
+            payload = ev.get("payload_json")
+            if isinstance(payload, str):
+                payload = json.loads(payload)
+            api.ingest_event(
+                event_type=ev.get("event_type") or "restored.event",
+                producer=ev.get("producer") or "restore",
+                family=TableFamily(ev.get("family") or "event"),
+                payload=payload or ev.get("payload") or {},
+                event_id=ev.get("event_id"),
+                idempotency_key=ev.get("idempotency_key") or ev.get("event_id"),
+                correlation_id=ev.get("correlation_id"),
+                causation_id=ev.get("causation_id"),
+            )
+        integrity = api.check_integrity()
+        if integrity.state != "valid":
+            isolated.close()
+            raise RestoreApplyError("post-restore integrity failed")
+        apply_id = str(uuid4())
+        self._audit(apply_id, backup_path, Path("postgresql://isolated"), verified, mutated=True)
+        count = isolated.last_sequence()
+        isolated.close()
+        return {
+            "ok": True,
+            "apply_id": apply_id,
+            "event_count": len(events),
+            "restored_seq": count,
+            "integrity": integrity.state,
+            "trading_blocked": True,
+            "source_untouched": True,
+            "backend": "postgresql",
+        }

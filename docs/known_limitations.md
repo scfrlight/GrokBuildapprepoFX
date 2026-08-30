@@ -9,9 +9,9 @@
 - Master Orchestration Prompt file is **SOURCE-MISSING**; sequence *order* comes from the correction/authorization prompts.
 - Original Drive `PM8a_Build_Spec.md` is **SOURCE-MISSING**; working copy is reconstructed (`RECONSTRUCTED-SOURCE`).
 - `PM7_Master_Prompt.md` is **SOURCE-MISSING**. PM7 sqlite/file journals now reload; the module is still not a production-durable warehouse and not the canonical downstream API.
-- PM8 named projections exist as rebuildable read models (not canonical truth). Isolated SQLite restore-apply exists; applying to the live store is refused. PostgreSQL restore-apply is **BLOCKED**.
-- Money keys on persist_* are Decimal/canonical strings. Residual non-money JSON fields may still be untyped.
-- SQLite outbox relay is local/test-only. PostgreSQL production durability is **BLOCKED**.
-- Sequence 15+ is **BLOCKED**.
+- PM8 named projections exist as rebuildable read models (not canonical truth). Isolated SQLite restore-apply exists; applying to the live store is refused. Isolated PostgreSQL restore-apply exists; live DSN is refused.
+- Money keys on persist_* are Decimal/canonical strings. PostgreSQL stores `NUMERIC(28,8)`. Residual non-money JSON fields may still be untyped.
+- SQLite outbox relay is local/test-only. PostgreSQL outbox uses `FOR UPDATE SKIP LOCKED`. `production_durable` remains refused — a running Postgres is not a production claim.
+- Sequence 15+ is **BLOCKED**. Sequence 11+ trading enablement remains blocked.
 
 Canonical copy of the Seq 14 limitations list: `docs/guides/known_limitations.md`.

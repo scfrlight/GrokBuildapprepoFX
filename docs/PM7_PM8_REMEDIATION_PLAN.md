@@ -1,7 +1,7 @@
 # PM7 / PM8 durability remediation plan
 
 Status: **REMEDIATION PASSED WITH PARTIALS** — 2026-08-30.  
-Not Sequence 15. PostgreSQL production durability remains **BLOCKED**.
+Not Sequence 15. Follow-on: PostgreSQL backend implemented 2026-08-30; `production_durable` remains **refused**.
 
 Source confidence: in-repo Seq 09 PM7 prompt + reconstructed PM8a (`RECONSTRUCTED-SOURCE`).  
 `PM7_Master_Prompt.md` / original Drive `PM8a_Build_Spec.md` = **SOURCE-MISSING**.
@@ -24,7 +24,7 @@ Source confidence: in-repo Seq 09 PM7 prompt + reconstructed PM8a (`RECONSTRUCTE
 ## Explicit limitations
 
 - `:memory:` remains valid for unit tests only.
-- SQLite outbox relay is **local/test-only**; PostgreSQL `FOR UPDATE SKIP LOCKED` is **BLOCKED**.
+- SQLite outbox relay is **local/test-only**; PostgreSQL uses `FOR UPDATE SKIP LOCKED`.
 - Restore-apply refuses the live store; trading stays blocked.
 - Named projections are not canonical truth.
 - Existing JSON payload bags remain; money keys are canonical decimal strings. Residual non-money floats in unrelated modules are **PARTIAL**.

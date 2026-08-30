@@ -38,7 +38,7 @@ from botmoduleproject1.modules.pm8_persistence.reconciliation import (
     ALLOWED_TRANSITIONS,
     ReconciliationRunState,
 )
-from botmoduleproject1.modules.pm8_persistence.store import SqliteStore, new_id
+from botmoduleproject1.modules.pm8_persistence.store import new_id
 
 
 SERVICE_CATALOG: tuple[str, ...] = (
@@ -102,7 +102,7 @@ class PersistenceApiV1:
 
     def __init__(
         self,
-        store: SqliteStore,
+        store: Any,
         *,
         enabled: bool = True,
         max_outbox_attempts: int = 3,
@@ -443,15 +443,17 @@ class PersistenceApiV1:
         lease_seconds: int = 30,
         publisher: OutboxPublisher | None = None,
     ) -> list[dict[str, Any]]:
-        """Claim → publish → published | retry | dead-letter. SQLite local/test-only."""
+        """Claim → publish → published | retry | dead-letter.
+
+        PostgreSQL uses FOR UPDATE SKIP LOCKED. SQLite claims rows sequentially.
+        """
         pub = publisher or self.publisher
         now = utc_now()
         now_iso = now.isoformat()
         until = (now + timedelta(seconds=lease_seconds)).isoformat()
         handled: list[dict[str, Any]] = []
-        for row in self.store.claimable_outbox(now_iso, limit):
-            if not self.store.claim_outbox(row["outbox_id"], worker, until, now_iso):
-                continue
+        rows = self.store.claim_outbox_batch(worker, until, now_iso, limit)
+        for row in rows:
             claimed = dict(row)
             claimed["state"] = "claimed"
             try:
@@ -1036,6 +1038,8 @@ class PersistenceApiV1:
             "mt5": False,
             "production_durable": False,
             "trading_readiness": False,
+            "backend": diag.get("backend"),
+            "sqlite_fallback": False,
         }
 
     def append(self, entry: JournalEntry) -> None:

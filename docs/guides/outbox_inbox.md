@@ -8,7 +8,7 @@ Business mutation and outbox insert share one transaction.
 
 States: pending → claimed → published | failed | dead-letter.
 
-SQLite relay is **local/test-only**. PostgreSQL multi-worker concurrency (`FOR UPDATE SKIP LOCKED`) is **BLOCKED**.
+SQLite relay is **local/test-only**. PostgreSQL multi-worker concurrency uses `FOR UPDATE SKIP LOCKED`. `production_durable` remains refused.
 
 No broker SDK is imported by PM8.
 

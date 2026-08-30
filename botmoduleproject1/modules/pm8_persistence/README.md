@@ -6,4 +6,4 @@ Replaces the Sequence 00 `NullStorage` placeholder when `enable_pm8_persistence`
 - Sequence 10: migrations v1→v2 with rollback policy, backup schedules, restore verification, restart drills.
 - Remediation: file-backed reload, Decimal money keys, nested UoW, outbox relay, named projections, reconciliation runs, isolated restore-apply.
 
-Default bind remains `NullStorage`. This module never sends orders, never talks to MT5, never treats `SIM-*` / `DEMO-*` as broker truth. PostgreSQL production durability is BLOCKED. SQLite relay is local/test-only.
+Default bind remains `NullStorage`. This module never sends orders, never talks to MT5, never treats `SIM-*` / `DEMO-*` as broker truth. `operating_mode=postgresql` uses `PostgresStore` and fails closed (no SQLite fallback). `production_durable` remains refused. SQLite relay is local/test-only; PostgreSQL relay uses `FOR UPDATE SKIP LOCKED`.

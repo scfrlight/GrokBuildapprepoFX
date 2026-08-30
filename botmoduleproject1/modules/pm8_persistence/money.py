@@ -2,8 +2,8 @@
 
 RECONSTRUCTED-SOURCE relative to PM8a accounting fields. Not a venue.
 
-SQLite stores canonical decimal strings. PostgreSQL NUMERIC mapping is
-documented only — production PostgreSQL is BLOCKED in this environment.
+SQLite stores canonical decimal strings. PostgreSQL maps money columns to NUMERIC(28, 8).
+`production_durable` remains refused even when PostgreSQL is configured.
 """
 
 from __future__ import annotations

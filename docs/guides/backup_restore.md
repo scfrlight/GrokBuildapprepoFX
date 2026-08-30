@@ -14,4 +14,4 @@ Flows: `verify_backup` → `prepare_restore_target` → `dry_run_restore` → `a
 - Trading readiness stays false. No MT5 send.
 - Pre-apply copy is kept for abort.
 - Backward sequence in a backup is rejected.
-- PostgreSQL restore-apply = **BLOCKED — environment unavailable**.
+- Isolated restore-apply: SQLite file target or isolated PostgreSQL DSN. Live store/DSN refused. `trading_blocked` always.

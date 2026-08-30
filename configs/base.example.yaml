@@ -228,3 +228,20 @@ pm8_operator:
   auto_rearm: false
   auto_promote_to_live: false
 
+# PM8 persistence knobs. Flag stays false. postgresql requires BOTMODULEPROJECT1_DATABASE_URL.
+pm8_persistence:
+  operating_mode: memory
+  storage_path: data/local/pm8
+  schema_version: 2
+  production_durable: false
+  mt5_enabled: false
+  broker_commands: false
+  connect_timeout_seconds: 5
+  statement_timeout_ms: 30000
+  pool_min: 1
+  pool_max: 8
+  sslmode: prefer
+  schema_name: public
+  relay_batch_size: 50
+  lease_timeout_seconds: 30
+

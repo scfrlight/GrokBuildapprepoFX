@@ -470,12 +470,27 @@ class Pm8PersistenceSection(BaseModel):
     production_durable: bool = False
     mt5_enabled: bool = False
     broker_commands: bool = False
+    connect_timeout_seconds: int = Field(default=5, ge=1, le=60)
+    statement_timeout_ms: int = Field(default=30_000, ge=1000, le=300_000)
+    pool_min: int = Field(default=1, ge=1, le=8)
+    pool_max: int = Field(default=8, ge=1, le=64)
+    sslmode: str = "prefer"
+    schema_name: str = "public"
+    relay_batch_size: int = Field(default=50, ge=1, le=500)
+    lease_timeout_seconds: int = Field(default=30, ge=1, le=600)
 
     @field_validator("operating_mode")
     @classmethod
     def _mode(cls, value: str) -> str:
-        if value not in {"disabled", "memory", "sqlite_local"}:
-            raise ValueError("pm8_persistence.operating_mode must be disabled|memory|sqlite_local")
+        if value not in {"disabled", "memory", "sqlite_local", "postgresql"}:
+            raise ValueError("pm8_persistence.operating_mode must be disabled|memory|sqlite_local|postgresql")
+        return value
+
+    @field_validator("sslmode")
+    @classmethod
+    def _ssl(cls, value: str) -> str:
+        if value not in {"disable", "allow", "prefer", "require", "verify-ca", "verify-full"}:
+            raise ValueError("sslmode must be disable|allow|prefer|require|verify-ca|verify-full")
         return value
 
     @field_validator("production_durable", "mt5_enabled", "broker_commands")

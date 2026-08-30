@@ -13,6 +13,22 @@ jobs:
       fail-fast: false
       matrix:
         python-version: ["3.11", "3.12"]
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: pm8
+          POSTGRES_PASSWORD: pm8
+          POSTGRES_DB: pm8_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U pm8 -d pm8_test"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      BOTMODULEPROJECT1_DATABASE_URL: postgresql://pm8:pm8@localhost:5432/pm8_test
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -40,6 +56,10 @@ jobs:
         run: |
           set -euo pipefail
           PYTHONPATH=. python scripts/bot/emit_evidence.py --out-dir docs/evidence
+      - name: PostgreSQL evidence
+        run: |
+          set -euo pipefail
+          PYTHONPATH=. python scripts/bot/emit_pg_evidence.py
       - name: Sequence 14 evidence
         run: |
           set -euo pipefail

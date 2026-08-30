@@ -100,11 +100,12 @@ Generic `projections` table + `family_counts` rebuild still exists. Named projec
 | Migrations + rollback policy | COMPLETE | v2→v1 allowed; v1 drop with journal refused |
 | Backup file + checksum | COMPLETE | run-specific dump hash; `payload_canonical_sha256` is comparable |
 | Restore **verification** | COMPLETE | mismatch raises; live seq untouched |
-| Restore **apply** | COMPLETE isolated SQLite | live store refused; PostgreSQL BLOCKED |
+| Restore **apply** | COMPLETE isolated SQLite + isolated PostgreSQL DSN | live store refused |
 | Integrity hash chain | COMPLETE | compromised → no rewrite |
 | Venue-vs-ledger drift suite | PARTIAL | tamper + corrupt backup; not venue drift |
 | `backup_schedules` table | PARTIAL | DDL v2 exists; not written by API |
-| `production_durable` | **BLOCKED** | validator raises |
+| `production_durable` | **BLOCKED / refused** | validator raises; PostgreSQL backend ≠ production claim |
+| PostgreSQL backend | COMPLETE as swappable store | sandbox/CI Postgres 16; not a hosted prod cluster |
 
 ## Scoreboard
 
@@ -117,7 +118,7 @@ Generic `projections` table + `family_counts` rebuild still exists. Named projec
 | E Reconciliation | PARTIAL |
 | F Named projections | COMPLETE as read models (not canonical) |
 | G Data API | COMPLETE with encapsulation caveats |
-| H Storage | PARTIAL (SQLite isolated restore-apply COMPLETE; PostgreSQL BLOCKED) |
+| H Storage | PARTIAL (SQLite + PostgreSQL isolated restore COMPLETE; `production_durable` refused) |
 
 **Blocked module-wide:** production durability, MT5/broker commands, live/demo/paper trading readiness.
 

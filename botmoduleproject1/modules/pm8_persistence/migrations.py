@@ -20,7 +20,7 @@ class MigrationError(Exception):
 class MigrationService:
     """Versioned schema. v1 is Sequence 09. v2 is Sequence 10 hardening tables."""
 
-    def __init__(self, store: SqliteStore) -> None:
+    def __init__(self, store: Any) -> None:
         self.store = store
 
     def current(self) -> int:
@@ -39,10 +39,18 @@ class MigrationService:
             current = 1
         if version >= 2 and current < 2:
             self.store.apply_v2()
+            checksum_src = SCHEMA_V2_UP
+            try:
+                from botmoduleproject1.modules.pm8_persistence.postgres.ddl import SCHEMA_PG_V2
+
+                if getattr(self.store, "backend_identity", "") == "postgresql":
+                    checksum_src = SCHEMA_PG_V2
+            except Exception:
+                pass
             self.store.record(
                 2,
                 "sequence10_hardening",
-                sha256(SCHEMA_V2_UP.encode()).hexdigest(),
+                sha256(checksum_src.encode()).hexdigest(),
                 utc_now().isoformat(),
                 "up",
             )

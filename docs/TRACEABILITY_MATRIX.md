@@ -62,14 +62,14 @@ This is **not** Sequence 15.
 | R-22 | Telegram refused | recon §8 | transport | `test_telegram_transport_refused` | COMPLETE | — | — |
 | R-23 | Numbering map 00–14 | recon §8 | map | `test_numbering_map_consistency_00_to_14` | COMPLETE | — | — |
 | R-24 | No unsafe CI pipe gates | recon §8 | `tests.yml` | `test_ci_hygiene_still_bans_piped_gates` | COMPLETE | — | — |
-| RMD-01 | Durable SQLite reload | rem §5 | `SqliteStore` / PM7 journals | `test_file_backed_sqlite_survives_process_restart` `test_pm7_journal_and_snapshot_survive_restart` | COMPLETE (local) | PG BLOCKED | — |
+| RMD-01 | Durable SQLite reload | rem §5 | `SqliteStore` / PM7 journals | `test_file_backed_sqlite_survives_process_restart` `test_pm7_journal_and_snapshot_survive_restart` | COMPLETE (local) | PG is a separate backend (PG-01+) | — |
 | RMD-02 | Decimal money keys | rem §6 | `pm8_persistence/money.py` | `test_decimal_round_trip_and_reject_float` | COMPLETE persist_* | residual JSON bags PARTIAL | — |
 | RMD-03 | Nested Unit of Work | rem §7 | `in_transaction` | `test_uow_failure_injection_rolls_back` | COMPLETE | — | — |
 | RMD-04 | Outbox relay / DLQ | rem §8 | `relay_outbox` | `test_outbox_relay_retry_dead_letter_and_restart` | COMPLETE SQLite | PG SKIP LOCKED BLOCKED | — |
 | RMD-05 | Inbox retry / hash conflict | rem §9 | `consume_inbox` | `test_inbox_retry_dead_letter_and_duplicate` `test_request_idempotency_hash_conflict` | COMPLETE | — | — |
 | RMD-06 | Named projections | rem §10 | `rebuild_named_projections` | `test_named_projections_rebuild_and_duplicate` | COMPLETE read-models | not canonical | supersedes R-13 ABSENT |
 | RMD-07 | Reconciliation run aggregate | rem §11 | `start_reconciliation_run` | `test_reconciliation_run_lifecycle_and_no_silent_pass` | COMPLETE | — | — |
-| RMD-08 | Isolated restore-apply | rem §12 | `restore_apply.py` | `test_isolated_restore_apply` | COMPLETE SQLite isolated | live target refused; PG BLOCKED | supersedes R-14 ABSENT |
+| RMD-08 | Isolated restore-apply | rem §12 | `restore_apply.py` | `test_isolated_restore_apply` | COMPLETE SQLite isolated + PG isolated DSN | live target refused | supersedes R-14 ABSENT |
 | RMD-09 | PM7 journal reload | rem §13 | sqlite/file journals | `test_pm7_file_journal_survives_restart` | COMPLETE sqlite/file | memory mode ephemeral | supersedes R-05 limitation |
 | RMD-10 | API version / no broker | rem §14 | `require_version` | `test_api_version_and_no_broker_surface` | COMPLETE | v1 only | — |
 | RMD-11 | Sequence 15 still blocked | rem stop | no artifacts | `test_no_sequence_15_artifacts` | COMPLETE (refused) | — | — |
@@ -77,3 +77,17 @@ This is **not** Sequence 15.
 | R-26 | PM7/PM8 not broker adapters | recon §5.13 | AST | `test_pm7_pm8_not_broker_adapters` | COMPLETE | — | — |
 | R-27 | Decimal accounting types | recon A | none | gap matrix | ABSENT | TEXT qty/avg_px | do not invent |
 | R-28 | Outbox relay / bus | recon C | none | gap matrix | ABSENT | in-process mark published | — |
+| PG-01 | PostgreSQL fail-closed / no SQLite fallback | PG durability | `open_pm8_store` `PostgresStore` | `test_pm8_postgresql_failclosed.py` | COMPLETE | production_durable still refused | — |
+| PG-02 | Prefixed DSN only | PG §15 | `BOTMODULEPROJECT1_DATABASE_URL` | `test_unprefixed_database_url_is_ignored` | COMPLETE | — | — |
+| PG-03 | NUMERIC money round-trip | PG §6 | `money_records` `positions_proj` | `test_numeric_round_trip` | COMPLETE on persist_* | residual JSON bags | — |
+| PG-04 | Append-only triggers | PG §8 | `pm8_forbid_mutation` | `test_append_only_events_and_audit` | COMPLETE | TRUNCATE still allowed for tests | — |
+| PG-05 | Unique idempotency | PG §10 | `idempotency_keys` PK | `test_unique_idempotency_index` | COMPLETE | — | — |
+| PG-06 | SKIP LOCKED outbox claim | PG §11 | `CLAIM_BATCH_SQL` | `test_outbox_skip_locked_concurrent_claim` | COMPLETE | sqlite sequential claim remains | — |
+| PG-07 | Schema migrations repeat-safe | PG §16 | `MigrationService` | `test_schema_migrations_repeat_safe` | COMPLETE | v1/v2 catalog | — |
+| PG-08 | Projection rebuild | PG §13 | `rebuild_named_projections` | `test_projection_rebuild` | COMPLETE read-models | not canonical | — |
+| PG-09 | Reconciliation lifecycle | PG §14 | recon run APIs | `test_reconciliation_lifecycle_no_silent_pass` | COMPLETE | — | — |
+| PG-10 | Isolated PG restore-apply | PG §13 | `apply_restore_postgres` | `test_isolated_restore_apply` | COMPLETE isolated DSN | live DSN refused | — |
+| PG-11 | Restart durability | PG §13 | reopen `PostgresStore` | `test_restart_durability` | COMPLETE | sandbox/CI cluster | — |
+| PG-12 | UoW fault injection | PG §20 | `inject_fault` | `test_uow_fault_injection_no_partial_commit` | COMPLETE | — | — |
+| PG-13 | Sequence 11+ still blocked | stop | flags / CLI | `test_reconciliation_boundaries.py` | COMPLETE (refused) | — | — |
+

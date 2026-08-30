@@ -15,6 +15,7 @@ dependencies = [
   "orjson>=3.10,<4",
   "tenacity>=9.0,<10",
   "typing-extensions>=4.12,<5",
+  "psycopg[binary]>=3.2,<4",
 ]
 
 [project.optional-dependencies]
@@ -46,6 +47,7 @@ asyncio_mode = "auto"
 addopts = "-q"
 markers = [
   "real_interpreter: run against the actual sys.version_info (ADR-008)",
+  "postgres: tests that require a live PostgreSQL server",
 ]
 
 [tool.ruff]

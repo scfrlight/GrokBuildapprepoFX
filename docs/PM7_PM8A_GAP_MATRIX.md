@@ -10,12 +10,12 @@ COMPLETE requires implementation + test + evidence.
 |---|---|---|---|
 | A Domain / Decimal | ABSENT | COMPLETE for persist_* money keys; residual JSON bags PARTIAL | `money.py` |
 | B Write / same UoW | PARTIAL | COMPLETE for signal/order/execution/recon | nested `in_transaction` |
-| C Outbox relay | ABSENT | COMPLETE local SQLite | PostgreSQL BLOCKED |
+| C Outbox relay | ABSENT | COMPLETE SQLite sequential + PG SKIP LOCKED | `production_durable` refused |
 | D Recovery / checkpoints | PARTIAL | COMPLETE monotonic + file reload | |
 | E Recon run aggregate | ABSENT | COMPLETE | venue cannot PASS |
 | F Named projections | ABSENT | COMPLETE as read models | not canonical |
 | G Data API | COMPLETE caveats | COMPLETE v1 | unsupported version rejected |
-| H Restore-apply | ABSENT | COMPLETE isolated SQLite | live target refused; PG BLOCKED |
+| H Restore-apply | ABSENT | COMPLETE isolated SQLite + isolated PG DSN | live target refused |
 
 ## PM7
 
@@ -31,4 +31,4 @@ COMPLETE requires implementation + test + evidence.
 | Backup apply | metadata-only in PM7 | byte restore is PM8 |
 | production_durable | BLOCKED | validator refuses |
 
-PostgreSQL production durability: **BLOCKED**. Sequence 15: **BLOCKED**.
+PostgreSQL is an implemented fail-closed PM8 backend (`PostgresStore`). `production_durable` remains **refused**. Sequence 15: **BLOCKED**. Sequence 11+ trading enablement: **BLOCKED**.

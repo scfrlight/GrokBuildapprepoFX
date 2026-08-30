@@ -290,6 +290,18 @@ class SqliteStore:
         )
         return cur.rowcount == 1
 
+    def claim_outbox_batch(self, worker: str, until: str, now_iso: str, limit: int = 50) -> list[dict[str, Any]]:
+        """SQLite local/test path. PostgreSQL uses FOR UPDATE SKIP LOCKED."""
+        claimed: list[dict[str, Any]] = []
+        for row in self.claimable_outbox(now_iso, limit):
+            if self.claim_outbox(row["outbox_id"], worker, until, now_iso):
+                item = dict(row)
+                item["state"] = "claimed"
+                item["claimed_by"] = worker
+                item["claimed_until"] = until
+                claimed.append(item)
+        return claimed
+
     def mark(self, outbox_id: str, state: str, published_at: str | None = None) -> None:
         self._exec(
             "UPDATE outbox SET state=?, attempts=attempts+1, published_at=COALESCE(?, published_at) WHERE outbox_id=?",
@@ -684,3 +696,42 @@ def _now() -> str:
 
 def new_id() -> str:
     return str(uuid4())
+
+
+def open_pm8_store(
+    *,
+    mode: str = "memory",
+    path: str | Path | None = None,
+    dsn: str | None = None,
+    connect_timeout: int = 5,
+    statement_timeout_ms: int = 30_000,
+    pool_min: int = 1,
+    pool_max: int = 8,
+    sslmode: str = "prefer",
+    schema_name: str = "public",
+) -> Any:
+    """Open the configured backend. postgresql never falls back to sqlite/memory."""
+    if mode == "postgresql":
+        from botmoduleproject1.modules.pm8_persistence.postgres.store import PostgresStore
+
+        if not dsn:
+            raise StorageUnavailable("postgresql requires BOTMODULEPROJECT1_DATABASE_URL; sqlite fallback is forbidden")
+        try:
+            return PostgresStore(
+                dsn,
+                connect_timeout=connect_timeout,
+                statement_timeout_ms=statement_timeout_ms,
+                pool_min=pool_min,
+                pool_max=pool_max,
+                sslmode=sslmode,
+                schema_name=schema_name,
+            )
+        except StorageUnavailable:
+            raise
+        except Exception as exc:
+            raise StorageUnavailable(f"postgresql configured but unavailable; sqlite fallback is forbidden: {exc}") from exc
+    if mode in {"disabled", "memory"}:
+        return SqliteStore(":memory:")
+    if not path or str(path) == ":memory:":
+        raise StorageUnavailable("sqlite_local requires an explicit storage_path; memory fallback is forbidden")
+    return SqliteStore(path)
