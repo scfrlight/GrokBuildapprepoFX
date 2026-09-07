@@ -1,4 +1,4 @@
-"""Typed feature flags. Dangerous flags are default-off and env-only."""
+"""Typed feature flags. Dangerous flags default-off, env-only."""
 
 from __future__ import annotations
 
@@ -11,12 +11,10 @@ from botmoduleproject1.app.exceptions import FeatureFlagError, LiveTradingDisabl
 from botmoduleproject1.app.profiles import ProfileName
 from botmoduleproject1.app.sequence_gate import assert_operator_not_frozen
 
-
 class SafetyClassification(str, Enum):
     SAFE = "safe"
     REQUIRES_REVIEW = "requires-review"
     DANGEROUS = "dangerous"
-
 
 class FeatureFlagSpec(BaseModel):
     model_config = ConfigDict(frozen=True)
@@ -29,11 +27,9 @@ class FeatureFlagSpec(BaseModel):
     safety: SafetyClassification
     env_key: str
 
-
 # Nested env path is BOTMODULEPROJECT1_FEATURE_FLAGS__<FIELD>
 def _env_key(field: str) -> str:
     return f"BOTMODULEPROJECT1_FEATURE_FLAGS__{field.upper()}"
-
 
 # Alias env keys used in the Sequence 02 spec (enable_* names).
 _ALIAS_ENV = {
@@ -69,21 +65,14 @@ _ALIAS_ENV = {
     "mt5_demo_adapter": "BOTMODULEPROJECT1_FEATURE__ENABLE_MT5_DEMO_ADAPTER",
     "exit_engine": "BOTMODULEPROJECT1_FEATURE__ENABLE_EXIT_ENGINE",
     "unified_runtime": "BOTMODULEPROJECT1_FEATURE__ENABLE_UNIFIED_RUNTIME",
+    "demo_trading_readiness": "BOTMODULEPROJECT1_FEATURE__ENABLE_DEMO_TRADING_READINESS",
 }
-
-_ALL_PROFILES = tuple(ProfileName)
-_NON_LIVE = (
-    ProfileName.DEMO,
-    ProfileName.TEST,
-    ProfileName.BACKTEST,
-    ProfileName.RESEARCH,
-)
 
 FEATURE_FLAG_CATALOG: tuple[FeatureFlagSpec, ...] = (
     FeatureFlagSpec(
         name="enable_pm2_market_data",
         field="market_data",
-        description="PM2 market context / regime / ranking. Env opt-in; test and research only.",
+        description="PM2 market context / regime / ranking. Env opt-in; test/research.",
         allowed_profiles=(ProfileName.TEST, ProfileName.RESEARCH),
         safety=SafetyClassification.REQUIRES_REVIEW,
         env_key=_ALIAS_ENV["market_data"],
@@ -91,7 +80,7 @@ FEATURE_FLAG_CATALOG: tuple[FeatureFlagSpec, ...] = (
     FeatureFlagSpec(
         name="enable_pm3_strategy_engine",
         field="strategy_engine",
-        description="PM3-Strategy Engine. Env opt-in; test and research only. TradeIntent only, never orders.",
+        description="PM3-Strategy Engine. Env opt-in; test/research. TradeIntent only, never orders.",
         allowed_profiles=(ProfileName.TEST, ProfileName.RESEARCH),
         safety=SafetyClassification.REQUIRES_REVIEW,
         env_key=_ALIAS_ENV["strategy_engine"],
@@ -99,7 +88,7 @@ FEATURE_FLAG_CATALOG: tuple[FeatureFlagSpec, ...] = (
     FeatureFlagSpec(
         name="enable_forecasting",
         field="forecasting",
-        description="PM3 forecasting / QRF residual quantile envelope. Env opt-in; demo/test/research. Enriches uncertainty only; never orders, never mutates side.",
+        description="PM3 forecasting / QRF envelope. Env opt-in; demo/test/research. Never orders.",
         allowed_profiles=(ProfileName.DEMO, ProfileName.RESEARCH, ProfileName.TEST),
         safety=SafetyClassification.REQUIRES_REVIEW,
         env_key=_ALIAS_ENV["forecasting"],
@@ -107,7 +96,7 @@ FEATURE_FLAG_CATALOG: tuple[FeatureFlagSpec, ...] = (
     FeatureFlagSpec(
         name="enable_pm4_risk_gate",
         field="risk_engine",
-        description="PM4 exclusive risk engine. Authoritative deny-by-default gate. Env opt-in; test and research only. ALLOW is not an order; PM5 stays closed.",
+        description="PM4 exclusive risk engine. Env opt-in; test/research. ALLOW is not an order.",
         allowed_profiles=(ProfileName.TEST, ProfileName.RESEARCH),
         safety=SafetyClassification.REQUIRES_REVIEW,
         env_key=_ALIAS_ENV["risk_engine"],
@@ -115,10 +104,7 @@ FEATURE_FLAG_CATALOG: tuple[FeatureFlagSpec, ...] = (
     FeatureFlagSpec(
         name="enable_pm5_simulation",
         field="pm5_simulation",
-        description=(
-            "PM5 OMS/EMS simulation. Env opt-in; test and research only. "
-            "Records simulated lifecycle. Does not send to a broker. Tickets are SIM-*."
-        ),
+        description="PM5 OMS/EMS simulation. Env opt-in; test/research. SIM-* only; no broker send.",
         allowed_profiles=(ProfileName.TEST, ProfileName.RESEARCH),
         safety=SafetyClassification.REQUIRES_REVIEW,
         env_key=_ALIAS_ENV["pm5_simulation"],
@@ -126,7 +112,7 @@ FEATURE_FLAG_CATALOG: tuple[FeatureFlagSpec, ...] = (
     FeatureFlagSpec(
         name="enable_pm5_execution",
         field="execution",
-        description="PM5 order send. Dangerous. Env opt-in only. Kernel still refuses orders.",
+        description="PM5 order send. Dangerous. Env opt-in. Kernel refuses orders.",
         allowed_profiles=(ProfileName.DEMO,),
         safety=SafetyClassification.DANGEROUS,
         env_key=_ALIAS_ENV["execution"],
@@ -134,7 +120,7 @@ FEATURE_FLAG_CATALOG: tuple[FeatureFlagSpec, ...] = (
     FeatureFlagSpec(
         name="enable_pm5_broker_adapter",
         field="pm5_broker_adapter",
-        description="PM5 real broker adapter. Refused in Sequence 07.",
+        description="PM5 real broker adapter. Refused in Seq07.",
         allowed_profiles=(),
         safety=SafetyClassification.DANGEROUS,
         env_key=_ALIAS_ENV["pm5_broker_adapter"],
@@ -142,7 +128,7 @@ FEATURE_FLAG_CATALOG: tuple[FeatureFlagSpec, ...] = (
     FeatureFlagSpec(
         name="enable_mt5_demo_execution",
         field="mt5_demo_execution",
-        description="MT5 demo execution. Future-controlled. Refused in Sequence 07.",
+        description="MT5 demo execution. Refused in Seq07.",
         allowed_profiles=(),
         safety=SafetyClassification.DANGEROUS,
         env_key=_ALIAS_ENV["mt5_demo_execution"],
@@ -150,7 +136,7 @@ FEATURE_FLAG_CATALOG: tuple[FeatureFlagSpec, ...] = (
     FeatureFlagSpec(
         name="enable_live_execution",
         field="live_execution",
-        description="Live execution. Always fail-closed in Sequence 07.",
+        description="Live execution. Always fail-closed.",
         allowed_profiles=(),
         safety=SafetyClassification.DANGEROUS,
         env_key=_ALIAS_ENV["live_execution"],
@@ -158,7 +144,7 @@ FEATURE_FLAG_CATALOG: tuple[FeatureFlagSpec, ...] = (
     FeatureFlagSpec(
         name="enable_telegram_control",
         field="telegram",
-        description="Real Telegram Bot API. Refused. Canonical operator plane is Sequence 13 (frozen until 09–12).",
+        description="Real Telegram Bot API. Refused. Canonical operator plane is Sequence 13.",
         allowed_profiles=(),
         safety=SafetyClassification.DANGEROUS,
         env_key=_ALIAS_ENV["telegram"],
@@ -166,7 +152,7 @@ FEATURE_FLAG_CATALOG: tuple[FeatureFlagSpec, ...] = (
     FeatureFlagSpec(
         name="enable_fine_tune_studio",
         field="fine_tune_studio",
-        description="PM9a studio. Research only. Never auto-promotes to live.",
+        description="PM9a studio. Research/test. Never auto-promotes to live.",
         allowed_profiles=(ProfileName.RESEARCH, ProfileName.TEST),
         safety=SafetyClassification.REQUIRES_REVIEW,
         env_key=_ALIAS_ENV["fine_tune_studio"],
@@ -174,7 +160,7 @@ FEATURE_FLAG_CATALOG: tuple[FeatureFlagSpec, ...] = (
     FeatureFlagSpec(
         name="enable_live_trading",
         field="live_trading",
-        description="Reserved. No override exists in this build. Always fail-closed.",
+        description="Reserved. Always fail-closed in this build.",
         allowed_profiles=(),
         safety=SafetyClassification.DANGEROUS,
         env_key=_ALIAS_ENV["live_trading"],
@@ -182,7 +168,7 @@ FEATURE_FLAG_CATALOG: tuple[FeatureFlagSpec, ...] = (
     FeatureFlagSpec(
         name="enable_pm6_post_trade",
         field="pm6_post_trade",
-        description="PM6 post-trade controls. Env opt-in; test and research only. Observes PM4/PM5. Never orders.",
+        description="PM6 post-trade controls. Env opt-in; test/research. Observes PM4/PM5. Never orders.",
         allowed_profiles=(ProfileName.TEST, ProfileName.RESEARCH),
         safety=SafetyClassification.REQUIRES_REVIEW,
         env_key=_ALIAS_ENV["pm6_post_trade"],
@@ -190,7 +176,7 @@ FEATURE_FLAG_CATALOG: tuple[FeatureFlagSpec, ...] = (
     FeatureFlagSpec(
         name="enable_pm6_surveillance",
         field="pm6_surveillance",
-        description="PM6 automated surveillance detectors. Test/research. Does not send orders.",
+        description="PM6 surveillance detectors. Test/research. No orders.",
         allowed_profiles=(ProfileName.TEST, ProfileName.RESEARCH),
         safety=SafetyClassification.REQUIRES_REVIEW,
         env_key=_ALIAS_ENV["pm6_surveillance"],
@@ -198,7 +184,7 @@ FEATURE_FLAG_CATALOG: tuple[FeatureFlagSpec, ...] = (
     FeatureFlagSpec(
         name="enable_pm6_incident_response",
         field="pm6_incident_response",
-        description="PM6 incident orchestration. Test/research. No auto-rearm, no broker commands.",
+        description="PM6 incidents. Test/research. No auto-rearm/broker cmds.",
         allowed_profiles=(ProfileName.TEST, ProfileName.RESEARCH),
         safety=SafetyClassification.REQUIRES_REVIEW,
         env_key=_ALIAS_ENV["pm6_incident_response"],
@@ -206,7 +192,7 @@ FEATURE_FLAG_CATALOG: tuple[FeatureFlagSpec, ...] = (
     FeatureFlagSpec(
         name="enable_pm6_governance_intelligence",
         field="pm6_governance",
-        description="PM6 governance/validation packets. Test/research. Headless DTOs only.",
+        description="PM6 governance packets. Test/research. Headless DTOs.",
         allowed_profiles=(ProfileName.TEST, ProfileName.RESEARCH),
         safety=SafetyClassification.REQUIRES_REVIEW,
         env_key=_ALIAS_ENV["pm6_governance"],
@@ -214,7 +200,7 @@ FEATURE_FLAG_CATALOG: tuple[FeatureFlagSpec, ...] = (
     FeatureFlagSpec(
         name="enable_pm6_withdrawal_planner",
         field="pm6_withdrawal",
-        description="PM6 orderly withdrawal planner. Test/research. Requests PM5 control; never a venue send.",
+        description="PM6 withdrawal planner. Test/research. Never a venue send.",
         allowed_profiles=(ProfileName.TEST, ProfileName.RESEARCH),
         safety=SafetyClassification.REQUIRES_REVIEW,
         env_key=_ALIAS_ENV["pm6_withdrawal"],
@@ -222,7 +208,7 @@ FEATURE_FLAG_CATALOG: tuple[FeatureFlagSpec, ...] = (
     FeatureFlagSpec(
         name="enable_pm7_persistence",
         field="pm7_persistence",
-        description="PM7 append-only journal. Env opt-in; test and research only. Never orders. Not production durability.",
+        description="PM7 append-only journal. Env opt-in; test/research. Never orders.",
         allowed_profiles=(ProfileName.TEST, ProfileName.RESEARCH),
         safety=SafetyClassification.REQUIRES_REVIEW,
         env_key=_ALIAS_ENV["pm7_persistence"],
@@ -230,7 +216,7 @@ FEATURE_FLAG_CATALOG: tuple[FeatureFlagSpec, ...] = (
     FeatureFlagSpec(
         name="enable_pm7_journal",
         field="pm7_journal",
-        description="PM7 journal writer. Test/research. Append-only. No historical mutation.",
+        description="PM7 journal writer. Test/research. Append-only.",
         allowed_profiles=(ProfileName.TEST, ProfileName.RESEARCH),
         safety=SafetyClassification.REQUIRES_REVIEW,
         env_key=_ALIAS_ENV["pm7_journal"],
@@ -238,7 +224,7 @@ FEATURE_FLAG_CATALOG: tuple[FeatureFlagSpec, ...] = (
     FeatureFlagSpec(
         name="enable_pm7_replay",
         field="pm7_replay",
-        description="PM7 deterministic replay. Test/research. Never mutates source history.",
+        description="PM7 deterministic replay. Test/research.",
         allowed_profiles=(ProfileName.TEST, ProfileName.RESEARCH),
         safety=SafetyClassification.REQUIRES_REVIEW,
         env_key=_ALIAS_ENV["pm7_replay"],
@@ -246,7 +232,7 @@ FEATURE_FLAG_CATALOG: tuple[FeatureFlagSpec, ...] = (
     FeatureFlagSpec(
         name="enable_pm7_integrity",
         field="pm7_integrity",
-        description="PM7 hash-chain verification. Test/research. Tamper detection, not tamper-proof.",
+        description="PM7 hash-chain verification. Test/research.",
         allowed_profiles=(ProfileName.TEST, ProfileName.RESEARCH),
         safety=SafetyClassification.REQUIRES_REVIEW,
         env_key=_ALIAS_ENV["pm7_integrity"],
@@ -254,7 +240,7 @@ FEATURE_FLAG_CATALOG: tuple[FeatureFlagSpec, ...] = (
     FeatureFlagSpec(
         name="enable_pm7_retention",
         field="pm7_retention",
-        description="PM7 retention/archive. Test/research. Freeze blocks purge. No silent deletion.",
+        description="PM7 retention/archive. Test/research. Freeze blocks purge.",
         allowed_profiles=(ProfileName.TEST, ProfileName.RESEARCH),
         safety=SafetyClassification.REQUIRES_REVIEW,
         env_key=_ALIAS_ENV["pm7_retention"],
@@ -262,7 +248,7 @@ FEATURE_FLAG_CATALOG: tuple[FeatureFlagSpec, ...] = (
     FeatureFlagSpec(
         name="enable_pm7_reporting",
         field="pm7_reporting",
-        description="PM7 lineage-aware reports. Test/research. insufficient_data when empty.",
+        description="PM7 lineage-aware reports. Test/research.",
         allowed_profiles=(ProfileName.TEST, ProfileName.RESEARCH),
         safety=SafetyClassification.REQUIRES_REVIEW,
         env_key=_ALIAS_ENV["pm7_reporting"],
@@ -270,7 +256,7 @@ FEATURE_FLAG_CATALOG: tuple[FeatureFlagSpec, ...] = (
     FeatureFlagSpec(
         name="enable_pm8_operator",
         field="pm8_operator",
-        description="PM8 operator control plane. FROZEN until Sequence 13. Canonical Sequence 13 preview. Commands are not orders.",
+        description="PM8 operator control plane. Seq13. Commands are not orders.",
         allowed_profiles=(ProfileName.TEST, ProfileName.RESEARCH),
         safety=SafetyClassification.REQUIRES_REVIEW,
         env_key=_ALIAS_ENV["pm8_operator"],
@@ -278,7 +264,7 @@ FEATURE_FLAG_CATALOG: tuple[FeatureFlagSpec, ...] = (
     FeatureFlagSpec(
         name="enable_pm8_hitl",
         field="pm8_hitl",
-        description="PM8 human-in-the-loop approval queue. Test/research. Approvals do not skip PM4.",
+        description="PM8 HITL approval queue. Test/research. Does not skip PM4.",
         allowed_profiles=(ProfileName.TEST, ProfileName.RESEARCH),
         safety=SafetyClassification.REQUIRES_REVIEW,
         env_key=_ALIAS_ENV["pm8_hitl"],
@@ -286,7 +272,7 @@ FEATURE_FLAG_CATALOG: tuple[FeatureFlagSpec, ...] = (
     FeatureFlagSpec(
         name="enable_pm8_command_audit",
         field="pm8_command_audit",
-        description="PM8 command audit trail. Sequence 13. Test/research. Not a durable ledger.",
+        description="PM8 command audit. Seq13. Test/research. Not durable ledger.",
         allowed_profiles=(ProfileName.TEST, ProfileName.RESEARCH),
         safety=SafetyClassification.REQUIRES_REVIEW,
         env_key=_ALIAS_ENV["pm8_command_audit"],
@@ -294,7 +280,7 @@ FEATURE_FLAG_CATALOG: tuple[FeatureFlagSpec, ...] = (
     FeatureFlagSpec(
         name="enable_pm8_persistence",
         field="pm8_persistence",
-        description="Canonical Sequence 09 PM8 persistence API. Test/research. Never orders. Not production_durable.",
+        description="Seq09 PM8 persistence API. Test/research. Never orders. Not production_durable.",
         allowed_profiles=(ProfileName.TEST, ProfileName.RESEARCH),
         safety=SafetyClassification.REQUIRES_REVIEW,
         env_key=_ALIAS_ENV["pm8_persistence"],
@@ -302,7 +288,7 @@ FEATURE_FLAG_CATALOG: tuple[FeatureFlagSpec, ...] = (
     FeatureFlagSpec(
         name="enable_pm8_outbox",
         field="pm8_outbox",
-        description="Sequence 09 outbox dispatcher. Test/research.",
+        description="Seq09 outbox dispatcher. Test/research.",
         allowed_profiles=(ProfileName.TEST, ProfileName.RESEARCH),
         safety=SafetyClassification.REQUIRES_REVIEW,
         env_key=_ALIAS_ENV["pm8_outbox"],
@@ -310,7 +296,7 @@ FEATURE_FLAG_CATALOG: tuple[FeatureFlagSpec, ...] = (
     FeatureFlagSpec(
         name="enable_pm8_projections",
         field="pm8_projections",
-        description="Sequence 09 projection rebuild. Test/research.",
+        description="Seq09 projection rebuild. Test/research.",
         allowed_profiles=(ProfileName.TEST, ProfileName.RESEARCH),
         safety=SafetyClassification.REQUIRES_REVIEW,
         env_key=_ALIAS_ENV["pm8_projections"],
@@ -318,7 +304,7 @@ FEATURE_FLAG_CATALOG: tuple[FeatureFlagSpec, ...] = (
     FeatureFlagSpec(
         name="enable_mt5_demo_adapter",
         field="mt5_demo_adapter",
-        description="Sequence 11 Demo-only MT5 adapter (`mt5_execution_engine`, not pm6). Test/research. Live account refused. No silent recon.",
+        description="Seq11 Demo-only MT5 adapter (mt5_execution_engine). Test/research. Live refused.",
         allowed_profiles=(ProfileName.TEST, ProfileName.RESEARCH),
         safety=SafetyClassification.REQUIRES_REVIEW,
         env_key=_ALIAS_ENV["mt5_demo_adapter"],
@@ -326,7 +312,7 @@ FEATURE_FLAG_CATALOG: tuple[FeatureFlagSpec, ...] = (
     FeatureFlagSpec(
         name="enable_exit_engine",
         field="exit_engine",
-        description="Sequence 11 structural SL/TP, breakeven, time stops in `mt5_execution_engine`. Test/research. Never bypasses PM4.",
+        description="Seq11 exit engine SL/TP/breakeven/time stops. Test/research. Never bypasses PM4.",
         allowed_profiles=(ProfileName.TEST, ProfileName.RESEARCH),
         safety=SafetyClassification.REQUIRES_REVIEW,
         env_key=_ALIAS_ENV["exit_engine"],
@@ -334,15 +320,22 @@ FEATURE_FLAG_CATALOG: tuple[FeatureFlagSpec, ...] = (
     FeatureFlagSpec(
         name="enable_unified_runtime",
         field="unified_runtime",
-        description="Sequence 12 unified orchestrator. Test/research. Recovery-before-trading. No live path.",
+        description="Seq12 unified orchestrator. Test/research. No live path.",
         allowed_profiles=(ProfileName.TEST, ProfileName.RESEARCH),
         safety=SafetyClassification.REQUIRES_REVIEW,
         env_key=_ALIAS_ENV["unified_runtime"],
     ),
+    FeatureFlagSpec(
+        name="enable_demo_trading_readiness",
+        field="demo_trading_readiness",
+        description="Seq15 DEMO readiness allowlist. Env opt-in; demo only. Not live/MT5. PM4 exclusive.",
+        allowed_profiles=(ProfileName.DEMO,),
+        safety=SafetyClassification.DANGEROUS,
+        env_key=_ALIAS_ENV["demo_trading_readiness"],
+    ),
 )
 
 CATALOG_BY_FIELD = {spec.field: spec for spec in FEATURE_FLAG_CATALOG}
-
 
 class FeatureFlag(BaseModel):
     model_config = ConfigDict(frozen=True)
@@ -354,7 +347,6 @@ class FeatureFlag(BaseModel):
     safety: SafetyClassification
     enabled: bool
     source: str = "default"
-
 
 class FeatureFlags(BaseModel):
     model_config = ConfigDict(extra="ignore")
@@ -391,6 +383,7 @@ class FeatureFlags(BaseModel):
     mt5_demo_adapter: bool = False
     exit_engine: bool = False
     unified_runtime: bool = False
+    demo_trading_readiness: bool = False
     env_opt_in: tuple[str, ...] = Field(default=())
 
     def enabled_map(self) -> dict[str, bool]:
@@ -421,10 +414,8 @@ class FeatureFlags(BaseModel):
             )
         return tuple(flags)
 
-
 def _parse_bool(raw: str) -> bool:
     return raw.strip().lower() in {"1", "true", "yes", "on"}
-
 
 def env_opt_in_fields(environ: Mapping[str, str]) -> dict[str, bool]:
     """Fields explicitly set via allowlisted feature-flag env keys."""
@@ -439,7 +430,6 @@ def env_opt_in_fields(environ: Mapping[str, str]) -> dict[str, bool]:
                 break
     return found
 
-
 def feature_flags_from_environ(environ: Mapping[str, str]) -> dict[str, Any]:
     opted = env_opt_in_fields(environ)
     if not opted:
@@ -447,7 +437,6 @@ def feature_flags_from_environ(environ: Mapping[str, str]) -> dict[str, Any]:
     payload: dict[str, Any] = dict(opted)
     payload["env_opt_in"] = tuple(opted.keys())
     return {"feature_flags": payload}
-
 
 def validate_feature_flags(flags: FeatureFlags, profile: ProfileName) -> None:
     opted = set(flags.env_opt_in)
