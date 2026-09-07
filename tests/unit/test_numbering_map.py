@@ -20,10 +20,11 @@ def test_numbering_map_file_exists_and_states_rules():
 
 
 def test_numbering_map_covers_seq_00_to_14():
-    for n in range(15):
+    for n in range(16):
         needle = f"| {n:02d} |"
         assert needle in MAP, f"MODULE_NUMBERING_MAP.md missing row for Sequence {n:02d}"
     assert CANONICAL_SEQUENCES[14] == "observability_operations_documentation"
+    assert CANONICAL_SEQUENCES[15] == "demo_only_trading_readiness_allowlist"
 
 
 def test_canonical_sequence_11_is_not_pm6():
