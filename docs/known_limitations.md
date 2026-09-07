@@ -1,6 +1,6 @@
 # Known limitations
 
-- Not ready for demo trading, live trading, paper trading, or production.
+- Not ready for live trading, paper trading, or production. Demo trading readiness is fail-closed unless Seq 15 DEMO allowlist (env opt-in) is explicit.
 - Fitted QRF is not implemented (**NOT-IN-SCOPE** / blocked).
 - No real MT5 terminal on this host. Venue absence is UNAVAILABLE, not pass.
 - Telegram Bot API unbound.
@@ -12,7 +12,7 @@
 - PM8 named projections exist as rebuildable read models (not canonical truth). Isolated SQLite restore-apply exists; applying to the live store is refused. Isolated PostgreSQL restore-apply exists; live DSN is refused.
 - Money keys on persist_* are Decimal/canonical strings. PostgreSQL stores `NUMERIC(28,8)`. Residual non-money JSON fields may still be untyped.
 - SQLite outbox relay is local/test-only. PostgreSQL outbox uses `FOR UPDATE SKIP LOCKED`. `production_durable` remains refused — a running Postgres is not a production claim.
-- Sequence 15+ is **BLOCKED**. Sequence 11+ trading enablement remains blocked.
+- Sequence 15 Phase 1 unlocks **demo-only readiness architecture** (allowlist FSM). Still blocked: real MT5 venue wiring, Seq 11 container wiring on this host, mobile BFF, live/production flags on by default, Telegram Bot API, fitted QRF.
 - PM4 capital pipeline is exclusive to `pm4_risk_gate`. Historical “Seq 07 / PM5 risk gate” is not a second package. Approved executable intents still have `execution_allowed=false`. Drawdown restart-safety requires injected PM8 persistence.
 
 Canonical copy of the Seq 14 limitations list: `docs/guides/known_limitations.md`.
