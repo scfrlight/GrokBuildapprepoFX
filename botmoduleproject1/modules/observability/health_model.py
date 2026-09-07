@@ -100,8 +100,8 @@ def evaluate(
         stale_data=stale_data,
         integrity_ok=integrity_ok,
     )
-    # Avoid literal "trading_readiness=True" / "accept_trade=True" in this file;
-    # Sequence 14 regression tests scan the source for those strings.
+    # Avoid literal True assignment forms for trading_readiness / accept_trade;
+    # Sequence 14 regression tests scan the source for those exact substrings.
     trade_ready = bool(decision.allowed)
     trading_state = ProbeState.PASS if trade_ready else ProbeState.FAIL
     trading_reasons = list(decision.reasons)
