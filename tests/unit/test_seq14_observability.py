@@ -1,1 +1,1 @@
-PLACEHOLDER
+@file:///tmp/obs_compact.py
