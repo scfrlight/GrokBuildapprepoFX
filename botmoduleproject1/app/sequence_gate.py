@@ -26,6 +26,7 @@ CANONICAL_SEQUENCES: dict[int, str] = {
     12: "unified_runtime_orchestrator",
     13: "pm9_operator_ux_telegram_control",
     14: "observability_operations_documentation",
+    15: "demo_only_trading_readiness_allowlist",
 }
 
 MISLABELED_OPERATOR_SEQUENCE = 10

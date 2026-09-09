@@ -59,7 +59,7 @@ def _imports(path: Path) -> set[str]:
 
 def test_numbering_map_consistency_00_to_14():
     text = (ROOT / "docs" / "MODULE_NUMBERING_MAP.md").read_text(encoding="utf-8")
-    for n in range(15):
+    for n in range(16):
         assert f"| {n:02d} |" in text
     assert "pm6_post_trade" in text
     assert "mt5_execution_engine" in text
@@ -70,7 +70,7 @@ def test_numbering_map_consistency_00_to_14():
     assert CANONICAL_SEQUENCES[11] == "mt5_execution_engine"
     assert not CANONICAL_SEQUENCES[11].startswith("pm6")
     assert CANONICAL_SEQUENCES[14] == "observability_operations_documentation"
-    assert 15 not in CANONICAL_SEQUENCES
+    assert CANONICAL_SEQUENCES[15] == "demo_only_trading_readiness_allowlist"
 
 
 def test_observability_is_not_pm6():
@@ -353,12 +353,19 @@ def test_recon_no_silent_pass(tmp_path: Path):
     assert rejected.disposition.value == "rejected"
 
 
-def test_no_sequence_15_artifacts():
+def test_no_full_sequence_15_trading_enablement_artifacts():
+    """Full Seq15 trading enablement stays blocked; Phase 1 allowlist is separate."""
     assert not (ROOT / "docs" / "architecture" / "sequence_15_report.md").exists()
     assert not (ROOT / "docs" / "sequence_15_report.md").exists()
     flags = (PKG / "app" / "feature_flags.py").read_text(encoding="utf-8")
     assert "enable_sequence_15" not in flags
     assert "enable_seq15" not in flags
+    assert "enable_demo_trading_readiness" in flags
+    assert (ROOT / "docs" / "architecture" / "sequence_15_demo_readiness_report.md").is_file()
+
+
+def test_no_sequence_15_artifacts():
+    test_no_full_sequence_15_trading_enablement_artifacts()
 
 
 def test_traceability_and_inventory_exist():

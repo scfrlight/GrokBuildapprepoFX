@@ -1,6 +1,6 @@
 # Known limitations
 
-- Not ready for demo trading, live trading, paper trading, or production.
+- Not ready for live trading, paper trading, or production. Demo trading readiness defaults closed (Seq 15 DEMO allowlist is env opt-in).
 - Fitted QRF is not implemented.
 - No real MT5 terminal on this host.
 - Telegram Bot API unbound.
@@ -11,7 +11,7 @@
 - PM7 sqlite/file journals reload after restart but are not a production warehouse.
 - PM8 named projections exist as read models; restore-apply is isolated SQLite or isolated PostgreSQL DSN (live target refused).
 - PostgreSQL is implemented as a fail-closed PM8 backend. `production_durable` remains refused. Not a hosted production cluster claim.
-- Sequence 15+ is blocked.
+- Sequence 15 Phase 1 = demo-only readiness allowlist. Still blocked: real MT5, Seq 11 container wiring, mobile BFF, live defaults.
 - Historical “Sequence 07 / PM5 Risk Gate” is implemented as PM4 capital hardening (`pm4_risk_gate/capital`). Canonical Sequence 07 remains `pm5_execution`. Approved intents are not orders.
 
 See also `docs/known_limitations.md` and `docs/ARCHITECTURE_INVENTORY.md`.

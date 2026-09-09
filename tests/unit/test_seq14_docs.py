@@ -35,7 +35,7 @@ REQUIRED_DOCS = (
 
 
 def test_numbering_map_covers_seq_00_to_14():
-    for n in range(15):
+    for n in range(16):
         assert f"| {n:02d} |" in MAP, f"missing Sequence {n:02d}"
     assert "observability" in MAP.lower()
     assert "pm6_post_trade" in MAP

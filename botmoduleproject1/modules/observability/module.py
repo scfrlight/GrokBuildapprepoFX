@@ -65,7 +65,7 @@ class ObservabilityModule:
                     kind=kind,
                     passed=True,
                     critical=True,
-                    message="trading_readiness remains false",
+                    message="trading_readiness fail-closed unless demo allowlist",
                 )
             ]
         return [
@@ -151,6 +151,12 @@ class ObservabilityModule:
             integrity_ok=integrity_ok,
         )
         self.metrics.set("botmodule.health.transitions", 1.0, module="observability", dimension="liveness", outcome="pass")
+        note = "NOT TRADE READY. Sequence 14 is observe-only."
+        if readiness.accept_trade:
+            note = (
+                "DEMO readiness allowlist open (Seq 15 Phase 1). "
+                "Not live/paper/production. Real MT5 not wired. PM4 exclusive."
+            )
         return ObservabilitySnapshot(
             health=health,
             readiness=readiness,
@@ -162,4 +168,5 @@ class ObservabilityModule:
             live_trading_enabled=bool(cfg.safety.live_trading_enabled),
             telegram_bound=telegram_bound,
             python="{}.{}.{}".format(*sys.version_info[:3]),
+            kernel_note=note,
         )

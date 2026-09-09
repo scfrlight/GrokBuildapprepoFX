@@ -26,9 +26,10 @@ Bare **`pm6` is reserved for post-trade**. Sequence 11 is **`mt5_execution_engin
 | 11 | MT5 Execution & Exit Engine (Demo-only). *Master Orchestration title:* “PM6 MT5 Execution & Exit Engine” | original spec missing | **`modules/mt5_execution_engine`** + adapter `adapters/mt5` | Done (sim/test-safe; real terminal BLOCKED) |
 | 12 | Unified Runtime Orchestrator | correction prompt | `botmoduleproject1/runtime` | Done |
 | 13 | PM9 Operator UX & Telegram Control | `PM8_Operator_Sequence10_Prompt.md` (historical filename) | `modules/pm8_operator` (re-export `pm9_operator_ux`) | Done (Telegram API BLOCKED) |
-| 14 | **Observability, Operations & Documentation** | architect Sequence 14 authorization 2026-08-30 | **`modules/observability`** (not PM6) | Done observe-only; `trading_readiness` false |
+| 14 | **Observability, Operations & Documentation** | architect Sequence 14 authorization 2026-08-30 | **`modules/observability`** (not PM6) | Done observe-only; `trading_readiness` false by default |
+| 15 | **Demo-only trading readiness allowlist** | Phase 1 readiness FSM / allowlist | `modules/observability/demo_readiness.py` + `health_model.py` | Done Phase 1; LIVE/paper/production refused; real MT5 not wired |
 
-No row uses a second package whose last path segment is bare `pm6`. There is no `modules/pm6_execution`. Sequence 15+ is not in this map.
+No row uses a second package whose last path segment is bare `pm6`. There is no `modules/pm6_execution`. Sequence 16+ (live enablement, mobile BFF, real MT5 host wiring) is not in this map.
 
 **Numbering footnote (2026-08-30).** A later architect prompt titled “SEQUENCE 07 — PM5 Risk & Capital Management Gate” is **historical Master Orchestration numbering**. Canonical Sequence 07 is already `pm5_execution` (OMS/EMS, `SIM-*`). That capital work was implemented as hardening of **Sequence 06 / `pm4_risk_gate/capital/`**. There is no `pm5_risk_capital_gate` package. Report: `docs/architecture/pm4_capital_gate_report.md`.
 
